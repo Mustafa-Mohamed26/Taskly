@@ -32,10 +32,30 @@ class AppStrings {
   static const String todaysTasks = 'Today\'s Tasks';
   static const String viewAll = 'View All';
 
+  // Calendar
+  static const String day = 'Day';
+  static const String week = 'Week';
+  static const String month = 'Month';
+
   // Weekly View
   static const String monthlyYear = 'October 2023';
   static const String tasksLeft = '3 tasks left';
   static const String todaysSchedule = 'Today\'s Schedule';
+
+  // Focus
+  static const String focusMode = 'Focus Mode';
+  static const String pomodoro = 'POMODORO';
+  static const String currentTask = 'CURRENT TASK';
+  static const String priorityHighPro = 'Priority: High • Taskly Pro';
+  static const String stepInfo = 'Step 2 of 3';
+  static const String complete = 'Complete';
+  static const String ambientSounds = 'AMBIENT SOUNDS';
+  static const String rain = 'Rain';
+  static const String forest = 'Forest';
+  static const String waves = 'Waves';
+  static const String white = 'White';
+  static const String pauseSession = 'Pause Session';
+  static const String endSession = 'End Session';
 
   // Add Task
   static const String newTask = 'New Task';

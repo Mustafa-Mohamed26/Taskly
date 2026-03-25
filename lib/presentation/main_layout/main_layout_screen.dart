@@ -3,6 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../core/constants/app_strings.dart';
 import '../../core/routes/app_routes.dart';
 import '../../core/theme/app_colors.dart';
+import '../calendar/calendar_screen.dart';
+import '../focus/focus_screen.dart';
 import '../home/home_screen.dart';
 
 class MainLayoutScreen extends StatefulWidget {
@@ -17,21 +19,26 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
 
   final List<Widget> _screens = [
     const HomeScreen(),
-    const Center(child: Text(AppStrings.calendar)),
-    const Center(child: Text(AppStrings.focus)),
+    const CalendarScreen(),
+    const FocusScreen(),
     const Center(child: Text(AppStrings.profile)),
   ];
 
   @override
   Widget build(BuildContext context) {
+    // Hide FAB in Focus Mode
+    final bool showFAB = _currentIndex != 2;
+
     return Scaffold(
       body: _screens[_currentIndex],
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.pushNamed(context, AppRoutes.addTask),
-        backgroundColor: AppColors.primary,
-        shape: const CircleBorder(),
-        child: const Icon(Icons.add, color: AppColors.white),
-      ),
+      floatingActionButton: showFAB
+          ? FloatingActionButton(
+              onPressed: () => Navigator.pushNamed(context, AppRoutes.addTask),
+              backgroundColor: AppColors.primary,
+              shape: const CircleBorder(),
+              child: const Icon(Icons.add, color: AppColors.white),
+            )
+          : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
