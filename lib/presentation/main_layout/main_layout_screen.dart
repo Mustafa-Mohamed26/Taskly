@@ -6,6 +6,7 @@ import '../../core/theme/app_colors.dart';
 import '../calendar/calendar_screen.dart';
 import '../focus/focus_screen.dart';
 import '../home/home_screen.dart';
+import '../profile/profile_screen.dart';
 
 class MainLayoutScreen extends StatefulWidget {
   const MainLayoutScreen({super.key});
@@ -21,13 +22,13 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
     const HomeScreen(),
     const CalendarScreen(),
     const FocusScreen(),
-    const Center(child: Text(AppStrings.profile)),
+    const ProfileScreen(),
   ];
 
   @override
   Widget build(BuildContext context) {
-    // Hide FAB in Focus Mode
-    final bool showFAB = _currentIndex != 2;
+    // Hide FAB in Focus and Profile Modes
+    final bool showFAB = _currentIndex == 0 || _currentIndex == 1;
 
     return Scaffold(
       body: _screens[_currentIndex],

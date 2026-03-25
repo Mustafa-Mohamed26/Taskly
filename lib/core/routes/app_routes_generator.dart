@@ -9,6 +9,10 @@ import '../../presentation/splash/splash_screen.dart';
 import '../../presentation/main_layout/main_layout_screen.dart';
 import '../../presentation/tasks/add_task_screen.dart';
 import '../../presentation/tasks/all_tasks_screen.dart';
+import '../../presentation/profile/personal_info_screen.dart';
+import '../../presentation/profile/notification_settings_screen.dart';
+import '../../presentation/profile/theme_preference_screen.dart';
+import '../../presentation/profile/security_privacy_screen.dart';
 import 'app_routes.dart';
 
 class AppRoutesGenerator {
@@ -34,6 +38,14 @@ class AppRoutesGenerator {
         return MaterialPageRoute(builder: (_) => const AddTaskScreen());
       case AppRoutes.allTasks:
         return MaterialPageRoute(builder: (_) => const AllTasksScreen());
+      case AppRoutes.personalInfo:
+        return MaterialPageRoute(builder: (_) => const PersonalInfoScreen());
+      case AppRoutes.notifications:
+        return MaterialPageRoute(builder: (_) => const NotificationSettingsScreen());
+      case AppRoutes.themePreference:
+        return MaterialPageRoute(builder: (_) => const ThemePreferenceScreen());
+      case AppRoutes.securityPrivacy:
+        return MaterialPageRoute(builder: (_) => const SecurityPrivacyScreen());
       default:
         return _errorRoute();
     }

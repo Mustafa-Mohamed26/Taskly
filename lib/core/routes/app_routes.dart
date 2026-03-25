@@ -8,5 +8,9 @@ class AppRoutes {
   static const String mainLayout = '/main-layout';
   static const String addTask = '/add-task';
   static const String allTasks = '/all-tasks';
+  static const String personalInfo = '/personal-info';
+  static const String notifications = '/notifications';
+  static const String themePreference = '/theme-preference';
+  static const String securityPrivacy = '/security-privacy';
   static const String splash = '/';
 }

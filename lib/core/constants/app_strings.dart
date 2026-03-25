@@ -57,6 +57,21 @@ class AppStrings {
   static const String pauseSession = 'Pause Session';
   static const String endSession = 'End Session';
 
+  // Profile
+  static const String completed = 'Completed';
+  static const String ongoing = 'Ongoing';
+  static const String success = 'Success';
+  static const String accountSettings = 'ACCOUNT SETTINGS';
+  static const String personalInfo = 'Personal Information';
+  static const String personalInfoSub = 'Name, email, and phone number';
+  static const String notificationSettings = 'Notification Settings';
+  static const String notificationSettingsSub = 'Alerts, reminders, and updates';
+  static const String themePreference = 'Theme Preference';
+  static const String themePreferenceSub = 'Dark mode, colors, and layout';
+  static const String securityPrivacy = 'Security & Privacy';
+  static const String securityPrivacySub = 'Password and data management';
+  static const String logout = 'Logout';
+
   // Add Task
   static const String newTask = 'New Task';
   static const String taskTitle = 'TASK TITLE';
