@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../core/routes/app_routes.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_styles.dart';
-import '../../core/routes/app_routes.dart';
-import 'widgets/auth_text_field.dart';
 import 'widgets/auth_button.dart';
+import 'widgets/auth_text_field.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -26,7 +26,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: AppColors.textPrimary, size: 24.sp),
@@ -34,7 +34,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         ),
         title: Text(
           'Forgot Password',
-          style: AppStyles.label.copyWith(fontSize: 18.sp),
+          style: AppStyles.titleSmall().copyWith(fontSize: 18.sp),
         ),
         centerTitle: true,
       ),
@@ -44,11 +44,16 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _buildIconHeader(),
-              SizedBox(height: 32.h),
-              _buildContent(),
-              SizedBox(height: 32.h),
+              _buildHeader(),
+              SizedBox(height: 48.h),
               _buildForm(),
+              SizedBox(height: 40.h),
+              AuthButton(
+                text: 'Send Instructions',
+                onPressed: () {
+                  Navigator.pushReplacementNamed(context, AppRoutes.changePassword);
+                },
+              ),
               SizedBox(height: 40.h),
               _buildFooter(),
             ],
@@ -58,78 +63,58 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     );
   }
 
-  Widget _buildIconHeader() {
-    return Center(
-      child: Container(
-        width: 80.w,
-        height: 80.w,
-        decoration: BoxDecoration(
-          color: AppColors.primary.withOpacity(0.1),
-          shape: BoxShape.circle,
-        ),
-        child: Icon(
-          Icons.refresh_rounded,
-          color: AppColors.primary,
-          size: 40.sp,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildContent() {
+  Widget _buildHeader() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Container(
+          padding: EdgeInsets.all(16.w),
+          decoration: BoxDecoration(
+            color: AppColors.primary.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(16.r),
+          ),
+          child: Icon(
+            Icons.lock_open_outlined,
+            color: AppColors.primary,
+            size: 32.sp,
+          ),
+        ),
+        SizedBox(height: 32.h),
         Text(
-          'Reset Password',
-          style: AppStyles.heading1,
-          textAlign: TextAlign.center,
+          'Reset Your Password',
+          style: AppStyles.displayLarge(),
         ),
         SizedBox(height: 12.h),
         Text(
-          'Enter the email address associated with your account and we\'ll send you a secure link to reset your password.',
-          style: AppStyles.subtitle,
-          textAlign: TextAlign.center,
+          'Enter the email associated with your account and we\'ll send you instructions to reset your password.',
+          style: AppStyles.bodyLarge(),
         ),
       ],
     );
   }
 
   Widget _buildForm() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        AuthTextField(
-          label: 'Email Address',
-          hint: 'name@company.com',
-          controller: _emailController,
-          prefixIcon: Icons.email_outlined,
-        ),
-        SizedBox(height: 32.h),
-        AuthButton(
-          text: 'Send Reset Link',
-          onPressed: () {
-            Navigator.pushNamed(context, AppRoutes.changePassword);
-          },
-        ),
-      ],
+    return AuthTextField(
+      label: 'Email Address',
+      hint: 'name@company.com',
+      controller: _emailController,
+      prefixIcon: Icons.email_outlined,
     );
   }
 
   Widget _buildFooter() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return Column(
       children: [
         Text(
-          'Suddenly remembered? ',
-          style: AppStyles.bodyNormal,
+          "Suddenly remember your password?",
+          style: AppStyles.bodyMedium(),
         ),
+        SizedBox(height: 8.h),
         GestureDetector(
-          onTap: () {
-            Navigator.pushNamedAndRemoveUntil(context, AppRoutes.login, (route) => false);
-          },
+          onTap: () => Navigator.pop(context),
           child: Text(
-            'Back to Login',
-            style: AppStyles.link,
+            'Back to login',
+            style: AppStyles.labelMedium(),
           ),
         ),
       ],

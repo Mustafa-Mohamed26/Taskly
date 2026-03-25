@@ -30,7 +30,7 @@ class AuthTextField extends StatelessWidget {
       children: [
         Text(
           label,
-          style: AppStyles.label,
+          style: AppStyles.titleSmall(),
         ),
         SizedBox(height: 8.h),
         TextFormField(
@@ -43,7 +43,7 @@ class AuthTextField extends StatelessWidget {
             prefixIcon: prefixIcon != null
                 ? Icon(
                     prefixIcon,
-                    color: AppColors.textSecondary.withOpacity(0.5),
+                    color: AppColors.textSecondary.withValues(alpha: 0.5),
                     size: 20.sp,
                   )
                 : null,

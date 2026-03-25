@@ -4,51 +4,104 @@ import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
 class AppStyles {
-  static TextStyle get heading1 => GoogleFonts.inter(
+  // Display
+  static TextStyle displayLarge([Color? color]) => GoogleFonts.inter(
         fontSize: 32.sp,
         fontWeight: FontWeight.w700,
-        color: AppColors.textPrimary,
+        color: color ?? AppColors.textPrimary,
       );
 
-  static TextStyle get heading2 => GoogleFonts.inter(
+  static TextStyle displayMedium([Color? color]) => GoogleFonts.inter(
         fontSize: 24.sp,
         fontWeight: FontWeight.w700,
-        color: AppColors.textPrimary,
+        color: color ?? AppColors.textPrimary,
       );
 
-  static TextStyle get subtitle => GoogleFonts.inter(
+  // Headline
+  static TextStyle headlineLarge([Color? color]) => GoogleFonts.inter(
+        fontSize: 20.sp,
+        fontWeight: FontWeight.w600,
+        color: color ?? AppColors.textPrimary,
+      );
+
+  static TextStyle headlineMedium([Color? color]) => GoogleFonts.inter(
+        fontSize: 22.sp,
+        fontWeight: FontWeight.w600,
+        color: color ?? AppColors.textPrimary,
+      );
+
+  // Title
+  static TextStyle titleLarge([Color? color]) => GoogleFonts.inter(
+        fontSize: 18.sp,
+        fontWeight: FontWeight.w600,
+        color: color ?? AppColors.textPrimary,
+      );
+
+  static TextStyle titleMedium([Color? color]) => GoogleFonts.inter(
         fontSize: 16.sp,
-        fontWeight: FontWeight.w400,
-        color: AppColors.textSecondary,
+        fontWeight: FontWeight.w600,
+        color: color ?? AppColors.textPrimary,
       );
 
-  static TextStyle get label => GoogleFonts.inter(
+  static TextStyle titleSmall([Color? color]) => GoogleFonts.inter(
         fontSize: 14.sp,
         fontWeight: FontWeight.w600,
-        color: AppColors.textPrimary,
+        color: color ?? AppColors.textPrimary,
       );
 
-  static TextStyle get hint => GoogleFonts.inter(
+  // Body
+  static TextStyle bodyLarge([Color? color]) => GoogleFonts.inter(
+        fontSize: 16.sp,
+        fontWeight: FontWeight.w400,
+        color: color ?? AppColors.textSecondary,
+      );
+
+  static TextStyle bodyLargeMedium([Color? color]) => GoogleFonts.inter(
+        fontSize: 16.sp,
+        fontWeight: FontWeight.w500,
+        color: color ?? AppColors.textPrimary,
+      );
+
+  static TextStyle bodyMedium([Color? color]) => GoogleFonts.inter(
         fontSize: 14.sp,
         fontWeight: FontWeight.w400,
-        color: AppColors.fieldHint,
+        color: color ?? AppColors.textSecondary,
       );
 
-  static TextStyle get buttonText => GoogleFonts.inter(
+  static TextStyle bodyMediumMedium([Color? color]) => GoogleFonts.inter(
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w500,
+        color: color ?? AppColors.textSecondary,
+      );
+
+  static TextStyle bodySmall([Color? color]) => GoogleFonts.inter(
+        fontSize: 12.sp,
+        fontWeight: FontWeight.w400,
+        color: color ?? AppColors.textSecondary,
+      );
+
+  static TextStyle bodySmallMedium([Color? color]) => GoogleFonts.inter(
+        fontSize: 12.sp,
+        fontWeight: FontWeight.w500,
+        color: color ?? AppColors.textSecondary,
+      );
+
+  // Label
+  static TextStyle labelLarge([Color? color]) => GoogleFonts.inter(
         fontSize: 16.sp,
         fontWeight: FontWeight.w600,
-        color: Colors.white,
+        color: color ?? AppColors.white,
       );
 
-  static TextStyle get link => GoogleFonts.inter(
+  static TextStyle labelMedium([Color? color]) => GoogleFonts.inter(
         fontSize: 14.sp,
         fontWeight: FontWeight.w700,
-        color: AppColors.textLink,
+        color: color ?? AppColors.textLink,
       );
 
-  static TextStyle get bodyNormal => GoogleFonts.inter(
-        fontSize: 14.sp,
-        fontWeight: FontWeight.w400,
-        color: AppColors.textSecondary,
+  static TextStyle labelSmall([Color? color]) => GoogleFonts.inter(
+        fontSize: 12.sp,
+        fontWeight: FontWeight.w600,
+        color: color ?? AppColors.textSecondary,
       );
 }

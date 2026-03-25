@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:todo_list_app/core/routes/app_routes.dart';
+import 'package:taskly/core/routes/app_routes.dart';
+import '../../core/constants/app_strings.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_styles.dart';
 import 'widgets/auth_logo.dart';
@@ -58,14 +59,14 @@ class _LoginScreenState extends State<LoginScreen> {
         const AuthLogo(),
         SizedBox(height: 40.h),
         Text(
-          'Welcome Back',
-          style: AppStyles.heading1,
+          AppStrings.welcomeBack,
+          style: AppStyles.displayLarge(),
           textAlign: TextAlign.center,
         ),
         SizedBox(height: 8.h),
         Text(
-          "Let's get back to crushing those goals.",
-          style: AppStyles.subtitle,
+          AppStrings.welcomeBackSubtitle,
+          style: AppStyles.bodyLarge(),
           textAlign: TextAlign.center,
         ),
       ],
@@ -77,13 +78,13 @@ class _LoginScreenState extends State<LoginScreen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         AuthTextField(
-          label: 'Email',
+          label: AppStrings.email,
           hint: 'Enter your email',
           controller: _emailController,
         ),
         SizedBox(height: 24.h),
         AuthTextField(
-          label: 'Password',
+          label: AppStrings.password,
           hint: 'Enter your password',
           controller: _passwordController,
           obscureText: _obscurePassword,
@@ -108,16 +109,16 @@ class _LoginScreenState extends State<LoginScreen> {
               Navigator.pushNamed(context, AppRoutes.forgotPassword);
             },
             child: Text(
-              'Forgot Password?',
-              style: AppStyles.link,
+              AppStrings.forgotPassword,
+              style: AppStyles.labelMedium(),
             ),
           ),
         ),
         SizedBox(height: 24.h),
         AuthButton(
-          text: 'Sign In',
+          text: AppStrings.signIn,
           onPressed: () {
-            // Handle sign in
+            Navigator.pushReplacementNamed(context, AppRoutes.mainLayout);
           },
         ),
       ],
@@ -133,8 +134,8 @@ class _LoginScreenState extends State<LoginScreen> {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.w),
               child: Text(
-                'Or continue with',
-                style: AppStyles.bodyNormal.copyWith(fontSize: 12.sp),
+                AppStrings.orContinueWith,
+                style: AppStyles.bodySmall(),
               ),
             ),
             const Expanded(child: Divider()),
@@ -147,14 +148,14 @@ class _LoginScreenState extends State<LoginScreen> {
               label: 'Google',
               onPressed: () {},
               isIconWidget: true,
-              iconWidget: Icon(Icons.g_mobiledata, color: Colors.red, size: 28.sp),
+              iconWidget: Icon(Icons.g_mobiledata, color: AppColors.priorityHigh, size: 28.sp),
             ),
             SizedBox(width: 16.w),
             SocialButton(
               label: 'Apple',
               onPressed: () {},
               isIconWidget: true,
-              iconWidget: Icon(Icons.apple, color: Colors.black, size: 24.sp),
+              iconWidget: Icon(Icons.apple, color: AppColors.textPrimary, size: 24.sp),
             ),
           ],
         ),
@@ -167,16 +168,16 @@ class _LoginScreenState extends State<LoginScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          "Don't have an account? ",
-          style: AppStyles.bodyNormal,
+          AppStrings.dontHaveAccount,
+          style: AppStyles.bodyMedium(),
         ),
         GestureDetector(
           onTap: () {
-            Navigator.pushNamed(context, '/register');
+            Navigator.pushNamed(context, AppRoutes.register);
           },
           child: Text(
-            'Create Account',
-            style: AppStyles.link,
+            AppStrings.createAccount,
+            style: AppStyles.labelMedium(),
           ),
         ),
       ],

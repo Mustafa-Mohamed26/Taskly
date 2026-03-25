@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_styles.dart';
 
@@ -19,10 +20,14 @@ class AuthButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: isLoading ? null : onPressed,
       child: isLoading
-          ? const CircularProgressIndicator(color: Colors.white)
+          ? SizedBox(
+              height: 20.h,
+              width: 20.h,
+              child: const CircularProgressIndicator(color: AppColors.white),
+            )
           : Text(
               text,
-              style: AppStyles.buttonText,
+              style: AppStyles.labelLarge(),
             ),
     );
   }

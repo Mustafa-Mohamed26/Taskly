@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../core/constants/app_strings.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_styles.dart';
 import 'widgets/auth_logo.dart';
@@ -56,14 +57,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
         const AuthLogo(),
         SizedBox(height: 40.h),
         Text(
-          'Join Taskly',
-          style: AppStyles.heading1,
+          AppStrings.joinTaskly,
+          style: AppStyles.displayLarge(),
           textAlign: TextAlign.center,
         ),
         SizedBox(height: 8.h),
         Text(
-          "Start managing your tasks efficiently today.",
-          style: AppStyles.subtitle,
+          AppStrings.joinTasklySubtitle,
+          style: AppStyles.bodyLarge(),
           textAlign: TextAlign.center,
         ),
       ],
@@ -75,21 +76,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         AuthTextField(
-          label: 'Full Name',
+          label: AppStrings.fullName,
           hint: 'John Doe',
           controller: _nameController,
           prefixIcon: Icons.person_outline,
         ),
         SizedBox(height: 24.h),
         AuthTextField(
-          label: 'Email Address',
+          label: AppStrings.email,
           hint: 'name@company.com',
           controller: _emailController,
           prefixIcon: Icons.email_outlined,
         ),
         SizedBox(height: 24.h),
         AuthTextField(
-          label: 'Password',
+          label: AppStrings.password,
           hint: '••••••••',
           controller: _passwordController,
           obscureText: _obscurePassword,
@@ -109,7 +110,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
         SizedBox(height: 24.h),
         AuthTextField(
-          label: 'Confirm Password',
+          label: AppStrings.confirmPassword,
           hint: '••••••••',
           controller: _confirmPasswordController,
           obscureText: _obscurePassword,
@@ -117,7 +118,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
         SizedBox(height: 32.h),
         AuthButton(
-          text: 'Create Account',
+          text: AppStrings.createAccount,
           onPressed: () {
             // Handle registration
           },
@@ -131,16 +132,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          "Already have an account? ",
-          style: AppStyles.bodyNormal,
+          AppStrings.alreadyHaveAccount,
+          style: AppStyles.bodyMedium(),
         ),
         GestureDetector(
           onTap: () {
             Navigator.pop(context);
           },
           child: Text(
-            'Sign in',
-            style: AppStyles.link,
+            AppStrings.signIn,
+            style: AppStyles.labelMedium(),
           ),
         ),
       ],

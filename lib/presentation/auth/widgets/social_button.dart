@@ -4,8 +4,8 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_styles.dart';
 
 class SocialButton extends StatelessWidget {
-  final String iconPath;
   final String label;
+  final String? iconPath;
   final VoidCallback onPressed;
   final bool isIconWidget;
   final Widget? iconWidget;
@@ -13,8 +13,8 @@ class SocialButton extends StatelessWidget {
   const SocialButton({
     super.key,
     required this.label,
+    this.iconPath,
     required this.onPressed,
-    this.iconPath = '',
     this.isIconWidget = false,
     this.iconWidget,
   });
@@ -26,29 +26,29 @@ class SocialButton extends StatelessWidget {
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(
           padding: EdgeInsets.symmetric(vertical: 16.h),
+          side: const BorderSide(color: AppColors.fieldBorder),
+          backgroundColor: AppColors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12.r),
           ),
-          side: const BorderSide(color: AppColors.fieldBorder),
-          backgroundColor: AppColors.white,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (isIconWidget && iconWidget != null)
               iconWidget!
-            else if (iconPath.isNotEmpty)
+            else if (iconPath != null)
               Image.asset(
-                iconPath,
-                height: 20.h,
+                iconPath!,
+                height: 24.h,
+                width: 24.h,
               ),
-            SizedBox(width: 8.w),
+            SizedBox(width: 12.w),
             Text(
               label,
-              style: AppStyles.bodyNormal.copyWith(
+              style: AppStyles.bodyMedium().copyWith(
                 color: AppColors.textPrimary,
                 fontWeight: FontWeight.w600,
-                fontSize: 14.sp,
               ),
             ),
           ],

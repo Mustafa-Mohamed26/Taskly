@@ -1,21 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../core/routes/app_routes.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_styles.dart';
-import '../../core/routes/app_routes.dart';
-import '../auth/widgets/auth_button.dart';
-
-class OnboardingModel {
-  final String title;
-  final String description;
-  final IconData icon;
-
-  OnboardingModel({
-    required this.title,
-    required this.description,
-    required this.icon,
-  });
-}
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -25,137 +12,167 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
+  final PageController _pageController = PageController();
   int _currentIndex = 0;
 
-  final List<OnboardingModel> _onboardingData = [
-    OnboardingModel(
-      title: 'Track Your Daily Tasks',
-      description: 'Experience the easiest way to manage your work and personal projects in one place.',
-      icon: Icons.track_changes_rounded,
+  final List<OnboardingItem> _items = [
+    OnboardingItem(
+      title: 'Simplify Your Life',
+      subtitle: 'Organize your daily tasks and boost your productivity effortlessly.',
+      icon: Icons.auto_awesome_outlined,
     ),
-    OnboardingModel(
-      title: 'Boost Productivity',
-      description: 'Set priorities and deadlines to ensure your goals are met with maximum efficiency.',
-      icon: Icons.rocket_launch_rounded,
+    OnboardingItem(
+      title: 'Set Your Goals',
+      subtitle: 'Keep track of your long-term goals and celebrate every small win.',
+      icon: Icons.track_changes_outlined,
     ),
-    OnboardingModel(
-      title: 'Stay Organized',
-      description: 'Organize your tasks by categories and tags for better workflow management.',
-      icon: Icons.folder_copy_rounded,
+    OnboardingItem(
+      title: 'Collaborate with Ease',
+      subtitle: 'Share tasks with your team and achieve milestones together.',
+      icon: Icons.groups_outlined,
     ),
   ];
 
-  void _nextStep() {
-    if (_currentIndex < _onboardingData.length - 1) {
-      setState(() {
-        _currentIndex++;
-      });
-    } else {
-      Navigator.pushReplacementNamed(context, AppRoutes.login);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final currentItem = _onboardingData[_currentIndex];
-
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 40.h),
-          child: Column(
-            children: [
-              _buildHeader(),
-              const Spacer(),
-              _buildContent(currentItem),
-              const Spacer(),
-              _buildBottomSection(),
-            ],
+      backgroundColor: AppColors.white,
+      appBar: AppBar(
+        backgroundColor: AppColors.transparent,
+        elevation: 0,
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pushReplacementNamed(context, AppRoutes.login),
+            child: Text(
+              'Skip',
+              style: AppStyles.labelMedium().copyWith(
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ),
-        ),
+          SizedBox(width: 16.w),
+        ],
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: PageView.builder(
+              controller: _pageController,
+              onPageChanged: (index) {
+                setState(() {
+                  _currentIndex = index;
+                });
+              },
+              itemCount: _items.length,
+              itemBuilder: (context, index) {
+                return _buildPage(_items[index]);
+              },
+            ),
+          ),
+          _buildBottomSection(),
+        ],
       ),
     );
   }
 
-  Widget _buildHeader() {
-    return Align(
-      alignment: Alignment.centerRight,
-      child: TextButton(
-        onPressed: () {
-          Navigator.pushReplacementNamed(context, AppRoutes.login);
-        },
-        child: Text(
-          'Skip',
-          style: AppStyles.link.copyWith(
-            color: AppColors.textSecondary,
-            fontWeight: FontWeight.normal,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildContent(OnboardingModel item) {
-    return Column(
-      key: ValueKey<int>(_currentIndex), // Important for animation effect
-      children: [
-        Container(
-          width: 240.w,
-          height: 240.w,
-          decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.05),
-            shape: BoxShape.circle,
-          ),
-          child: Center(
+  Widget _buildPage(OnboardingItem item) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 40.w),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 200.w,
+            height: 200.w,
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.05),
+              shape: BoxShape.circle,
+            ),
             child: Icon(
               item.icon,
               size: 100.sp,
               color: AppColors.primary,
             ),
           ),
-        ),
-        SizedBox(height: 60.h),
-        Text(
-          item.title,
-          style: AppStyles.heading1.copyWith(fontSize: 28.sp),
-          textAlign: TextAlign.center,
-        ),
-        SizedBox(height: 16.h),
-        Text(
-          item.description,
-          style: AppStyles.subtitle.copyWith(fontSize: 16.sp),
-          textAlign: TextAlign.center,
-        ),
-      ],
+          SizedBox(height: 60.h),
+          Text(
+            item.title,
+            style: AppStyles.displayLarge().copyWith(fontSize: 28.sp),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 16.h),
+          Text(
+            item.subtitle,
+            style: AppStyles.bodyLarge().copyWith(fontSize: 16.sp),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildBottomSection() {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(
-            _onboardingData.length,
-            (index) => AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              margin: EdgeInsets.symmetric(horizontal: 4.w),
-              height: 8.h,
-              width: _currentIndex == index ? 24.w : 8.w,
-              decoration: BoxDecoration(
-                color: _currentIndex == index ? AppColors.primary : AppColors.primary.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(4.r),
+    return Padding(
+      padding: EdgeInsets.fromLTRB(24.w, 0, 24.w, 60.h),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // Dot Indicator
+          Row(
+            children: List.generate(
+              _items.length,
+              (index) => Container(
+                margin: EdgeInsets.only(right: 8.w),
+                width: _currentIndex == index ? 24.w : 8.w,
+                height: 8.w,
+                decoration: BoxDecoration(
+                  color: _currentIndex == index ? AppColors.primary : AppColors.primary.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(4.r),
+                ),
               ),
             ),
           ),
-        ),
-        SizedBox(height: 48.h),
-        AuthButton(
-          text: _currentIndex == _onboardingData.length - 1 ? 'Get Started' : 'Next',
-          onPressed: _nextStep,
-        ),
-      ],
+          
+          // Next/Get Started Button
+          ElevatedButton(
+            onPressed: () {
+              if (_currentIndex == _items.length - 1) {
+                Navigator.pushReplacementNamed(context, AppRoutes.login);
+              } else {
+                _pageController.nextPage(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: AppColors.white,
+              minimumSize: Size(_currentIndex == _items.length - 1 ? 160.w : 60.w, 60.w),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30.r),
+              ),
+              elevation: 0,
+            ),
+            child: _currentIndex == _items.length - 1
+                ? Text('Get Started', style: AppStyles.labelLarge())
+                : const Icon(Icons.arrow_forward),
+          ),
+        ],
+      ),
     );
   }
+}
+
+class OnboardingItem {
+  final String title;
+  final String subtitle;
+  final IconData icon;
+
+  OnboardingItem({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+  });
 }

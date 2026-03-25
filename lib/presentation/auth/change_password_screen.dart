@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../core/routes/app_routes.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_styles.dart';
-import '../../core/routes/app_routes.dart';
-import 'widgets/auth_text_field.dart';
 import 'widgets/auth_button.dart';
+import 'widgets/auth_text_field.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -14,16 +14,13 @@ class ChangePasswordScreen extends StatefulWidget {
 }
 
 class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
-  final _currentPasswordController = TextEditingController();
   final _newPasswordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  bool _obscureCurrent = true;
-  bool _obscureNew = true;
-  bool _obscureConfirm = true;
+  bool _obscureNewPassword = true;
+  bool _obscureConfirmPassword = true;
 
   @override
   void dispose() {
-    _currentPasswordController.dispose();
     _newPasswordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
@@ -33,7 +30,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: AppColors.textPrimary, size: 24.sp),
@@ -41,7 +38,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         ),
         title: Text(
           'Change Password',
-          style: AppStyles.label.copyWith(fontSize: 18.sp),
+          style: AppStyles.titleSmall().copyWith(fontSize: 18.sp),
         ),
         centerTitle: true,
       ),
@@ -52,12 +49,17 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               _buildHeader(),
-              SizedBox(height: 32.h),
+              SizedBox(height: 40.h),
               _buildForm(),
-              SizedBox(height: 24.h),
+              SizedBox(height: 32.h),
               _buildChecklist(),
               SizedBox(height: 40.h),
-              _buildFooter(),
+              AuthButton(
+                text: 'Update Password',
+                onPressed: () {
+                  Navigator.pushReplacementNamed(context, AppRoutes.passwordChanged);
+                },
+              ),
             ],
           ),
         ),
@@ -70,13 +72,13 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Secure your account',
-          style: AppStyles.heading1,
+          'Create New Password',
+          style: AppStyles.displayLarge(),
         ),
-        SizedBox(height: 12.h),
+        SizedBox(height: 8.h),
         Text(
-          'Enter your current password and choose a new one to update your security settings.',
-          style: AppStyles.subtitle,
+          'Your new password must be different from previous passwords.',
+          style: AppStyles.bodyLarge(),
         ),
       ],
     );
@@ -86,47 +88,32 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     return Column(
       children: [
         AuthTextField(
-          label: 'Current Password',
-          hint: 'Enter current password',
-          controller: _currentPasswordController,
-          obscureText: _obscureCurrent,
-          suffixIcon: IconButton(
-            icon: Icon(
-              _obscureCurrent ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-              color: AppColors.fieldHint,
-              size: 20.sp,
-            ),
-            onPressed: () => setState(() => _obscureCurrent = !_obscureCurrent),
-          ),
-        ),
-        SizedBox(height: 24.h),
-        AuthTextField(
           label: 'New Password',
-          hint: 'Minimum 8 characters',
+          hint: '••••••••',
           controller: _newPasswordController,
-          obscureText: _obscureNew,
+          obscureText: _obscureNewPassword,
           suffixIcon: IconButton(
             icon: Icon(
-              _obscureNew ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+              _obscureNewPassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
               color: AppColors.fieldHint,
               size: 20.sp,
             ),
-            onPressed: () => setState(() => _obscureNew = !_obscureNew),
+            onPressed: () => setState(() => _obscureNewPassword = !_obscureNewPassword),
           ),
         ),
         SizedBox(height: 24.h),
         AuthTextField(
           label: 'Confirm New Password',
-          hint: 'Repeat new password',
+          hint: '••••••••',
           controller: _confirmPasswordController,
-          obscureText: _obscureConfirm,
+          obscureText: _obscureConfirmPassword,
           suffixIcon: IconButton(
             icon: Icon(
-              _obscureConfirm ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+              _obscureConfirmPassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
               color: AppColors.fieldHint,
               size: 20.sp,
             ),
-            onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
+            onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
           ),
         ),
       ],
@@ -135,59 +122,41 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
   Widget _buildChecklist() {
     return Container(
-      padding: EdgeInsets.all(16.r),
+      padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: AppColors.primary.withOpacity(0.05),
+        color: AppColors.primary.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12.r),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'SECURITY CHECKLIST',
-            style: AppStyles.label.copyWith(
-              color: AppColors.primary,
-              fontSize: 12.sp,
-              letterSpacing: 1.2,
-            ),
-          ),
+          _buildCheckItem('At least 8 characters long', true),
           SizedBox(height: 12.h),
-          _buildChecklistItem('At least 8 characters long', true),
-          SizedBox(height: 8.h),
-          _buildChecklistItem('Includes a number or symbol', false),
-          SizedBox(height: 8.h),
-          _buildChecklistItem('Includes uppercase and lowercase', false),
+          _buildCheckItem('Must contain at least one uppercase letter', false),
+          SizedBox(height: 12.h),
+          _buildCheckItem('Must contain at least one number', true),
         ],
       ),
     );
   }
 
-  Widget _buildChecklistItem(String text, bool isChecked) {
+  Widget _buildCheckItem(String text, bool isChecked) {
     return Row(
       children: [
         Icon(
-          isChecked ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
+          isChecked ? Icons.check_circle : Icons.check_circle_outline,
           color: isChecked ? Colors.green : AppColors.textSecondary,
-          size: 16.sp,
+          size: 20.sp,
         ),
-        SizedBox(width: 8.w),
-        Text(
-          text,
-          style: AppStyles.bodyNormal.copyWith(
-            fontSize: 13.sp,
-            color: isChecked ? Colors.green : AppColors.textSecondary,
+        SizedBox(width: 12.w),
+        Expanded(
+          child: Text(
+            text,
+            style: AppStyles.bodyMedium().copyWith(
+              color: isChecked ? Colors.green : AppColors.textSecondary,
+            ),
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildFooter() {
-    return AuthButton(
-      text: 'Update Password',
-      onPressed: () {
-        Navigator.pushNamed(context, AppRoutes.passwordChanged);
-      },
     );
   }
 }
