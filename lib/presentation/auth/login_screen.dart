@@ -1,6 +1,11 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:taskly/core/routes/app_routes.dart';
+import 'package:taskly/domain/entities/user_entity.dart';
+import 'package:taskly/presentation/auth/cubit/auth_cubit.dart';
+import 'package:taskly/presentation/auth/widgets/auth_loading_widget.dart';
 import '../../core/constants/app_strings.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_styles.dart';
@@ -20,6 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -30,23 +36,48 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 40.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildHeader(),
-              SizedBox(height: 48.h),
-              _buildForm(),
-              SizedBox(height: 32.h),
-              _buildSocialLogin(),
-              SizedBox(height: 40.h),
-              _buildFooter(),
-            ],
+    return BlocListener<AuthCubit, AuthState>(
+      listener: (context, state) {
+        setState(() {
+          _isLoading = state is AuthLoading;
+        });
+
+        if (state is AuthSuccess<UserEntity>) {
+          Navigator.pushReplacementNamed(context, AppRoutes.mainLayout);
+        } else if (state is AuthError) {
+          AwesomeDialog(
+            context: context,
+            dialogType: DialogType.error,
+            animType: AnimType.bottomSlide,
+            title: 'Login Error',
+            desc: state.message,
+            btnOkOnPress: () {},
+          ).show();
+        }
+      },
+      child: Stack(
+        children: [
+          Scaffold(
+            body: SafeArea(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 40.h),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _buildHeader(),
+                    SizedBox(height: 48.h),
+                    _buildForm(),
+                    SizedBox(height: 32.h),
+                    _buildSocialLogin(),
+                    SizedBox(height: 40.h),
+                    _buildFooter(),
+                  ],
+                ),
+              ),
+            ),
           ),
-        ),
+          if (_isLoading) const AuthLoadingWidget(),
+        ],
       ),
     );
   }
@@ -118,7 +149,21 @@ class _LoginScreenState extends State<LoginScreen> {
         AuthButton(
           text: AppStrings.signIn,
           onPressed: () {
-            Navigator.pushReplacementNamed(context, AppRoutes.mainLayout);
+            if (_emailController.text.isNotEmpty && _passwordController.text.isNotEmpty) {
+              context.read<AuthCubit>().login(
+                    _emailController.text.trim(),
+                    _passwordController.text.trim(),
+                  );
+            } else {
+              AwesomeDialog(
+                context: context,
+                dialogType: DialogType.warning,
+                animType: AnimType.bottomSlide,
+                title: 'Validation',
+                desc: 'Please fill in all fields',
+                btnOkOnPress: () {},
+              ).show();
+            }
           },
         ),
       ],

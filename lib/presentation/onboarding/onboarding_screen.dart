@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:taskly/core/service/cache_helper.dart';
 import '../../core/routes/app_routes.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_styles.dart';
@@ -33,6 +34,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     ),
   ];
 
+  void _finishOnboarding() {
+    CacheHelper.setOnboardingCompleted(true);
+    Navigator.pushReplacementNamed(context, AppRoutes.login);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,7 +48,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         elevation: 0,
         actions: [
           TextButton(
-            onPressed: () => Navigator.pushReplacementNamed(context, AppRoutes.login),
+            onPressed: _finishOnboarding,
             child: Text(
               'Skip',
               style: AppStyles.labelMedium().copyWith(
@@ -138,7 +144,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ElevatedButton(
             onPressed: () {
               if (_currentIndex == _items.length - 1) {
-                Navigator.pushReplacementNamed(context, AppRoutes.login);
+                _finishOnboarding();
               } else {
                 _pageController.nextPage(
                   duration: const Duration(milliseconds: 300),
