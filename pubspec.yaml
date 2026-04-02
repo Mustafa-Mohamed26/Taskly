@@ -46,7 +46,8 @@ dependencies:
   cloud_firestore: ^6.2.0
   firebase_auth: ^6.3.0
   path: ^1.9.1
-  get_it: ^9.2.1
+  get_it: 8.0.3
+  injectable: 2.5.0
   
 
 dev_dependencies:
@@ -59,6 +60,8 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
+  injectable_generator: 2.6.2
+  build_runner: 2.4.13
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
