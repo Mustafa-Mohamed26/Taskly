@@ -32,16 +32,17 @@ This document outlines the development phases for Taskly, tracking progress from
 *Goal: Prepare the project for data handling and backend communication.*
 
 - [x] **Add Dependencies**: Firebase (Core, Auth, Firestore), `get_it`, `path`.
-- [ ] **Firebase Integration**:
-    - [ ] Install FlutterFire CLI: `dart pub global activate flutterfire_cli`
-    - [ ] Configure Firebase: `flutterfire configure --project=taskly-9f9bd`
-    - [ ] Initialize Firebase in `main.dart` using `DefaultFirebaseOptions`.
-- [ ] **Local Storage Foundation**:
-    - [ ] Initialize `Sqflite` database helper.
-    - [ ] Define SQL schemas for Tasks table.
-    - [ ] Set up `Shared Preferences` for user settings (Theme, Onboarding flag).
-- [ ] **Dependency Injection (DI)**:
-    - [ ] Set up `GetIt` or manual provider-based DI to manage repositories and services.
+- [x] **Firebase Integration**:
+    - [x] Install FlutterFire CLI: `dart pub global activate flutterfire_cli`
+    - [x] Configure Firebase: `flutterfire configure --project=taskly-9f9bd`
+    - [x] Initialize Firebase in `main.dart` using `DefaultFirebaseOptions`.
+- [x] **Local Storage Foundation**:
+    - [x] Initialize `Sqflite` database helper.
+    - [x] Define SQL schemas for Tasks table.
+    - [x] Set up `Shared Preferences` for user settings (Theme, Onboarding flag).
+- [x] **Dependency Injection (DI)**:
+    - [x] Set up `GetIt` with `injectable` and `build_runner`.
+    - [x] Create `lib/config/di/di.dart` and generate `di.config.dart`.
 
 ---
 
