@@ -3,7 +3,10 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  rive_common
+  cloud_firestore
+  firebase_auth
+  firebase_core
+  rive_native
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST
