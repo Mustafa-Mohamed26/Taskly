@@ -33,10 +33,9 @@ This document outlines the development phases for Taskly, tracking progress from
 
 - [x] **Add Dependencies**: Firebase (Core, Auth, Firestore), `get_it`, `path`.
 - [ ] **Firebase Integration**:
-    - [ ] Create Firebase Project.
-    - [ ] Add Android Configuration (`google-services.json`).
-    - [ ] Add iOS Configuration (`GoogleService-Info.plist`).
-    - [ ] Initialize Firebase in `main.dart`.
+    - [ ] Install FlutterFire CLI: `dart pub global activate flutterfire_cli`
+    - [ ] Configure Firebase: `flutterfire configure --project=taskly-9f9bd`
+    - [ ] Initialize Firebase in `main.dart` using `DefaultFirebaseOptions`.
 - [ ] **Local Storage Foundation**:
     - [ ] Initialize `Sqflite` database helper.
     - [ ] Define SQL schemas for Tasks table.
