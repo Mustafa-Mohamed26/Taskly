@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "559226531566",
+    "project_id": "taskly-9f9bd",
+    "storage_bucket": "taskly-9f9bd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:559226531566:android:5610deba12e40a6dc00dff",
+        "android_client_info": {
+          "package_name": "com.example.todo_list_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBCUGf0a2tVADa5jk-H07lS5JaF5LevS8E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
