@@ -1,20 +1,27 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:todo_list_app/providers/todo_provider.dart';
-import 'package:todo_list_app/providers/theme_provider.dart';
-import 'package:todo_list_app/screens/home_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:taskly/config/di/di.dart';
+import 'package:taskly/core/service/cache_helper.dart';
+import 'package:taskly/firebase_options.dart';
+import 'package:taskly/presentation/auth/cubit/auth_cubit.dart';
+import 'core/theme/app_theme.dart';
+import 'core/routes/app_routes.dart';
+import 'core/routes/app_routes_generator.dart';
 
-void main() {
-  runApp(
-    // providers
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => TodoProvider()),
-        ChangeNotifierProvider(create: (_) => ThemeProvider()),
-      ],
-      child: MyApp(),
-    ),
-  );
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  try {
+    await CacheHelper.init();
+  } catch (e) {
+    debugPrint('CacheHelper initialization failed: $e');
+  }
+
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  configureDependencies();
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -22,17 +29,26 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Todo List App',
-      // set up for the Dark mode
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
-      themeMode: themeProvider.themeMode,
-
-      home: HomeScreen(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthCubit>(
+          create: (context) => getIt<AuthCubit>()..checkAuth(),
+        ),
+      ],
+      child: ScreenUtilInit(
+        designSize: const Size(375, 812),
+        minTextAdapt: true,
+        splitScreenMode: true,
+        builder: (context, child) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'Taskly',
+            theme: AppTheme.light,
+            initialRoute: AppRoutes.splash,
+            onGenerateRoute: AppRoutesGenerator.onGenerateRoute,
+          );
+        },
+      ),
     );
   }
 }
