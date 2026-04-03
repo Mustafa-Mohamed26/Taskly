@@ -1,44 +1,61 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../core/constants/app_strings.dart';
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_styles.dart';
+import 'package:taskly/presentation/main_layout/focus/cubit/focus_cubit.dart';
+import '../../../core/constants/app_strings.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_styles.dart';
 
 class FocusScreen extends StatelessWidget {
   const FocusScreen({super.key});
 
+  String _formatDuration(int seconds) {
+    final minutes = (seconds / 60).floor();
+    final remainingSeconds = seconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.white,
-      appBar: AppBar(
-        backgroundColor: AppColors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.close, color: AppColors.textPrimary),
-          onPressed: () {},
-        ),
-        title: Text(AppStrings.focusMode, style: AppStyles.titleLarge()),
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
-        child: Column(
-          children: [
-            _buildTimerSection(),
-            SizedBox(height: 48.h),
-            _buildCurrentTaskCard(),
-            SizedBox(height: 32.h),
-            _buildAmbientSoundsSection(),
-            SizedBox(height: 40.h),
-            _buildActionButtons(),
-          ],
-        ),
-      ),
+    return BlocBuilder<FocusCubit, FocusState>(
+      builder: (context, state) {
+        return Scaffold(
+          backgroundColor: AppColors.white,
+          appBar: AppBar(
+            backgroundColor: AppColors.white,
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(Icons.close, color: AppColors.textPrimary),
+              onPressed: () => Navigator.pop(context),
+            ),
+            title: Text(AppStrings.focusMode, style: AppStyles.titleLarge()),
+            centerTitle: true,
+          ),
+          body: SingleChildScrollView(
+            padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
+            child: Column(
+              children: [
+                _buildTimerSection(context, state),
+                SizedBox(height: 48.h),
+                _buildCurrentTaskCard(),
+                SizedBox(height: 32.h),
+                _buildAmbientSoundsSection(),
+                SizedBox(height: 40.h),
+                _buildActionButtons(context, state),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildTimerSection() {
+  Widget _buildTimerSection(BuildContext context, FocusState state) {
+    double progress = 0;
+    if (state is FocusRunning || state is FocusPaused || state is FocusInitial) {
+      progress = state.duration / (25 * 60); // Assuming 25 min default for progress
+    }
+
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -46,7 +63,7 @@ class FocusScreen extends StatelessWidget {
           width: 240.w,
           height: 240.w,
           child: CircularProgressIndicator(
-            value: 0.7,
+            value: progress,
             strokeWidth: 12.w,
             backgroundColor: AppColors.primary.withValues(alpha: 0.1),
             valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
@@ -55,7 +72,7 @@ class FocusScreen extends StatelessWidget {
         Column(
           children: [
             Text(
-              '25:00',
+              _formatDuration(state.duration),
               style: AppStyles.displayLarge().copyWith(fontSize: 48.sp),
             ),
             Text(
@@ -202,11 +219,19 @@ class FocusScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButtons() {
+  Widget _buildActionButtons(BuildContext context, FocusState state) {
+    final bool isRunning = state is FocusRunning;
+
     return Column(
       children: [
         ElevatedButton(
-          onPressed: () {},
+          onPressed: () {
+            if (isRunning) {
+              context.read<FocusCubit>().pauseTimer();
+            } else {
+              context.read<FocusCubit>().startTimer();
+            }
+          },
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,
             minimumSize: Size(double.infinity, 64.h),
@@ -217,15 +242,18 @@ class FocusScreen extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.pause, color: AppColors.white, size: 24.sp),
+              Icon(isRunning ? Icons.pause : Icons.play_arrow, color: AppColors.white, size: 24.sp),
               SizedBox(width: 12.w),
-              Text(AppStrings.pauseSession, style: AppStyles.labelLarge()),
+              Text(
+                isRunning ? AppStrings.pauseSession : 'Start Session',
+                style: AppStyles.labelLarge(),
+              ),
             ],
           ),
         ),
         SizedBox(height: 16.h),
         TextButton(
-          onPressed: () {},
+          onPressed: () => context.read<FocusCubit>().stopTimer(),
           style: TextButton.styleFrom(
             backgroundColor: AppColors.background,
             minimumSize: Size(double.infinity, 64.h),

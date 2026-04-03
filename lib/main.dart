@@ -6,6 +6,9 @@ import 'package:taskly/config/di/di.dart';
 import 'package:taskly/core/service/cache_helper.dart';
 import 'package:taskly/firebase_options.dart';
 import 'package:taskly/presentation/auth/cubit/auth_cubit.dart';
+import 'package:taskly/presentation/main_layout/focus/cubit/focus_cubit.dart';
+import 'package:taskly/presentation/main_layout/tasks/cubit/sync_cubit.dart';
+import 'package:taskly/presentation/main_layout/tasks/cubit/task_cubit.dart';
 import 'core/theme/app_theme.dart';
 import 'core/routes/app_routes.dart';
 import 'core/routes/app_routes_generator.dart';
@@ -33,6 +36,15 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider<AuthCubit>(
           create: (context) => getIt<AuthCubit>()..checkAuth(),
+        ),
+        BlocProvider<TaskCubit>(
+          create: (context) => getIt<TaskCubit>(),
+        ),
+        BlocProvider<SyncCubit>(
+          create: (context) => getIt<SyncCubit>(),
+        ),
+        BlocProvider<FocusCubit>(
+          create: (context) => getIt<FocusCubit>(),
         ),
       ],
       child: ScreenUtilInit(
