@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:injectable/injectable.dart';
 import '../../models/user_model.dart';
@@ -8,6 +9,7 @@ import '../../../core/utils/auth_exception_handler.dart';
 @Injectable(as: AuthDataSource)
 class FirebaseAuthDataSourceImpl implements AuthDataSource {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
   Future<UserModel> login({
@@ -37,14 +39,28 @@ class FirebaseAuthDataSourceImpl implements AuthDataSource {
         password: password,
       );
       
-      // Ensure display name is set before returning the model
       await userCredential.user!.updateDisplayName(name);
       await userCredential.user!.reload();
       final updatedUser = _firebaseAuth.currentUser!;
+      final userModel = UserModel.fromFirebaseUser(updatedUser);
       
-      return UserModel.fromFirebaseUser(updatedUser);
+      await saveUserProfile(userModel);
+      
+      return userModel;
     } catch (e) {
       throw AuthException(AuthExceptionHandler.handleException(e));
+    }
+  }
+
+  @override
+  Future<void> saveUserProfile(UserModel user) async {
+    try {
+      await _firestore.collection('users').doc(user.id).set(
+        user.toJson(),
+        SetOptions(merge: true),
+      );
+    } catch (e) {
+      throw AuthException('Failed to sync user data to Firestore: ${e.toString()}');
     }
   }
 

@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../core/constants/app_strings.dart';
-import '../../core/routes/app_routes.dart';
 import '../../core/theme/app_colors.dart';
-import '../calendar/calendar_screen.dart';
-import '../focus/focus_screen.dart';
-import '../home/home_screen.dart';
-import '../profile/profile_screen.dart';
+import 'calendar/calendar_screen.dart';
+import 'focus/focus_screen.dart';
+import 'home/home_screen.dart';
+import 'profile/profile_screen.dart';
+import 'tasks/all_tasks_screen.dart';
 
 class MainLayoutScreen extends StatefulWidget {
   const MainLayoutScreen({super.key});
@@ -20,29 +18,19 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
 
   final List<Widget> _screens = [
     const HomeScreen(),
-    const CalendarScreen(),
+    const AllTasksScreen(),
     const FocusScreen(),
+    const CalendarScreen(),
     const ProfileScreen(),
   ];
 
   @override
   Widget build(BuildContext context) {
-    // Hide FAB in Focus and Profile Modes
-    final bool showFAB = _currentIndex == 0 || _currentIndex == 1;
-
     return Scaffold(
-      body: _screens[_currentIndex],
-      floatingActionButton:
-          showFAB
-              ? FloatingActionButton(
-                onPressed:
-                    () => Navigator.pushNamed(context, AppRoutes.addTask),
-                backgroundColor: AppColors.primary,
-                shape: const CircleBorder(),
-                child: const Icon(Icons.add, color: AppColors.white),
-              )
-              : null,
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _screens,
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) {
@@ -53,28 +41,31 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
         type: BottomNavigationBarType.fixed,
         selectedItemColor: AppColors.primary,
         unselectedItemColor: AppColors.textSecondary,
-        showSelectedLabels: true,
-        showUnselectedLabels: true,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
             activeIcon: Icon(Icons.home),
-            label: AppStrings.home,
+            label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today_outlined),
-            activeIcon: Icon(Icons.calendar_today),
-            label: AppStrings.calendar,
+            icon: Icon(Icons.task_outlined),
+            activeIcon: Icon(Icons.task),
+            label: 'Tasks',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.timer_outlined),
             activeIcon: Icon(Icons.timer),
-            label: AppStrings.focus,
+            label: 'Focus',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_month_outlined),
+            activeIcon: Icon(Icons.calendar_month),
+            label: 'Calendar',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),
             activeIcon: Icon(Icons.person),
-            label: AppStrings.profile,
+            label: 'Profile',
           ),
         ],
       ),

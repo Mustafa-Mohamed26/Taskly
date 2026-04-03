@@ -7,12 +7,12 @@ import '../../presentation/auth/password_changed_screen.dart';
 import '../../presentation/onboarding/onboarding_screen.dart';
 import '../../presentation/splash/splash_screen.dart';
 import '../../presentation/main_layout/main_layout_screen.dart';
-import '../../presentation/tasks/add_task_screen.dart';
-import '../../presentation/tasks/all_tasks_screen.dart';
-import '../../presentation/profile/personal_info_screen.dart';
-import '../../presentation/profile/notification_settings_screen.dart';
-import '../../presentation/profile/theme_preference_screen.dart';
-import '../../presentation/profile/security_privacy_screen.dart';
+import '../../presentation/main_layout/tasks/add_task_screen.dart';
+import '../../presentation/main_layout/tasks/all_tasks_screen.dart';
+import '../../presentation/main_layout/profile/personal_info_screen.dart';
+import '../../presentation/main_layout/profile/notification_settings_screen.dart';
+import '../../presentation/main_layout/profile/theme_preference_screen.dart';
+import '../../presentation/main_layout/profile/security_privacy_screen.dart';
 import 'app_routes.dart';
 
 class AppRoutesGenerator {
