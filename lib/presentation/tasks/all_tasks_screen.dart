@@ -32,7 +32,8 @@ class AllTasksScreen extends StatelessWidget {
                           _buildTaskItemCard(
                             title: 'Morning Standup',
                             time: '09:00 AM',
-                            description: 'Discuss project milestones with the core engineering team.',
+                            description:
+                                'Discuss project milestones with the core engineering team.',
                             tags: ['WORK', 'HIGH PRIORITY'],
                             isChecked: false,
                           ),
@@ -53,7 +54,8 @@ class AllTasksScreen extends StatelessWidget {
                           _buildTaskItemCard(
                             title: 'Product Design Review',
                             time: '03:00 PM',
-                            description: 'Reviewing the new UI components for the mobile app.',
+                            description:
+                                'Reviewing the new UI components for the mobile app.',
                             tags: ['WORK', 'MEETING'],
                             isChecked: false,
                           ),
@@ -85,7 +87,10 @@ class AllTasksScreen extends StatelessWidget {
           Row(
             children: [
               IconButton(
-                icon: const Icon(Icons.calendar_month_outlined, color: AppColors.primary),
+                icon: const Icon(
+                  Icons.calendar_month_outlined,
+                  color: AppColors.primary,
+                ),
                 onPressed: () {},
               ),
               Text(
@@ -124,22 +129,32 @@ class AllTasksScreen extends StatelessWidget {
       margin: EdgeInsets.only(right: 12.w),
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       decoration: BoxDecoration(
-        color: isSelected ? AppColors.primary : AppColors.white.withValues(alpha: 0.5),
+        color:
+            isSelected
+                ? AppColors.primary
+                : AppColors.white.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: isSelected ? AppColors.primary : AppColors.fieldBorder.withValues(alpha: 0.5),
+          color:
+              isSelected
+                  ? AppColors.primary
+                  : AppColors.fieldBorder.withValues(alpha: 0.5),
         ),
       ),
       child: Column(
         children: [
           Text(
             day,
-            style: AppStyles.bodyLargeMedium(isSelected ? AppColors.white : AppColors.textPrimary),
+            style: AppStyles.bodyLargeMedium(
+              isSelected ? AppColors.white : AppColors.textPrimary,
+            ),
           ),
           SizedBox(height: 4.h),
           Text(
             weekday,
-            style: AppStyles.bodySmallMedium(isSelected ? AppColors.white : AppColors.textSecondary),
+            style: AppStyles.bodySmallMedium(
+              isSelected ? AppColors.white : AppColors.textSecondary,
+            ),
           ),
           if (isSelected) ...[
             SizedBox(height: 4.h),
@@ -161,10 +176,7 @@ class AllTasksScreen extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          AppStrings.todaysSchedule,
-          style: AppStyles.titleLarge(),
-        ),
+        Text(AppStrings.todaysSchedule, style: AppStyles.titleLarge()),
         Text(
           AppStrings.tasksLeft,
           style: AppStyles.bodyMediumMedium(AppColors.primary),
@@ -208,7 +220,14 @@ class AllTasksScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(6.r),
                   border: Border.all(color: AppColors.fieldBorder, width: 2),
                 ),
-                child: isChecked ? const Icon(Icons.check, size: 16, color: AppColors.primary) : null,
+                child:
+                    isChecked
+                        ? const Icon(
+                          Icons.check,
+                          size: 16,
+                          color: AppColors.primary,
+                        )
+                        : null,
               ),
               SizedBox(width: 16.w),
               Expanded(
@@ -218,14 +237,8 @@ class AllTasksScreen extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          title,
-                          style: AppStyles.bodyLargeMedium(),
-                        ),
-                        Text(
-                          time,
-                          style: AppStyles.bodySmallMedium(),
-                        ),
+                        Text(title, style: AppStyles.bodyLargeMedium()),
+                        Text(time, style: AppStyles.bodySmallMedium()),
                       ],
                     ),
                     SizedBox(height: 8.h),
@@ -262,10 +275,9 @@ class AllTasksScreen extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: AppStyles.labelSmall(AppColors.primary).copyWith(
-          fontSize: 10.sp,
-          fontWeight: FontWeight.w700,
-        ),
+        style: AppStyles.labelSmall(
+          AppColors.primary,
+        ).copyWith(fontSize: 10.sp, fontWeight: FontWeight.w700),
       ),
     );
   }

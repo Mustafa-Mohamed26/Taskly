@@ -1,6 +1,12 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:taskly/core/routes/app_routes.dart';
+import 'package:taskly/core/utils/validators.dart';
+import 'package:taskly/domain/entities/user_entity.dart';
+import 'package:taskly/presentation/auth/cubit/auth_cubit.dart';
+import 'package:taskly/presentation/auth/widgets/auth_loading_widget.dart';
 import '../../core/constants/app_strings.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_styles.dart';
@@ -17,9 +23,11 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -30,23 +38,60 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 40.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildHeader(),
-              SizedBox(height: 48.h),
-              _buildForm(),
-              SizedBox(height: 32.h),
-              _buildSocialLogin(),
-              SizedBox(height: 40.h),
-              _buildFooter(),
-            ],
+    return BlocListener<AuthCubit, AuthState>(
+      listener: (context, state) {
+        setState(() {
+          _isLoading = state is AuthLoading;
+        });
+
+        if (state is LoginSuccess) {
+          AwesomeDialog(
+            context: context,
+            dialogType: DialogType.success,
+            animType: AnimType.bottomSlide,
+            title: 'Login Success',
+            desc: 'Welcome back, ${state.user.name ?? 'User'}!',
+            btnOkOnPress: () {
+              Navigator.pushReplacementNamed(context, AppRoutes.mainLayout);
+            },
+          ).show();
+        } else if (state is AuthError) {
+          AwesomeDialog(
+            context: context,
+            dialogType: DialogType.error,
+            animType: AnimType.bottomSlide,
+            title: 'Login Error',
+            desc: state.message,
+            btnOkOnPress: () {},
+          ).show();
+        }
+      },
+      child: Stack(
+        children: [
+          Scaffold(
+            body: SafeArea(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 40.h),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _buildHeader(),
+                      SizedBox(height: 48.h),
+                      _buildForm(),
+                      SizedBox(height: 32.h),
+                      _buildSocialLogin(),
+                      SizedBox(height: 40.h),
+                      _buildFooter(),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ),
-        ),
+          if (_isLoading) const AuthLoadingWidget(),
+        ],
       ),
     );
   }
@@ -81,6 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
           label: AppStrings.email,
           hint: 'Enter your email',
           controller: _emailController,
+          validator: (val) => Validators.validateEmail(val),
         ),
         SizedBox(height: 24.h),
         AuthTextField(
@@ -88,6 +134,7 @@ class _LoginScreenState extends State<LoginScreen> {
           hint: 'Enter your password',
           controller: _passwordController,
           obscureText: _obscurePassword,
+          validator: (val) => Validators.validatePassword(val),
           suffixIcon: IconButton(
             icon: Icon(
               _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
@@ -118,7 +165,12 @@ class _LoginScreenState extends State<LoginScreen> {
         AuthButton(
           text: AppStrings.signIn,
           onPressed: () {
-            Navigator.pushReplacementNamed(context, AppRoutes.mainLayout);
+            if (_formKey.currentState!.validate()) {
+              context.read<AuthCubit>().login(
+                    _emailController.text.trim(),
+                    _passwordController.text.trim(),
+                  );
+            }
           },
         ),
       ],
@@ -144,13 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
         SizedBox(height: 24.h),
         Row(
           children: [
-            SocialButton(
-              label: 'Google',
-              onPressed: () {},
-              isIconWidget: true,
-              iconWidget: Icon(Icons.g_mobiledata, color: AppColors.priorityHigh, size: 28.sp),
-            ),
-            SizedBox(width: 16.w),
+
             SocialButton(
               label: 'Apple',
               onPressed: () {},

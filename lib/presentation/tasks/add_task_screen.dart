@@ -18,10 +18,7 @@ class AddTaskScreen extends StatelessWidget {
           icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(
-          AppStrings.newTask,
-          style: AppStyles.titleLarge(),
-        ),
+        title: Text(AppStrings.newTask, style: AppStyles.titleLarge()),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -94,10 +91,7 @@ class AddTaskScreen extends StatelessWidget {
                 children: [
                   const Icon(Icons.add_task, color: AppColors.white),
                   SizedBox(width: 8.w),
-                  Text(
-                    AppStrings.createTask,
-                    style: AppStyles.labelLarge(),
-                  ),
+                  Text(AppStrings.createTask, style: AppStyles.labelLarge()),
                 ],
               ),
             ),
@@ -160,16 +154,24 @@ class AddTaskScreen extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
       decoration: BoxDecoration(
         color: isSelected ? AppColors.primary : AppColors.white,
-        border: Border.all(color: isSelected ? AppColors.primary : AppColors.fieldBorder),
+        border: Border.all(
+          color: isSelected ? AppColors.primary : AppColors.fieldBorder,
+        ),
         borderRadius: BorderRadius.circular(25.r),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 18, color: isSelected ? AppColors.white : AppColors.textSecondary),
+          Icon(
+            icon,
+            size: 18,
+            color: isSelected ? AppColors.white : AppColors.textSecondary,
+          ),
           SizedBox(width: 6.w),
           Text(
             label,
-            style: AppStyles.bodyMediumMedium(isSelected ? AppColors.white : AppColors.textSecondary),
+            style: AppStyles.bodyMediumMedium(
+              isSelected ? AppColors.white : AppColors.textSecondary,
+            ),
           ),
         ],
       ),
@@ -182,7 +184,10 @@ class AddTaskScreen extends StatelessWidget {
       padding: EdgeInsets.symmetric(vertical: 12.h),
       decoration: BoxDecoration(
         color: isSelected ? color.withValues(alpha: 0.1) : AppColors.white,
-        border: Border.all(color: isSelected ? color : AppColors.fieldBorder, width: isSelected ? 2 : 1),
+        border: Border.all(
+          color: isSelected ? color : AppColors.fieldBorder,
+          width: isSelected ? 2 : 1,
+        ),
         borderRadius: BorderRadius.circular(12.r),
       ),
       child: Column(
@@ -191,7 +196,9 @@ class AddTaskScreen extends StatelessWidget {
           SizedBox(height: 4.h),
           Text(
             label,
-            style: AppStyles.bodyMediumMedium(isSelected ? AppColors.textPrimary : AppColors.textSecondary),
+            style: AppStyles.bodyMediumMedium(
+              isSelected ? AppColors.textPrimary : AppColors.textSecondary,
+            ),
           ),
         ],
       ),

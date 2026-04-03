@@ -21,10 +21,7 @@ class CalendarScreen extends StatelessWidget {
             icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
             onPressed: () {},
           ),
-          title: Text(
-            AppStrings.calendar,
-            style: AppStyles.titleLarge(),
-          ),
+          title: Text(AppStrings.calendar, style: AppStyles.titleLarge()),
           centerTitle: true,
           actions: [
             IconButton(
@@ -85,10 +82,7 @@ class CalendarScreen extends StatelessWidget {
           onPressed: () {},
         ),
         SizedBox(width: 16.w),
-        Text(
-          AppStrings.monthlyYear,
-          style: AppStyles.titleLarge(),
-        ),
+        Text(AppStrings.monthlyYear, style: AppStyles.titleLarge()),
         SizedBox(width: 16.w),
         IconButton(
           icon: const Icon(Icons.chevron_right, color: AppColors.textPrimary),
@@ -104,12 +98,15 @@ class CalendarScreen extends StatelessWidget {
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: weekdays
-              .map((day) => Text(
-                    day,
-                    style: AppStyles.bodySmallMedium(AppColors.primary),
-                  ))
-              .toList(),
+          children:
+              weekdays
+                  .map(
+                    (day) => Text(
+                      day,
+                      style: AppStyles.bodySmallMedium(AppColors.primary),
+                    ),
+                  )
+                  .toList(),
         ),
         SizedBox(height: 16.h),
         GridView.builder(
@@ -211,7 +208,10 @@ class CalendarScreen extends StatelessWidget {
                 width: 2,
               ),
             ),
-            child: isDone ? Icon(Icons.check, size: 16.sp, color: AppColors.white) : null,
+            child:
+                isDone
+                    ? Icon(Icons.check, size: 16.sp, color: AppColors.white)
+                    : null,
           ),
           SizedBox(width: 16.w),
           Expanded(

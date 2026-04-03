@@ -1,136 +1,121 @@
 # Taskly - Implementation Roadmap
 
-This document outlines the development phases for Taskly, tracking progress from the initial UI prototype to a fully functional, synchronized task management system.
+This document outlines the development phases for Taskly, tracking progress from the initial UI prototype to a fully functional, synchronized task management system using Clean Architecture.
 
 ---
 
 ## Phase 0: UI/UX Prototyping & Foundation (Completed)
-*Goal: Establish the visual identity and core navigation structure.*
-
 - [x] **Project Scaffolding**: Standard Flutter project structure.
 - [x] **Theme System**: Definition of `AppColors`, `AppStyles`, and `AppTheme`.
 - [x] **Navigation Setup**: Centralized routing in `AppRoutes` and `AppRoutesGenerator`.
-- [x] **Authentication UI**:
-    - [x] Splash Screen.
-    - [x] Onboarding Carousel.
-    - [x] Login & Register Screens.
-    - [x] Forgot/Change Password Screens.
-- [x] **Task Management UI**:
-    - [x] Main Dashboard (Home).
-    - [x] All Tasks View with Weekly Strip.
-    - [x] Add Task Form (Title, Desc, Date, Time, Category, Priority).
-- [x] **User Profile UI**:
-    - [x] Profile Overview.
-    - [x] Settings (Personal Info, Notifications, Security).
-- [x] **Utility Screens**:
-    - [x] Focus Timer UI.
-    - [x] Calendar View.
+- [x] **Authentication UI**: Splash, Onboarding, Login, Register, Forgot/Change Password.
+- [x] **Task Management UI**: Home, All Tasks, Add Task Form.
+- [x] **User Profile UI**: Profile Overview, Settings.
+- [x] **Utility Screens**: Focus Timer UI, Calendar View.
 
 ---
 
-## Phase 1: Core Infrastructure & Setup
-*Goal: Prepare the project for data handling and backend communication.*
-
-- [x] **Add Dependencies**: Firebase (Core, Auth, Firestore), `get_it`, `path`.
-- [x] **Firebase Integration**:
-    - [x] Install FlutterFire CLI: `dart pub global activate flutterfire_cli`
-    - [x] Configure Firebase: `flutterfire configure --project=taskly-9f9bd`
-    - [x] Initialize Firebase in `main.dart` using `DefaultFirebaseOptions`.
-- [x] **Local Storage Foundation**:
-    - [x] Initialize `Sqflite` database helper.
-    - [x] Define SQL schemas for Tasks table.
-    - [x] Set up `Shared Preferences` for user settings (Theme, Onboarding flag).
-- [x] **Dependency Injection (DI)**:
-    - [x] Set up `GetIt` with `injectable` and `build_runner`.
-    - [x] Create `lib/config/di/di.dart` and generate `di.config.dart`.
+## Phase 1: Core Infrastructure & Setup (Completed)
+- [x] **Add Dependencies**: Firebase, `get_it`, `path`, `injectable`, `awesome_dialog`, `build_runner`.
+- [x] **Firebase Integration**: FlutterFire CLI configuration and `main.dart` initialization.
+- [x] **Local Storage Foundation**: `Sqflite` (`DatabaseHelper`) and `Shared Preferences` (`CacheHelper`).
+- [x] **Dependency Injection (DI)**: `GetIt` with `injectable` and `build_runner` code generation.
 
 ---
 
-## Phase 2: Authentication System (Logic)
-*Goal: Connect the existing Auth UI to Firebase Authentication.*
+## Phase 2: Authentication System (Domain & Data Logic) (Completed - Refactored)
+*Goal: Implement secure user management using Clean Architecture with strict decoupling and improved UX.*
 
-- [ ] **Auth Data Layer**:
-    - [ ] Implement `AuthDataSource` (Firebase API).
-    - [ ] Implement `AuthRepository`.
-- [ ] **Auth State Management**:
-    - [ ] Create `AuthCubit` for Login/Register/Logout logic.
-    - [ ] Handle persistence of user session.
-- [ ] **User Flow Integration**:
-    - [ ] Connect `LoginScreen` to `AuthCubit`.
-    - [ ] Connect `RegisterScreen` to `AuthCubit`.
-    - [ ] Implement "Forgot Password" email trigger.
+### **1. Domain Layer**
+- [x] Define `UserEntity`.
+- [x] Define `AuthRepository` (Abstract interface in a separated file).
+- [x] Implement **Static Use Cases** (Zero-object instantiation pattern):
+    - [x] `LoginUseCase.execute()`
+    - [x] `RegisterUseCase.execute()`
+    - [x] `LogoutUseCase.execute()`
+    - [x] `ForgotPasswordUseCase.execute()`
+    - [x] `GetAuthenticatedUserUseCase.execute()` (Auth state stream).
+
+### **2. Data Layer**
+- [x] Create `UserModel` (Firebase/JSON mapping).
+- [x] **Decoupled DataSources**:
+    - [x] Define abstract `AuthDataSource`.
+    - [x] Implement `FirebaseAuthDataSourceImpl` in `remote/` folder with `@Injectable(as: AuthDataSource)`.
+- [x] **Decoupled Repositories**:
+    - [x] Implement `AuthRepositoryImpl` in `remote/` folder with `@Injectable(as: AuthRepository)`.
+
+### **3. Presentation Layer**
+- [x] Create `AuthCubit` with specific states (`Initial`, `Loading`, `AuthSuccess<T>`, `AuthError`) and `@injectable`.
+- [x] **Enhanced UI Feedback**:
+    - [x] Create `AuthLoadingWidget` (Specialized circular progress container).
+    - [x] Implement `BlocListener` in all Auth screens for `AwesomeDialog` overlays.
+    - [x] Use stack-based `AuthLoadingWidget` overlay triggered by state changes.
+- [x] **Navigation & Persistence**:
+    - [x] Update `SplashScreen` for conditional navigation based on Auth status and Onboarding.
+    - [x] Update `OnboardingScreen` to persist completion status via `CacheHelper`.
 
 ---
 
 ## Phase 3: Task Management (Domain & Data Layer)
-*Goal: Build the engine that handles task data.*
+*Goal: Build the offline-first task engine.*
 
-- [ ] **Domain Layer**:
-    - [ ] Define `TaskEntity`.
-    - [ ] Define `TaskRepository` interface.
-    - [ ] Create Use Cases: `GetTasks`, `AddTask`, `UpdateTask`, `DeleteTask`.
-- [ ] **Data Layer**:
-    - [ ] Create `TaskModel` with JSON & Map serialization.
-    - [ ] Implement `TaskRemoteDataSource` (Firestore).
-    - [ ] Implement `TaskLocalDataSource` (Sqflite).
-    - [ ] Implement `TaskRepositoryImpl` with caching logic.
+### **1. Domain Layer**
+- [ ] Define `TaskEntity` (id, title, desc, dateTime, category, priority, isCompleted, isSynced, updatedAt).
+- [ ] Define `TaskRepository` (interface in separated file).
+- [ ] Implement **Static Use Cases**:
+    - [ ] `GetTasksUseCase`
+    - [ ] `AddTaskUseCase`
+    - [ ] `UpdateTaskUseCase`
+    - [ ] `DeleteTaskUseCase`
+
+### **2. Data Layer**
+- [ ] Create `TaskModel` (Serialization + SQL mapping).
+- [ ] **Remote Data Layer**:
+    - [ ] Define abstract `TaskRemoteDataSource`.
+    - [ ] Implement `FirestoreTaskDataSourceImpl` in `remote/`.
+- [ ] **Local Data Layer**:
+    - [ ] Define abstract `TaskLocalDataSource`.
+    - [ ] Implement `SqfliteTaskDataSourceImpl` in `local/`.
+- [ ] **Repository Implementation**:
+    - [ ] Implement `TaskRepositoryImpl` (Logic for local cache first + background remote sync).
 
 ---
 
 ## Phase 4: State Management & UI Wiring
-*Goal: Make the UI functional using the Data Layer.*
-
-- [ ] **Task State Management**:
-    - [ ] Create `TaskCubit` to manage the list and individual task states.
+- [ ] **Task State Management**: `TaskCubit` with `@injectable` and generic `Success<T>` states.
 - [ ] **UI Integration**:
-    - [ ] Connect `AddTaskScreen` to save tasks to the database.
-    - [ ] Connect `AllTasksScreen` to display tasks from the database.
-    - [ ] Implement "Mark as Completed" toggle in list items.
-    - [ ] Implement task deletion from the UI.
+    - [ ] Connect `AddTaskScreen` to Domain logic.
+    - [ ] Connect `AllTasksScreen` to live data stream.
+    - [ ] Implement real-time updates for completion status.
 
 ---
 
 ## Phase 5: Synchronization & Offline Mode
-*Goal: Ensure data is saved locally first and synced to the cloud when online.*
-
-- [ ] **Offline-First Strategy**:
-    - [ ] Update repository to always read from Local DB.
-    - [ ] Implement background fetch to update Local DB from Firestore.
 - [ ] **Sync Engine**:
-    - [ ] Implement "Pending Sync" flag for offline writes.
-    - [ ] Set up Connectivity listener to trigger sync when internet returns.
-    - [ ] Handle conflict resolution (Last-Write-Wins based on `updatedAt`).
+    - [ ] Implement "Pending Sync" flag for local changes.
+    - [ ] Set up `Connectivity` listener for auto-syncing when online.
+    - [ ] Implement conflict resolution (Last-Write-Wins based on `updatedAt`).
 
 ---
 
 ## Phase 6: Advanced Features & Polishing
-*Goal: Complete the remaining functional modules and enhance the UX.*
-
-- [ ] **Focus Timer Logic**:
-    - [ ] Implement countdown timer functionality.
-    - [ ] Add background task support for the timer.
-- [ ] **Calendar Integration**:
-    - [ ] Map task dates to the full calendar view.
-- [ ] **Notification System**:
-    - [ ] Set up `flutter_local_notifications`.
-    - [ ] Schedule reminders for task due dates.
-- [ ] **Settings Logic**:
-    - [ ] Implement Theme Toggle (Light/Dark/System).
-    - [ ] Implement Personal Info updates.
+- [ ] **Focus Timer**: Logic for countdown and notifications.
+- [ ] **Calendar**: Mapping tasks to the calendar view.
+- [ ] **Notifications**: `flutter_local_notifications` for task reminders.
+- [ ] **Settings**: Theme toggle and Profile updates logic.
 
 ---
 
 ## Phase 7: QA & Deployment
-*Goal: Verify stability and prepare for release.*
+- [ ] **Testing**: Unit tests for UseCases and Cubits.
+- [ ] **Optimization**: Database indexing and performance tuning.
+---
 
-- [ ] **Testing**:
-    - [ ] Unit tests for Repositories and Cubits.
-    - [ ] Widget tests for core components.
-    - [ ] Integration tests for the Sync flow.
-- [ ] **Optimization**:
-    - [ ] Fix any layout overflows on small devices.
-    - [ ] Optimize database queries.
-- [ ] **Final Preparation**:
-    - [ ] Generate App Icons.
-    - [ ] Configure ProGuard (Android) and App Store settings (iOS).
-    - [ ] Production build.
+## 🚩 Resume Point (Next Session)
+**Next Step**: Start **Phase 3: Task Management (Domain & Data Layer)**.
+1. Create `TaskEntity` in `lib/domain/entities/task_entity.dart`.
+2. Create `TaskRepository` abstract interface in `lib/domain/repositories/task_repository.dart`.
+3. Implement Static UseCases in `lib/domain/usecases/tasks/`.
+4. Create `TaskModel` and DataSources.
+
+*Note: Ensure all new components follow the refactored rules (Injectable, Static UseCases, Decoupled Folders).*

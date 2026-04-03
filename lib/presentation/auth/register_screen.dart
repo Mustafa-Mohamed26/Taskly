@@ -1,5 +1,11 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:taskly/core/routes/app_routes.dart';
+import 'package:taskly/core/utils/validators.dart';
+import 'package:taskly/presentation/auth/cubit/auth_cubit.dart';
+import 'package:taskly/presentation/auth/widgets/auth_loading_widget.dart';
 import '../../core/constants/app_strings.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_styles.dart';
@@ -15,11 +21,14 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -32,21 +41,58 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 40.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildHeader(),
-              SizedBox(height: 48.h),
-              _buildForm(),
-              SizedBox(height: 40.h),
-              _buildFooter(),
-            ],
+    return BlocListener<AuthCubit, AuthState>(
+      listener: (context, state) {
+        setState(() {
+          _isLoading = state is AuthLoading;
+        });
+
+        if (state is RegisterSuccess) {
+          AwesomeDialog(
+            context: context,
+            dialogType: DialogType.success,
+            animType: AnimType.bottomSlide,
+            title: 'Registration Success',
+            desc: 'Account created successfully!',
+            btnOkOnPress: () {
+              Navigator.pushReplacementNamed(context, AppRoutes.mainLayout);
+            },
+          ).show();
+        } else if (state is AuthError) {
+          AwesomeDialog(
+            context: context,
+            dialogType: DialogType.error,
+            animType: AnimType.bottomSlide,
+            title: 'Registration Error',
+            desc: state.message,
+            btnOkOnPress: () {},
+          ).show();
+        }
+      },
+      child: Stack(
+        children: [
+          Scaffold(
+            body: SafeArea(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 40.h),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _buildHeader(),
+                      SizedBox(height: 48.h),
+                      _buildForm(),
+                      SizedBox(height: 40.h),
+                      _buildFooter(),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ),
-        ),
+          if (_isLoading) const AuthLoadingWidget(),
+        ],
       ),
     );
   }
@@ -80,6 +126,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           hint: 'John Doe',
           controller: _nameController,
           prefixIcon: Icons.person_outline,
+          validator: (val) => Validators.validateFullName(val),
         ),
         SizedBox(height: 24.h),
         AuthTextField(
@@ -87,6 +134,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           hint: 'name@company.com',
           controller: _emailController,
           prefixIcon: Icons.email_outlined,
+          validator: (val) => Validators.validateEmail(val),
         ),
         SizedBox(height: 24.h),
         AuthTextField(
@@ -95,6 +143,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           controller: _passwordController,
           obscureText: _obscurePassword,
           prefixIcon: Icons.lock_outline,
+          validator: (val) => Validators.validatePassword(val),
           suffixIcon: IconButton(
             icon: Icon(
               _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
@@ -113,14 +162,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
           label: AppStrings.confirmPassword,
           hint: '••••••••',
           controller: _confirmPasswordController,
-          obscureText: _obscurePassword,
+          obscureText: _obscureConfirmPassword,
           prefixIcon: Icons.shield_outlined,
+          validator: (val) => Validators.validateConfirmPassword(val, _passwordController.text),
+          suffixIcon: IconButton(
+            icon: Icon(
+              _obscureConfirmPassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+              color: AppColors.fieldHint,
+              size: 20.sp,
+            ),
+            onPressed: () {
+              setState(() {
+                _obscureConfirmPassword = !_obscureConfirmPassword;
+              });
+            },
+          ),
         ),
         SizedBox(height: 32.h),
         AuthButton(
           text: AppStrings.createAccount,
           onPressed: () {
-            // Handle registration
+            if (_formKey.currentState!.validate()) {
+              context.read<AuthCubit>().register(
+                    _nameController.text.trim(),
+                    _emailController.text.trim(),
+                    _passwordController.text.trim(),
+                  );
+            }
           },
         ),
       ],
@@ -131,18 +199,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(
-          AppStrings.alreadyHaveAccount,
-          style: AppStyles.bodyMedium(),
-        ),
+        Text(AppStrings.alreadyHaveAccount, style: AppStyles.bodyMedium()),
         GestureDetector(
           onTap: () {
             Navigator.pop(context);
           },
-          child: Text(
-            AppStrings.signIn,
-            style: AppStyles.labelMedium(),
-          ),
+          child: Text(AppStrings.signIn, style: AppStyles.labelMedium()),
         ),
       ],
     );

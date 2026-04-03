@@ -39,14 +39,8 @@ class HomeScreen extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              AppStrings.goodMorning,
-              style: AppStyles.headlineLarge(),
-            ),
-            Text(
-              'Monday, Oct 24',
-              style: AppStyles.bodyMediumMedium(),
-            ),
+            Text(AppStrings.goodMorning, style: AppStyles.headlineLarge()),
+            Text('Monday, Oct 24', style: AppStyles.bodyMediumMedium()),
           ],
         ),
         Row(
@@ -56,7 +50,10 @@ class HomeScreen extends StatelessWidget {
               onPressed: () {},
             ),
             IconButton(
-              icon: const Icon(Icons.notifications_none, color: AppColors.textPrimary),
+              icon: const Icon(
+                Icons.notifications_none,
+                color: AppColors.textPrimary,
+              ),
               onPressed: () {},
             ),
           ],
@@ -153,7 +150,9 @@ class HomeScreen extends StatelessWidget {
               value: 0.6,
               minHeight: 8.h,
               backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                AppColors.primary,
+              ),
             ),
           ),
         ],
@@ -170,7 +169,10 @@ class HomeScreen extends StatelessWidget {
             Text(AppStrings.todaysTasks, style: AppStyles.titleLarge()),
             TextButton(
               onPressed: () => Navigator.pushNamed(context, AppRoutes.allTasks),
-              child: Text(AppStrings.viewAll, style: AppStyles.bodyMediumMedium(AppColors.primary)),
+              child: Text(
+                AppStrings.viewAll,
+                style: AppStyles.bodyMediumMedium(AppColors.primary),
+              ),
             ),
           ],
         ),
@@ -183,7 +185,12 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTaskItem(String title, String priority, String time, bool isDone) {
+  Widget _buildTaskItem(
+    String title,
+    String priority,
+    String time,
+    bool isDone,
+  ) {
     Color priorityColor;
     switch (priority) {
       case 'HIGH':
@@ -210,10 +217,16 @@ class HomeScreen extends StatelessWidget {
             height: 24.w,
             decoration: BoxDecoration(
               color: isDone ? AppColors.primary : AppColors.transparent,
-              border: Border.all(color: isDone ? AppColors.primary : AppColors.fieldBorder, width: 2),
+              border: Border.all(
+                color: isDone ? AppColors.primary : AppColors.fieldBorder,
+                width: 2,
+              ),
               borderRadius: BorderRadius.circular(6.r),
             ),
-            child: isDone ? const Icon(Icons.check, color: AppColors.white, size: 16) : null,
+            child:
+                isDone
+                    ? const Icon(Icons.check, color: AppColors.white, size: 16)
+                    : null,
           ),
           SizedBox(width: 16.w),
           Expanded(
@@ -236,10 +249,7 @@ class HomeScreen extends StatelessWidget {
                       style: AppStyles.bodySmallMedium(priorityColor),
                     ),
                     SizedBox(width: 12.w),
-                    Text(
-                      time,
-                      style: AppStyles.bodySmallMedium(),
-                    ),
+                    Text(time, style: AppStyles.bodySmallMedium()),
                   ],
                 ),
               ],

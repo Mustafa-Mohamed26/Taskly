@@ -29,7 +29,8 @@ class AppRoutesGenerator {
       case AppRoutes.forgotPassword:
         return MaterialPageRoute(builder: (_) => const ForgotPasswordScreen());
       case AppRoutes.changePassword:
-        return MaterialPageRoute(builder: (_) => const ChangePasswordScreen());
+        final email = settings.arguments as String?;
+        return MaterialPageRoute(builder: (_) => ChangePasswordScreen(email: email));
       case AppRoutes.passwordChanged:
         return MaterialPageRoute(builder: (_) => const PasswordChangedScreen());
       case AppRoutes.mainLayout:
@@ -41,7 +42,9 @@ class AppRoutesGenerator {
       case AppRoutes.personalInfo:
         return MaterialPageRoute(builder: (_) => const PersonalInfoScreen());
       case AppRoutes.notifications:
-        return MaterialPageRoute(builder: (_) => const NotificationSettingsScreen());
+        return MaterialPageRoute(
+          builder: (_) => const NotificationSettingsScreen(),
+        );
       case AppRoutes.themePreference:
         return MaterialPageRoute(builder: (_) => const ThemePreferenceScreen());
       case AppRoutes.securityPrivacy:
@@ -53,11 +56,10 @@ class AppRoutesGenerator {
 
   static Route<dynamic> _errorRoute() {
     return MaterialPageRoute(
-      builder: (_) => const Scaffold(
-        body: Center(
-          child: Text('Error: Route not found'),
-        ),
-      ),
+      builder:
+          (_) => const Scaffold(
+            body: Center(child: Text('Error: Route not found')),
+          ),
     );
   }
 }

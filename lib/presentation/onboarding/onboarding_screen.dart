@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:taskly/core/service/cache_helper.dart';
 import '../../core/routes/app_routes.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_styles.dart';
@@ -18,12 +19,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final List<OnboardingItem> _items = [
     OnboardingItem(
       title: 'Simplify Your Life',
-      subtitle: 'Organize your daily tasks and boost your productivity effortlessly.',
+      subtitle:
+          'Organize your daily tasks and boost your productivity effortlessly.',
       icon: Icons.auto_awesome_outlined,
     ),
     OnboardingItem(
       title: 'Set Your Goals',
-      subtitle: 'Keep track of your long-term goals and celebrate every small win.',
+      subtitle:
+          'Keep track of your long-term goals and celebrate every small win.',
       icon: Icons.track_changes_outlined,
     ),
     OnboardingItem(
@@ -32,6 +35,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       icon: Icons.groups_outlined,
     ),
   ];
+
+  void _finishOnboarding() async {
+    await CacheHelper.setOnboardingCompleted(true);
+    if (mounted) {
+      Navigator.pushReplacementNamed(context, AppRoutes.login);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +52,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         elevation: 0,
         actions: [
           TextButton(
-            onPressed: () => Navigator.pushReplacementNamed(context, AppRoutes.login),
+            onPressed: _finishOnboarding,
             child: Text(
               'Skip',
               style: AppStyles.labelMedium().copyWith(
@@ -89,11 +99,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               color: AppColors.primary.withValues(alpha: 0.05),
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              item.icon,
-              size: 100.sp,
-              color: AppColors.primary,
-            ),
+            child: Icon(item.icon, size: 100.sp, color: AppColors.primary),
           ),
           SizedBox(height: 60.h),
           Text(
@@ -127,18 +133,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 width: _currentIndex == index ? 24.w : 8.w,
                 height: 8.w,
                 decoration: BoxDecoration(
-                  color: _currentIndex == index ? AppColors.primary : AppColors.primary.withValues(alpha: 0.2),
+                  color:
+                      _currentIndex == index
+                          ? AppColors.primary
+                          : AppColors.primary.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(4.r),
                 ),
               ),
             ),
           ),
-          
+
           // Next/Get Started Button
           ElevatedButton(
             onPressed: () {
               if (_currentIndex == _items.length - 1) {
-                Navigator.pushReplacementNamed(context, AppRoutes.login);
+                _finishOnboarding();
               } else {
                 _pageController.nextPage(
                   duration: const Duration(milliseconds: 300),
@@ -149,15 +158,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               foregroundColor: AppColors.white,
-              minimumSize: Size(_currentIndex == _items.length - 1 ? 160.w : 60.w, 60.w),
+              minimumSize: Size(
+                _currentIndex == _items.length - 1 ? 160.w : 60.w,
+                60.w,
+              ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(30.r),
               ),
               elevation: 0,
             ),
-            child: _currentIndex == _items.length - 1
-                ? Text('Get Started', style: AppStyles.labelLarge())
-                : const Icon(Icons.arrow_forward),
+            child:
+                _currentIndex == _items.length - 1
+                    ? Text('Get Started', style: AppStyles.labelLarge())
+                    : const Icon(Icons.arrow_forward),
           ),
         ],
       ),

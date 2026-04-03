@@ -19,10 +19,7 @@ class SecurityPrivacyScreen extends StatelessWidget {
           icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(
-          AppStrings.securityPrivacy,
-          style: AppStyles.titleLarge(),
-        ),
+        title: Text(AppStrings.securityPrivacy, style: AppStyles.titleLarge()),
         centerTitle: true,
       ),
       body: ListView(
@@ -83,8 +80,15 @@ class SecurityPrivacyScreen extends StatelessWidget {
         children: [
           Container(
             padding: EdgeInsets.all(10.w),
-            decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
-            child: Icon(Icons.verified_user_outlined, color: AppColors.white, size: 24.sp),
+            decoration: const BoxDecoration(
+              color: AppColors.primary,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.verified_user_outlined,
+              color: AppColors.white,
+              size: 24.sp,
+            ),
           ),
           SizedBox(width: 16.w),
           Expanded(
@@ -92,7 +96,10 @@ class SecurityPrivacyScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Account is Secure', style: AppStyles.bodyLargeMedium()),
-                Text('Your security settings are up to date.', style: AppStyles.bodySmall()),
+                Text(
+                  'Your security settings are up to date.',
+                  style: AppStyles.bodySmall(),
+                ),
               ],
             ),
           ),
@@ -104,10 +111,9 @@ class SecurityPrivacyScreen extends StatelessWidget {
   Widget _buildSectionHeader(String title) {
     return Text(
       title,
-      style: AppStyles.labelSmall(AppColors.textSecondary).copyWith(
-        letterSpacing: 1.2,
-        fontWeight: FontWeight.w700,
-      ),
+      style: AppStyles.labelSmall(
+        AppColors.textSecondary,
+      ).copyWith(letterSpacing: 1.2, fontWeight: FontWeight.w700),
     );
   }
 
@@ -146,7 +152,11 @@ class SecurityPrivacyScreen extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(Icons.chevron_right, color: AppColors.textSecondary, size: 20.sp),
+            Icon(
+              Icons.chevron_right,
+              color: AppColors.textSecondary,
+              size: 20.sp,
+            ),
           ],
         ),
       ),
@@ -224,11 +234,18 @@ class SecurityPrivacyScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title, style: AppStyles.bodyLargeMedium(Colors.red)),
-                Text(subtitle, style: AppStyles.bodySmall(AppColors.textSecondary)),
+                Text(
+                  subtitle,
+                  style: AppStyles.bodySmall(AppColors.textSecondary),
+                ),
               ],
             ),
           ),
-          Icon(Icons.warning_amber_rounded, color: Colors.red.withValues(alpha: 0.5), size: 24.sp),
+          Icon(
+            Icons.warning_amber_rounded,
+            color: Colors.red.withValues(alpha: 0.5),
+            size: 24.sp,
+          ),
         ],
       ),
     );

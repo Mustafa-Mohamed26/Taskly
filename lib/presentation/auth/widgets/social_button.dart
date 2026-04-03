@@ -38,11 +38,7 @@ class SocialButton extends StatelessWidget {
             if (isIconWidget && iconWidget != null)
               iconWidget!
             else if (iconPath != null)
-              Image.asset(
-                iconPath!,
-                height: 24.h,
-                width: 24.h,
-              ),
+              Image.asset(iconPath!, height: 24.h, width: 24.h),
             SizedBox(width: 12.w),
             Text(
               label,

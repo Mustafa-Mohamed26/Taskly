@@ -66,10 +66,9 @@ class NotificationSettingsScreen extends StatelessWidget {
   Widget _buildSectionHeader(String title) {
     return Text(
       title,
-      style: AppStyles.labelSmall(AppColors.textSecondary).copyWith(
-        letterSpacing: 1.2,
-        fontWeight: FontWeight.w700,
-      ),
+      style: AppStyles.labelSmall(
+        AppColors.textSecondary,
+      ).copyWith(letterSpacing: 1.2, fontWeight: FontWeight.w700),
     );
   }
 

@@ -18,10 +18,7 @@ class PersonalInfoScreen extends StatelessWidget {
           icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(
-          AppStrings.personalInfo,
-          style: AppStyles.titleLarge(),
-        ),
+        title: Text(AppStrings.personalInfo, style: AppStyles.titleLarge()),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -58,9 +55,17 @@ class PersonalInfoScreen extends StatelessWidget {
       children: [
         _buildInfoField('Full Name', 'Alex Thompson', Icons.person_outline),
         SizedBox(height: 20.h),
-        _buildInfoField('Email Address', 'alex.t@taskly.app', Icons.email_outlined),
+        _buildInfoField(
+          'Email Address',
+          'alex.t@taskly.app',
+          Icons.email_outlined,
+        ),
         SizedBox(height: 20.h),
-        _buildInfoField('Phone Number', '+1 (415) 555-0123', Icons.phone_outlined),
+        _buildInfoField(
+          'Phone Number',
+          '+1 (415) 555-0123',
+          Icons.phone_outlined,
+        ),
         SizedBox(height: 20.h),
         _buildBioField(),
       ],
@@ -89,7 +94,10 @@ class PersonalInfoScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(12.r),
               borderSide: BorderSide.none,
             ),
-            contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 16.w,
+              vertical: 16.h,
+            ),
           ),
         ),
       ],
@@ -109,7 +117,8 @@ class PersonalInfoScreen extends StatelessWidget {
         ),
         SizedBox(height: 8.h),
         TextFormField(
-          initialValue: 'Product Designer focusing on productivity tools and streamlined workflows. Always multitasking.',
+          initialValue:
+              'Product Designer focusing on productivity tools and streamlined workflows. Always multitasking.',
           maxLines: 4,
           style: AppStyles.bodyMedium(AppColors.textPrimary),
           decoration: InputDecoration(
@@ -135,7 +144,11 @@ class PersonalInfoScreen extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(Icons.verified_user_outlined, color: AppColors.primary, size: 24.sp),
+          Icon(
+            Icons.verified_user_outlined,
+            color: AppColors.primary,
+            size: 24.sp,
+          ),
           SizedBox(width: 12.w),
           Expanded(
             child: Column(
@@ -166,7 +179,9 @@ class PersonalInfoScreen extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,
             minimumSize: Size(double.infinity, 56.h),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.r),
+            ),
           ),
           child: Text('Save Changes', style: AppStyles.labelLarge()),
         ),
@@ -176,9 +191,14 @@ class PersonalInfoScreen extends StatelessWidget {
           style: TextButton.styleFrom(
             minimumSize: Size(double.infinity, 56.h),
             backgroundColor: AppColors.white,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.r),
+            ),
           ),
-          child: Text('Cancel', style: AppStyles.bodyLargeMedium(AppColors.textSecondary)),
+          child: Text(
+            'Cancel',
+            style: AppStyles.bodyLargeMedium(AppColors.textSecondary),
+          ),
         ),
       ],
     );

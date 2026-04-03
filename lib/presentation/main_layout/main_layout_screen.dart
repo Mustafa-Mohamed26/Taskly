@@ -32,14 +32,16 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
 
     return Scaffold(
       body: _screens[_currentIndex],
-      floatingActionButton: showFAB
-          ? FloatingActionButton(
-              onPressed: () => Navigator.pushNamed(context, AppRoutes.addTask),
-              backgroundColor: AppColors.primary,
-              shape: const CircleBorder(),
-              child: const Icon(Icons.add, color: AppColors.white),
-            )
-          : null,
+      floatingActionButton:
+          showFAB
+              ? FloatingActionButton(
+                onPressed:
+                    () => Navigator.pushNamed(context, AppRoutes.addTask),
+                backgroundColor: AppColors.primary,
+                shape: const CircleBorder(),
+                child: const Icon(Icons.add, color: AppColors.white),
+              )
+              : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,

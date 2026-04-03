@@ -18,10 +18,7 @@ class ThemePreferenceScreen extends StatelessWidget {
           icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(
-          AppStrings.themePreference,
-          style: AppStyles.titleLarge(),
-        ),
+        title: Text(AppStrings.themePreference, style: AppStyles.titleLarge()),
         centerTitle: true,
         actions: [
           TextButton(
@@ -66,7 +63,9 @@ class ThemePreferenceScreen extends StatelessWidget {
             SizedBox(height: 32.h),
             Text(
               'PREVIEW',
-              style: AppStyles.labelSmall(AppColors.textSecondary).copyWith(letterSpacing: 1.2),
+              style: AppStyles.labelSmall(
+                AppColors.textSecondary,
+              ).copyWith(letterSpacing: 1.2),
             ),
             SizedBox(height: 16.h),
             _buildPreviewCard(),
@@ -76,7 +75,9 @@ class ThemePreferenceScreen extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 minimumSize: Size(double.infinity, 56.h),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
               ),
               child: Text('Apply Changes', style: AppStyles.labelLarge()),
             ),
@@ -115,17 +116,25 @@ class ThemePreferenceScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(16.r),
-        border: isSelected ? Border.all(color: AppColors.primary, width: 2) : null,
+        border:
+            isSelected ? Border.all(color: AppColors.primary, width: 2) : null,
       ),
       child: Row(
         children: [
           Container(
             padding: EdgeInsets.all(10.w),
             decoration: BoxDecoration(
-              color: isSelected ? AppColors.primary : AppColors.primary.withValues(alpha: 0.1),
+              color:
+                  isSelected
+                      ? AppColors.primary
+                      : AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12.r),
             ),
-            child: Icon(icon, color: isSelected ? AppColors.white : AppColors.primary, size: 20.sp),
+            child: Icon(
+              icon,
+              color: isSelected ? AppColors.white : AppColors.primary,
+              size: 20.sp,
+            ),
           ),
           SizedBox(width: 16.w),
           Expanded(
@@ -165,19 +174,26 @@ class ThemePreferenceScreen extends StatelessWidget {
     return Wrap(
       spacing: 16.w,
       runSpacing: 16.h,
-      children: colors.map((color) {
-        final isSelected = color == AppColors.primary;
-        return Container(
-          width: 44.w,
-          height: 44.w,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-            border: isSelected ? Border.all(color: Colors.black, width: 2) : null,
-          ),
-          child: isSelected ? Icon(Icons.check, color: Colors.white, size: 20.sp) : null,
-        );
-      }).toList(),
+      children:
+          colors.map((color) {
+            final isSelected = color == AppColors.primary;
+            return Container(
+              width: 44.w,
+              height: 44.w,
+              decoration: BoxDecoration(
+                color: color,
+                shape: BoxShape.circle,
+                border:
+                    isSelected
+                        ? Border.all(color: Colors.black, width: 2)
+                        : null,
+              ),
+              child:
+                  isSelected
+                      ? Icon(Icons.check, color: Colors.white, size: 20.sp)
+                      : null,
+            );
+          }).toList(),
     );
   }
 
@@ -200,16 +216,34 @@ class ThemePreferenceScreen extends StatelessWidget {
                   color: AppColors.primary,
                   borderRadius: BorderRadius.circular(8.r),
                 ),
-                child: Icon(Icons.check_rounded, color: AppColors.white, size: 20.sp),
+                child: Icon(
+                  Icons.check_rounded,
+                  color: AppColors.white,
+                  size: 20.sp,
+                ),
               ),
               SizedBox(width: 12.w),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(width: 100.w, height: 8.h, decoration: BoxDecoration(color: AppColors.fieldBorder, borderRadius: BorderRadius.circular(4.r))),
+                    Container(
+                      width: 100.w,
+                      height: 8.h,
+                      decoration: BoxDecoration(
+                        color: AppColors.fieldBorder,
+                        borderRadius: BorderRadius.circular(4.r),
+                      ),
+                    ),
                     SizedBox(height: 4.h),
-                    Container(width: 60.w, height: 6.h, decoration: BoxDecoration(color: AppColors.fieldBorder.withValues(alpha: 0.5), borderRadius: BorderRadius.circular(3.r))),
+                    Container(
+                      width: 60.w,
+                      height: 6.h,
+                      decoration: BoxDecoration(
+                        color: AppColors.fieldBorder.withValues(alpha: 0.5),
+                        borderRadius: BorderRadius.circular(3.r),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -232,12 +266,34 @@ class ThemePreferenceScreen extends StatelessWidget {
           height: 18.w,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            border: Border.all(color: isChecked ? AppColors.primary : AppColors.fieldBorder, width: 2),
+            border: Border.all(
+              color: isChecked ? AppColors.primary : AppColors.fieldBorder,
+              width: 2,
+            ),
           ),
-          child: isChecked ? Center(child: Container(width: 8.w, height: 8.w, decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle))) : null,
+          child:
+              isChecked
+                  ? Center(
+                    child: Container(
+                      width: 8.w,
+                      height: 8.w,
+                      decoration: const BoxDecoration(
+                        color: AppColors.primary,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  )
+                  : null,
         ),
         SizedBox(width: 12.w),
-        Container(width: 150.w, height: 8.h, decoration: BoxDecoration(color: AppColors.fieldBorder.withValues(alpha: 0.5), borderRadius: BorderRadius.circular(4.r))),
+        Container(
+          width: 150.w,
+          height: 8.h,
+          decoration: BoxDecoration(
+            color: AppColors.fieldBorder.withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(4.r),
+          ),
+        ),
       ],
     );
   }

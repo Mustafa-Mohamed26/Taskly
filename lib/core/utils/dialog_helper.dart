@@ -55,8 +55,10 @@ class DialogHelper {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) =>
-          const Center(child: CircularProgressIndicator(color: Colors.white)),
+      builder:
+          (_) => const Center(
+            child: CircularProgressIndicator(color: Colors.white),
+          ),
     );
   }
 
