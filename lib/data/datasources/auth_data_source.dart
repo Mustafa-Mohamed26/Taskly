@@ -16,6 +16,8 @@ abstract class AuthDataSource {
 
   Future<void> forgotPassword(String email);
 
+  Future<void> saveUserProfile(UserModel user);
+
   Stream<UserModel?> get authStateChanges;
 
   Future<UserModel?> get currentAuthenticatedUser;

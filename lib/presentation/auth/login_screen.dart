@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:taskly/core/routes/app_routes.dart';
 import 'package:taskly/core/utils/validators.dart';
-import 'package:taskly/domain/entities/user_entity.dart';
 import 'package:taskly/presentation/auth/cubit/auth_cubit.dart';
 import 'package:taskly/presentation/auth/widgets/auth_loading_widget.dart';
 import '../../core/constants/app_strings.dart';
@@ -196,7 +195,22 @@ class _LoginScreenState extends State<LoginScreen> {
         SizedBox(height: 24.h),
         Row(
           children: [
-
+            SocialButton(
+              label: 'Google',
+              onPressed: () {
+                // Feature removed for now
+                AwesomeDialog(
+                  context: context,
+                  dialogType: DialogType.info,
+                  title: 'Coming Soon',
+                  desc: 'Google Login is currently disabled.',
+                  btnOkOnPress: () {},
+                ).show();
+              },
+              isIconWidget: true,
+              iconWidget: Icon(Icons.g_mobiledata, color: AppColors.priorityHigh, size: 28.sp),
+            ),
+            SizedBox(width: 16.w),
             SocialButton(
               label: 'Apple',
               onPressed: () {},

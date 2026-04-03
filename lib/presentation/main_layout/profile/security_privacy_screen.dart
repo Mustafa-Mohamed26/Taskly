@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../core/constants/app_strings.dart';
-import '../../core/routes/app_routes.dart';
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_styles.dart';
+import '../../../core/constants/app_strings.dart';
+import '../../../core/routes/app_routes.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_styles.dart';
 
 class SecurityPrivacyScreen extends StatelessWidget {
   const SecurityPrivacyScreen({super.key});
