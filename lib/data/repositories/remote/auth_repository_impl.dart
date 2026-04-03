@@ -23,7 +23,11 @@ class AuthRepositoryImpl implements AuthRepository {
     required String email,
     required String password,
   }) async {
-    return await _remoteDataSource.register(name: name, email: email, password: password);
+    return await _remoteDataSource.register(
+      name: name,
+      email: email,
+      password: password,
+    );
   }
 
   @override
@@ -37,8 +41,10 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Stream<UserEntity?> get authStateChanges => _remoteDataSource.authStateChanges;
+  Stream<UserEntity?> get authStateChanges =>
+      _remoteDataSource.authStateChanges;
 
   @override
-  Future<UserEntity?> get currentAuthenticatedUser => _remoteDataSource.currentAuthenticatedUser;
+  Future<UserEntity?> get currentAuthenticatedUser =>
+      _remoteDataSource.currentAuthenticatedUser;
 }

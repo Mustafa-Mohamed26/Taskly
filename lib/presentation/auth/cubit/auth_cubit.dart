@@ -16,9 +16,13 @@ class AuthCubit extends Cubit<AuthState> {
   void checkAuth() {
     GetAuthenticatedUserUseCase.execute().listen((user) {
       if (user != null) {
-        emit(AuthSuccess<UserEntity>(user));
+        if (state is! Authenticated &&
+            state is! LoginSuccess &&
+            state is! RegisterSuccess) {
+          emit(Authenticated(user));
+        }
       } else {
-        emit(AuthInitial());
+        emit(Unauthenticated());
       }
     });
   }
@@ -27,7 +31,7 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
     try {
       final user = await LoginUseCase.execute(email: email, password: password);
-      emit(AuthSuccess<UserEntity>(user));
+      emit(LoginSuccess(user));
     } catch (e) {
       emit(AuthError(e.toString()));
     }
@@ -36,8 +40,12 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> register(String name, String email, String password) async {
     emit(AuthLoading());
     try {
-      final user = await RegisterUseCase.execute(name: name, email: email, password: password);
-      emit(AuthSuccess<UserEntity>(user));
+      final user = await RegisterUseCase.execute(
+        name: name,
+        email: email,
+        password: password,
+      );
+      emit(RegisterSuccess(user));
     } catch (e) {
       emit(AuthError(e.toString()));
     }
@@ -47,7 +55,7 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
     try {
       await LogoutUseCase.execute();
-      emit(AuthInitial());
+      emit(Unauthenticated());
     } catch (e) {
       emit(AuthError(e.toString()));
     }
@@ -57,7 +65,7 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
     try {
       await ForgotPasswordUseCase.execute(email);
-      emit(AuthSuccess<String>('Reset link sent to your email'));
+      emit(ForgotPasswordSuccess('Reset link sent to your email'));
     } catch (e) {
       emit(AuthError(e.toString()));
     }

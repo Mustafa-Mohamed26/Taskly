@@ -19,16 +19,14 @@ class AuthButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: isLoading ? null : onPressed,
-      child: isLoading
-          ? SizedBox(
-              height: 20.h,
-              width: 20.h,
-              child: const CircularProgressIndicator(color: AppColors.white),
-            )
-          : Text(
-              text,
-              style: AppStyles.labelLarge(),
-            ),
+      child:
+          isLoading
+              ? SizedBox(
+                height: 20.h,
+                width: 20.h,
+                child: const CircularProgressIndicator(color: AppColors.white),
+              )
+              : Text(text, style: AppStyles.labelLarge()),
     );
   }
 }

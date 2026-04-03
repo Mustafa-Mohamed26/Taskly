@@ -19,12 +19,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final List<OnboardingItem> _items = [
     OnboardingItem(
       title: 'Simplify Your Life',
-      subtitle: 'Organize your daily tasks and boost your productivity effortlessly.',
+      subtitle:
+          'Organize your daily tasks and boost your productivity effortlessly.',
       icon: Icons.auto_awesome_outlined,
     ),
     OnboardingItem(
       title: 'Set Your Goals',
-      subtitle: 'Keep track of your long-term goals and celebrate every small win.',
+      subtitle:
+          'Keep track of your long-term goals and celebrate every small win.',
       icon: Icons.track_changes_outlined,
     ),
     OnboardingItem(
@@ -34,9 +36,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     ),
   ];
 
-  void _finishOnboarding() {
-    CacheHelper.setOnboardingCompleted(true);
-    Navigator.pushReplacementNamed(context, AppRoutes.login);
+  void _finishOnboarding() async {
+    await CacheHelper.setOnboardingCompleted(true);
+    if (mounted) {
+      Navigator.pushReplacementNamed(context, AppRoutes.login);
+    }
   }
 
   @override
@@ -95,11 +99,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               color: AppColors.primary.withValues(alpha: 0.05),
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              item.icon,
-              size: 100.sp,
-              color: AppColors.primary,
-            ),
+            child: Icon(item.icon, size: 100.sp, color: AppColors.primary),
           ),
           SizedBox(height: 60.h),
           Text(
@@ -133,13 +133,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 width: _currentIndex == index ? 24.w : 8.w,
                 height: 8.w,
                 decoration: BoxDecoration(
-                  color: _currentIndex == index ? AppColors.primary : AppColors.primary.withValues(alpha: 0.2),
+                  color:
+                      _currentIndex == index
+                          ? AppColors.primary
+                          : AppColors.primary.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(4.r),
                 ),
               ),
             ),
           ),
-          
+
           // Next/Get Started Button
           ElevatedButton(
             onPressed: () {
@@ -155,15 +158,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               foregroundColor: AppColors.white,
-              minimumSize: Size(_currentIndex == _items.length - 1 ? 160.w : 60.w, 60.w),
+              minimumSize: Size(
+                _currentIndex == _items.length - 1 ? 160.w : 60.w,
+                60.w,
+              ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(30.r),
               ),
               elevation: 0,
             ),
-            child: _currentIndex == _items.length - 1
-                ? Text('Get Started', style: AppStyles.labelLarge())
-                : const Icon(Icons.arrow_forward),
+            child:
+                _currentIndex == _items.length - 1
+                    ? Text('Get Started', style: AppStyles.labelLarge())
+                    : const Icon(Icons.arrow_forward),
           ),
         ],
       ),

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:taskly/core/service/cache_helper.dart';
-import 'package:taskly/domain/entities/user_entity.dart';
 import 'package:taskly/presentation/auth/cubit/auth_cubit.dart';
 import 'package:taskly/presentation/auth/widgets/auth_loading_widget.dart';
 import '../../core/constants/app_strings.dart';
@@ -42,9 +41,9 @@ class _SplashScreenState extends State<SplashScreen> {
           _isLoading = state is AuthLoading;
         });
 
-        if (state is AuthSuccess<UserEntity>) {
+        if (state is Authenticated) {
           _navigate(AppRoutes.mainLayout);
-        } else if (state is AuthInitial) {
+        } else if (state is Unauthenticated) {
           if (CacheHelper.getOnboardingCompleted()) {
             _navigate(AppRoutes.login);
           } else {
@@ -58,7 +57,6 @@ class _SplashScreenState extends State<SplashScreen> {
             title: 'Authentication Error',
             desc: state.message,
             btnOkOnPress: () {
-              // Retry checkAuth if error occurs
               context.read<AuthCubit>().checkAuth();
             },
           ).show();

@@ -2,6 +2,7 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:taskly/core/utils/validators.dart';
 import 'package:taskly/presentation/auth/cubit/auth_cubit.dart';
 import 'package:taskly/presentation/auth/widgets/auth_loading_widget.dart';
 import '../../core/routes/app_routes.dart';
@@ -18,6 +19,7 @@ class ForgotPasswordScreen extends StatefulWidget {
 }
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+  final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   bool _isLoading = false;
 
@@ -35,15 +37,19 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           _isLoading = state is AuthLoading;
         });
 
-        if (state is AuthSuccess<String>) {
+        if (state is ForgotPasswordSuccess) {
           AwesomeDialog(
             context: context,
             dialogType: DialogType.success,
             animType: AnimType.bottomSlide,
             title: 'Email Sent',
-            desc: state.data,
+            desc: state.message,
             btnOkOnPress: () {
-              Navigator.pop(context);
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                AppRoutes.login,
+                (route) => false,
+              );
             },
           ).show();
         } else if (state is AuthError) {
@@ -64,7 +70,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               backgroundColor: AppColors.transparent,
               elevation: 0,
               leading: IconButton(
-                icon: Icon(Icons.arrow_back, color: AppColors.textPrimary, size: 24.sp),
+                icon: Icon(
+                  Icons.arrow_back,
+                  color: AppColors.textPrimary,
+                  size: 24.sp,
+                ),
                 onPressed: () => Navigator.pop(context),
               ),
               title: Text(
@@ -76,33 +86,29 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             body: SafeArea(
               child: SingleChildScrollView(
                 padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _buildHeader(),
-                    SizedBox(height: 48.h),
-                    _buildForm(),
-                    SizedBox(height: 40.h),
-                    AuthButton(
-                      text: 'Send Instructions',
-                      onPressed: () {
-                        if (_emailController.text.isNotEmpty) {
-                          context.read<AuthCubit>().forgotPassword(_emailController.text.trim());
-                        } else {
-                          AwesomeDialog(
-                            context: context,
-                            dialogType: DialogType.warning,
-                            animType: AnimType.bottomSlide,
-                            title: 'Validation',
-                            desc: 'Please enter your email',
-                            btnOkOnPress: () {},
-                          ).show();
-                        }
-                      },
-                    ),
-                    SizedBox(height: 40.h),
-                    _buildFooter(),
-                  ],
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _buildHeader(),
+                      SizedBox(height: 48.h),
+                      _buildForm(),
+                      SizedBox(height: 40.h),
+                      AuthButton(
+                        text: 'Send Instructions',
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            context.read<AuthCubit>().forgotPassword(
+                                  _emailController.text.trim(),
+                                );
+                          }
+                        },
+                      ),
+                      SizedBox(height: 40.h),
+                      _buildFooter(),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -130,10 +136,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           ),
         ),
         SizedBox(height: 32.h),
-        Text(
-          'Reset Your Password',
-          style: AppStyles.displayLarge(),
-        ),
+        Text('Reset Your Password', style: AppStyles.displayLarge()),
         SizedBox(height: 12.h),
         Text(
           'Enter the email associated with your account and we\'ll send you instructions to reset your password.',
@@ -149,23 +152,18 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       hint: 'name@company.com',
       controller: _emailController,
       prefixIcon: Icons.email_outlined,
+      validator: (val) => Validators.validateEmail(val),
     );
   }
 
   Widget _buildFooter() {
     return Column(
       children: [
-        Text(
-          "Suddenly remember your password?",
-          style: AppStyles.bodyMedium(),
-        ),
+        Text("Suddenly remember your password?", style: AppStyles.bodyMedium()),
         SizedBox(height: 8.h),
         GestureDetector(
           onTap: () => Navigator.pop(context),
-          child: Text(
-            'Back to login',
-            style: AppStyles.labelMedium(),
-          ),
+          child: Text('Back to login', style: AppStyles.labelMedium()),
         ),
       ],
     );

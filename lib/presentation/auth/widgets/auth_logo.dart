@@ -17,11 +17,7 @@ class AuthLogo extends StatelessWidget {
             color: AppColors.primary,
             borderRadius: BorderRadius.circular(16.r),
           ),
-          child: Icon(
-            Icons.check_rounded,
-            color: AppColors.white,
-            size: 40.sp,
-          ),
+          child: Icon(Icons.check_rounded, color: AppColors.white, size: 40.sp),
         ),
         SizedBox(height: 16.h),
         Text(

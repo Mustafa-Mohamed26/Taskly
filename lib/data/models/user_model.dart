@@ -13,16 +13,11 @@ class UserModel extends UserEntity {
       id: user.uid,
       email: user.email ?? '',
       name: user.displayName,
-      photoUrl: user.photoUrl,
+      photoUrl: user.photoURL,
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'email': email,
-      'name': name,
-      'photoUrl': photoUrl,
-    };
+    return {'id': id, 'email': email, 'name': name, 'photoUrl': photoUrl};
   }
 }

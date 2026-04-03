@@ -13,7 +13,8 @@ import 'package:injectable/injectable.dart' as _i526;
 
 import '../../core/service/database_helper.dart' as _i512;
 import '../../data/datasources/auth_data_source.dart' as _i305;
-import '../../data/datasources/remote/auth_remote_data_source.dart' as _i624;
+import '../../data/datasources/remote/auth_remote_data_source_impl.dart'
+    as _i743;
 import '../../data/repositories/remote/auth_repository_impl.dart' as _i381;
 import '../../domain/repositories/auth_repository.dart' as _i1073;
 import '../../domain/usecases/auth/forgot_password_usecase.dart' as _i674;
@@ -43,7 +44,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i659.RegisterUseCase>(() => _i659.RegisterUseCase());
     gh.factory<_i1063.AuthCubit>(() => _i1063.AuthCubit());
     gh.singleton<_i512.DatabaseHelper>(() => _i512.DatabaseHelper());
-    gh.factory<_i305.AuthDataSource>(() => _i624.FirebaseAuthDataSourceImpl());
+    gh.factory<_i305.AuthDataSource>(() => _i743.FirebaseAuthDataSourceImpl());
     gh.factory<_i1073.AuthRepository>(
         () => _i381.AuthRepositoryImpl(gh<_i305.AuthDataSource>()));
     return this;

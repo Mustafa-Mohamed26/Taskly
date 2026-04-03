@@ -7,7 +7,8 @@ import 'widgets/auth_button.dart';
 import 'widgets/auth_text_field.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
-  const ChangePasswordScreen({super.key});
+  final String? email;
+  const ChangePasswordScreen({super.key, this.email});
 
   @override
   State<ChangePasswordScreen> createState() => _ChangePasswordScreenState();
@@ -33,7 +34,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         backgroundColor: AppColors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AppColors.textPrimary, size: 24.sp),
+          icon: Icon(
+            Icons.arrow_back,
+            color: AppColors.textPrimary,
+            size: 24.sp,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -57,7 +62,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               AuthButton(
                 text: 'Update Password',
                 onPressed: () {
-                  Navigator.pushReplacementNamed(context, AppRoutes.passwordChanged);
+                  Navigator.pushReplacementNamed(
+                    context,
+                    AppRoutes.passwordChanged,
+                  );
                 },
               ),
             ],
@@ -71,10 +79,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Create New Password',
-          style: AppStyles.displayLarge(),
-        ),
+        Text('Create New Password', style: AppStyles.displayLarge()),
         SizedBox(height: 8.h),
         Text(
           'Your new password must be different from previous passwords.',
@@ -94,11 +99,15 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           obscureText: _obscureNewPassword,
           suffixIcon: IconButton(
             icon: Icon(
-              _obscureNewPassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+              _obscureNewPassword
+                  ? Icons.visibility_outlined
+                  : Icons.visibility_off_outlined,
               color: AppColors.fieldHint,
               size: 20.sp,
             ),
-            onPressed: () => setState(() => _obscureNewPassword = !_obscureNewPassword),
+            onPressed:
+                () =>
+                    setState(() => _obscureNewPassword = !_obscureNewPassword),
           ),
         ),
         SizedBox(height: 24.h),
@@ -109,11 +118,16 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           obscureText: _obscureConfirmPassword,
           suffixIcon: IconButton(
             icon: Icon(
-              _obscureConfirmPassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+              _obscureConfirmPassword
+                  ? Icons.visibility_outlined
+                  : Icons.visibility_off_outlined,
               color: AppColors.fieldHint,
               size: 20.sp,
             ),
-            onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+            onPressed:
+                () => setState(
+                  () => _obscureConfirmPassword = !_obscureConfirmPassword,
+                ),
           ),
         ),
       ],

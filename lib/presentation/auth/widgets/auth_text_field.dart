@@ -28,10 +28,7 @@ class AuthTextField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: AppStyles.titleSmall(),
-        ),
+        Text(label, style: AppStyles.titleSmall()),
         SizedBox(height: 8.h),
         TextFormField(
           controller: controller,
@@ -40,13 +37,14 @@ class AuthTextField extends StatelessWidget {
           style: TextStyle(fontSize: 14.sp),
           decoration: InputDecoration(
             hintText: hint,
-            prefixIcon: prefixIcon != null
-                ? Icon(
-                    prefixIcon,
-                    color: AppColors.textSecondary.withValues(alpha: 0.5),
-                    size: 20.sp,
-                  )
-                : null,
+            prefixIcon:
+                prefixIcon != null
+                    ? Icon(
+                      prefixIcon,
+                      color: AppColors.textSecondary.withValues(alpha: 0.5),
+                      size: 20.sp,
+                    )
+                    : null,
             suffixIcon: suffixIcon,
           ),
         ),

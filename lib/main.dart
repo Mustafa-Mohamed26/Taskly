@@ -12,8 +12,14 @@ import 'core/routes/app_routes_generator.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  try {
+    await CacheHelper.init();
+  } catch (e) {
+    debugPrint('CacheHelper initialization failed: $e');
+  }
+
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await CacheHelper.init();
   configureDependencies();
   runApp(const MyApp());
 }

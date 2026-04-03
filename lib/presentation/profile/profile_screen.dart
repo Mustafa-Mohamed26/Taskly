@@ -15,10 +15,7 @@ class ProfileScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: AppColors.white,
         elevation: 0,
-        title: Text(
-          AppStrings.profile,
-          style: AppStyles.titleLarge(),
-        ),
+        title: Text(AppStrings.profile, style: AppStyles.titleLarge()),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -93,10 +90,7 @@ class ProfileScreen extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Text(
-            label,
-            style: AppStyles.bodySmallMedium(AppColors.primary),
-          ),
+          Text(label, style: AppStyles.bodySmallMedium(AppColors.primary)),
           SizedBox(height: 8.h),
           Text(
             value,
@@ -113,10 +107,9 @@ class ProfileScreen extends StatelessWidget {
       children: [
         Text(
           AppStrings.accountSettings,
-          style: AppStyles.labelSmall(AppColors.textSecondary).copyWith(
-            letterSpacing: 1.2,
-            fontWeight: FontWeight.w700,
-          ),
+          style: AppStyles.labelSmall(
+            AppColors.textSecondary,
+          ).copyWith(letterSpacing: 1.2, fontWeight: FontWeight.w700),
         ),
         SizedBox(height: 16.h),
         _buildSettingItem(
@@ -162,7 +155,9 @@ class ProfileScreen extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.circular(16.r),
-          border: Border.all(color: AppColors.fieldBorder.withValues(alpha: 0.5)),
+          border: Border.all(
+            color: AppColors.fieldBorder.withValues(alpha: 0.5),
+          ),
         ),
         child: Row(
           children: [
@@ -179,19 +174,17 @@ class ProfileScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    title,
-                    style: AppStyles.bodyLargeMedium(),
-                  ),
+                  Text(title, style: AppStyles.bodyLargeMedium()),
                   SizedBox(height: 2.h),
-                  Text(
-                    subtitle,
-                    style: AppStyles.bodySmall(),
-                  ),
+                  Text(subtitle, style: AppStyles.bodySmall()),
                 ],
               ),
             ),
-            Icon(Icons.chevron_right, color: AppColors.textSecondary, size: 20.sp),
+            Icon(
+              Icons.chevron_right,
+              color: AppColors.textSecondary,
+              size: 20.sp,
+            ),
           ],
         ),
       ),
@@ -201,7 +194,11 @@ class ProfileScreen extends StatelessWidget {
   Widget _buildLogoutButton(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.pushNamedAndRemoveUntil(context, AppRoutes.login, (route) => false);
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          AppRoutes.login,
+          (route) => false,
+        );
       },
       child: Container(
         width: double.infinity,

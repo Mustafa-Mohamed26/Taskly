@@ -18,10 +18,7 @@ class FocusScreen extends StatelessWidget {
           icon: const Icon(Icons.close, color: AppColors.textPrimary),
           onPressed: () {},
         ),
-        title: Text(
-          AppStrings.focusMode,
-          style: AppStyles.titleLarge(),
-        ),
+        title: Text(AppStrings.focusMode, style: AppStyles.titleLarge()),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -93,10 +90,7 @@ class FocusScreen extends StatelessWidget {
                     style: AppStyles.labelSmall(AppColors.primary),
                   ),
                   SizedBox(height: 4.h),
-                  Text(
-                    'Design System Update',
-                    style: AppStyles.titleLarge(),
-                  ),
+                  Text('Design System Update', style: AppStyles.titleLarge()),
                   SizedBox(height: 4.h),
                   Text(
                     AppStrings.priorityHighPro,
@@ -110,7 +104,11 @@ class FocusScreen extends StatelessWidget {
                   color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12.r),
                 ),
-                child: Icon(Icons.palette_outlined, color: AppColors.primary, size: 24.sp),
+                child: Icon(
+                  Icons.palette_outlined,
+                  color: AppColors.primary,
+                  size: 24.sp,
+                ),
               ),
             ],
           ),
@@ -121,7 +119,9 @@ class FocusScreen extends StatelessWidget {
               value: 0.6,
               minHeight: 6.h,
               backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                AppColors.primary,
+              ),
             ),
           ),
           SizedBox(height: 12.h),
@@ -134,7 +134,11 @@ class FocusScreen extends StatelessWidget {
               ),
               Row(
                 children: [
-                  Icon(Icons.check_circle_outline, color: AppColors.primary, size: 16.sp),
+                  Icon(
+                    Icons.check_circle_outline,
+                    color: AppColors.primary,
+                    size: 16.sp,
+                  ),
                   SizedBox(width: 4.w),
                   Text(
                     AppStrings.complete,
