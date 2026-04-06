@@ -18,21 +18,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   final List<OnboardingItem> _items = [
     OnboardingItem(
-      title: 'Simplify Your Life',
+      title: 'Organize Your Life',
       subtitle:
-          'Organize your daily tasks and boost your productivity effortlessly.',
-      icon: Icons.auto_awesome_outlined,
+          'Stay on top of your daily goals and boost your productivity with Taskly\'s intuitive interface.',
+      image: 'assets/images/onboarding_1.png',
     ),
     OnboardingItem(
-      title: 'Set Your Goals',
+      title: 'Stay on Schedule',
       subtitle:
-          'Keep track of your long-term goals and celebrate every small win.',
-      icon: Icons.track_changes_outlined,
+          'Plan your days with precision and never miss a deadline again with our integrated calendar views.',
+      image: 'assets/images/onboarding_2.png',
     ),
     OnboardingItem(
-      title: 'Collaborate with Ease',
-      subtitle: 'Share tasks with your team and achieve milestones together.',
-      icon: Icons.groups_outlined,
+      title: 'Reach Your Potential',
+      subtitle:
+          'Track your progress, overcome obstacles, and celebrate every milestone on your journey to success. Our tools are designed to keep you focused on what matters most.',
+      image: 'assets/images/onboarding_3.png',
     ),
   ];
 
@@ -45,147 +46,236 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: AppColors.white,
-      appBar: AppBar(
-        backgroundColor: AppColors.transparent,
-        elevation: 0,
-        actions: [
-          TextButton(
-            onPressed: _finishOnboarding,
-            child: Text(
-              'Skip',
-              style: AppStyles.labelMedium().copyWith(
-                color: AppColors.textSecondary,
-                fontWeight: FontWeight.w500,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: SafeArea(
+        child: Column(
+          children: [
+            _buildHeader(isDark),
+            Expanded(
+              child: PageView.builder(
+                controller: _pageController,
+                onPageChanged: (index) {
+                  setState(() {
+                    _currentIndex = index;
+                  });
+                },
+                itemCount: _items.length,
+                itemBuilder: (context, index) {
+                  return _buildPage(_items[index], isDark);
+                },
               ),
             ),
-          ),
-          SizedBox(width: 16.w),
-        ],
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: PageView.builder(
-              controller: _pageController,
-              onPageChanged: (index) {
-                setState(() {
-                  _currentIndex = index;
-                });
-              },
-              itemCount: _items.length,
-              itemBuilder: (context, index) {
-                return _buildPage(_items[index]);
-              },
-            ),
-          ),
-          _buildBottomSection(),
-        ],
+            _buildBottomSection(isDark),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildPage(OnboardingItem item) {
+  Widget _buildHeader(bool isDark) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 40.w),
-      child: Column(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: 200.w,
-            height: 200.w,
+            padding: EdgeInsets.all(6.w),
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.05),
-              shape: BoxShape.circle,
+              color: AppColors.primary,
+              borderRadius: BorderRadius.circular(10.r),
             ),
-            child: Icon(item.icon, size: 100.sp, color: AppColors.primary),
+            child: Icon(
+              Icons.check_rounded,
+              color: AppColors.white,
+              size: 20.sp,
+            ),
           ),
-          SizedBox(height: 60.h),
+          SizedBox(width: 10.w),
           Text(
-            item.title,
-            style: AppStyles.displayLarge().copyWith(fontSize: 28.sp),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: 16.h),
-          Text(
-            item.subtitle,
-            style: AppStyles.bodyLarge().copyWith(fontSize: 16.sp),
-            textAlign: TextAlign.center,
+            'Taskly',
+            style: AppStyles.displayMedium(
+              isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            ).copyWith(
+              fontWeight: FontWeight.w900,
+              fontSize: 22.sp,
+              letterSpacing: -0.5,
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildBottomSection() {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(24.w, 0, 24.w, 60.h),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Dot Indicator
-          Row(
-            children: List.generate(
-              _items.length,
-              (index) => Container(
-                margin: EdgeInsets.only(right: 8.w),
-                width: _currentIndex == index ? 24.w : 8.w,
-                height: 8.w,
-                decoration: BoxDecoration(
-                  color:
-                      _currentIndex == index
-                          ? AppColors.primary
-                          : AppColors.primary.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(4.r),
+  Widget _buildPage(OnboardingItem item, bool isDark) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: constraints.maxHeight,
+            ),
+            child: IntrinsicHeight(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24.w),
+                child: Column(
+                  children: [
+                    SizedBox(height: 20.h),
+                    _buildImageSection(item, isDark),
+                    const Spacer(),
+                    _buildContentSection(item, isDark),
+                    SizedBox(height: 40.h),
+                  ],
                 ),
               ),
             ),
           ),
+        );
+      },
+    );
+  }
 
-          // Next/Get Started Button
-          ElevatedButton(
-            onPressed: () {
-              if (_currentIndex == _items.length - 1) {
-                _finishOnboarding();
-              } else {
-                _pageController.nextPage(
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
-                );
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: AppColors.white,
-              minimumSize: Size(
-                _currentIndex == _items.length - 1 ? 160.w : 60.w,
-                60.w,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30.r),
-              ),
-              elevation: 0,
-            ),
-            child:
-                _currentIndex == _items.length - 1
-                    ? Text('Get Started', style: AppStyles.labelLarge())
-                    : const Icon(Icons.arrow_forward),
+  Widget _buildImageSection(OnboardingItem item, bool isDark) {
+    return Container(
+      constraints: BoxConstraints(
+        maxHeight: 380.h,
+        minHeight: 250.h,
+      ),
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(24.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
           ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24.r),
+        child: Image.asset(
+          item.image,
+          fit: BoxFit.cover,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContentSection(OnboardingItem item, bool isDark) {
+    return Column(
+      children: [
+        Text(
+          item.title,
+          style: AppStyles.displayMedium(
+            isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          ).copyWith(
+            fontSize: 28.sp,
+            fontWeight: FontWeight.w900,
+            letterSpacing: -0.5,
+            height: 1.2,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        SizedBox(height: 16.h),
+        Text(
+          item.subtitle,
+          style: AppStyles.bodyLarge(
+            isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+          ).copyWith(
+            fontSize: 15.sp,
+            height: 1.5,
+            fontWeight: FontWeight.w400,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBottomSection(bool isDark) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(24.w, 0, 24.w, 32.h),
+      child: Column(
+        children: [
+          _buildDotIndicator(isDark),
+          SizedBox(height: 32.h),
+          _buildNextButton(isDark),
         ],
       ),
     );
   }
+
+  Widget _buildDotIndicator(bool isDark) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(
+        _items.length,
+        (index) => AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          margin: EdgeInsets.only(right: 8.w),
+          width: _currentIndex == index ? 24.w : 10.w,
+          height: 10.w,
+          decoration: BoxDecoration(
+            color:
+                _currentIndex == index
+                    ? AppColors.primary
+                    : AppColors.primary.withValues(alpha: 0.2),
+            borderRadius: BorderRadius.circular(5.r),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNextButton(bool isDark) {
+    final bool isLastPage = _currentIndex == _items.length - 1;
+    return SizedBox(
+      width: double.infinity,
+      height: 60.h,
+      child: ElevatedButton(
+        onPressed: () {
+          if (isLastPage) {
+            _finishOnboarding();
+          } else {
+            _pageController.nextPage(
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.easeInOutCubic,
+            );
+          }
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          foregroundColor: AppColors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.r),
+          ),
+          elevation: 0,
+        ),
+        child: Text(
+          isLastPage ? 'Continue' : 'Next',
+          style: AppStyles.labelLarge(AppColors.white).copyWith(
+            fontSize: 18.sp,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+      ),
+    );
+  }
+
 }
 
 class OnboardingItem {
   final String title;
   final String subtitle;
-  final IconData icon;
+  final String image;
 
   OnboardingItem({
     required this.title,
     required this.subtitle,
-    required this.icon,
+    required this.image,
   });
 }

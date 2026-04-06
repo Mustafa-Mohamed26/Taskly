@@ -17,38 +17,70 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
-  bool _isLoading = false;
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _progressController;
+  late Animation<double> _progressAnimation;
 
   @override
   void initState() {
     super.initState();
-  }
 
-  void _navigate(String route) {
-    Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) {
-        Navigator.pushReplacementNamed(context, route);
+    _progressController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    );
+
+    _progressAnimation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(parent: _progressController, curve: Curves.easeInOut),
+    )..addListener(() {
+      setState(() {});
+    });
+
+    _progressController.forward();
+
+    // Ensure AuthCubit triggers the check on initialization
+    context.read<AuthCubit>().checkAuth();
+
+    _progressController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _checkAndNavigate();
       }
     });
   }
 
   @override
+  void dispose() {
+    _progressController.dispose();
+    super.dispose();
+  }
+
+  void _checkAndNavigate() {
+    if (!mounted) return;
+    final state = context.read<AuthCubit>().state;
+    
+    // Only navigate if we've finished the splash animation
+    if (_progressController.isCompleted) {
+      if (state is Authenticated) {
+        Navigator.pushReplacementNamed(context, AppRoutes.mainLayout);
+      } else if (state is Unauthenticated) {
+        if (!CacheHelper.getOnboardingCompleted()) {
+          Navigator.pushReplacementNamed(context, AppRoutes.onboarding);
+        } else {
+          Navigator.pushReplacementNamed(context, AppRoutes.login);
+        }
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return BlocListener<AuthCubit, AuthState>(
       listener: (context, state) {
-        setState(() {
-          _isLoading = state is AuthLoading;
-        });
-
-        if (state is Authenticated) {
-          _navigate(AppRoutes.mainLayout);
-        } else if (state is Unauthenticated) {
-          if (CacheHelper.getOnboardingCompleted()) {
-            _navigate(AppRoutes.login);
-          } else {
-            _navigate(AppRoutes.onboarding);
-          }
+        if (_progressController.isCompleted) {
+          _checkAndNavigate();
         } else if (state is AuthError) {
           AwesomeDialog(
             context: context,
@@ -56,116 +88,139 @@ class _SplashScreenState extends State<SplashScreen> {
             animType: AnimType.bottomSlide,
             title: 'Authentication Error',
             desc: state.message,
-            btnOkOnPress: () {
-              context.read<AuthCubit>().checkAuth();
-            },
+            btnOkOnPress: () => context.read<AuthCubit>().checkAuth(),
           ).show();
         }
       },
-      child: Stack(
-        children: [
-          Scaffold(
-            backgroundColor: AppColors.white,
-            body: Stack(
-              children: [
-                _buildBackgroundDecorations(),
-                Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 80.w,
-                        height: 80.w,
-                        decoration: BoxDecoration(
-                          color: AppColors.primary,
-                          borderRadius: BorderRadius.circular(20.r),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.primary.withValues(alpha: 0.3),
-                              blurRadius: 20,
-                              offset: const Offset(0, 10),
-                            ),
-                          ],
-                        ),
-                        child: Icon(Icons.check_rounded, color: AppColors.white, size: 50.sp),
-                      ),
-                      SizedBox(height: 24.h),
-                      Text(
-                        AppStrings.appName,
-                        style: AppStyles.displayLarge().copyWith(
-                          letterSpacing: 1.2,
-                        ),
-                      ),
-                      SizedBox(height: 8.h),
-                      Text(
-                        'Manage Your Daily Tasks',
-                        style: AppStyles.bodyLarge().copyWith(
-                          color: AppColors.textSecondary.withValues(alpha: 0.8),
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Positioned(
-                  bottom: 50.h,
-                  left: 0,
-                  right: 0,
-                  child: Column(
-                    children: [
-                      Text(
-                        'Version 1.0.0',
-                        style: AppStyles.bodyMedium().copyWith(
-                          color: AppColors.textSecondary.withValues(alpha: 0.7),
-                          fontSize: 12.sp,
-                        ),
-                      ),
-                      SizedBox(height: 16.h),
-                      SizedBox(
-                        width: 40.w,
-                        height: 2.h,
-                        child: LinearProgressIndicator(
-                          backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                          valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+      child: Scaffold(
+        body: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: BoxDecoration(
+            color: Theme.of(context).scaffoldBackgroundColor,
           ),
-          if (_isLoading) const AuthLoadingWidget(),
-        ],
+          child: Stack(
+            children: [
+              _buildBackgroundDecorations(isDark),
+              Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildLogo(isDark),
+                    SizedBox(height: 32.h),
+                    Text(
+                      AppStrings.appName,
+                      style: AppStyles.displayLarge(
+                        isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                      ).copyWith(
+                        letterSpacing: 2.0,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    SizedBox(height: 12.h),
+                    Text(
+                      'Simplify your day.',
+                      style: AppStyles.bodyLarge(
+                        isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                      ).copyWith(
+                        letterSpacing: 1.0,
+                        fontWeight: FontWeight.w300,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Positioned(
+                bottom: 60.h,
+                left: 40.w,
+                right: 40.w,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'PREPARING WORKSPACE',
+                          style: AppStyles.labelSmall(
+                            isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                          ).copyWith(
+                            letterSpacing: 1.5,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        Text(
+                          '${(_progressAnimation.value * 100).toInt()}%',
+                          style: AppStyles.labelSmall(
+                            isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                          ).copyWith(
+                            fontWeight: FontWeight.w900,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 12.h),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10.r),
+                      child: LinearProgressIndicator(
+                        value: _progressAnimation.value,
+                        backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                        valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
+                        minHeight: 6.h,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildBackgroundDecorations() {
+  Widget _buildLogo(bool isDark) {
+    return Container(
+      width: 100.w,
+      height: 100.w,
+      decoration: BoxDecoration(
+        color: AppColors.primary,
+        borderRadius: BorderRadius.circular(28.r),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.4),
+            blurRadius: 30,
+            offset: const Offset(0, 15),
+            spreadRadius: 2,
+          ),
+        ],
+      ),
+      child: Icon(Icons.check_rounded, color: AppColors.white, size: 60.sp),
+    );
+  }
+
+  Widget _buildBackgroundDecorations(bool isDark) {
+    final color = AppColors.primary.withValues(alpha: isDark ? 0.05 : 0.03);
     return Stack(
       children: [
         Positioned(
-          top: -100,
-          right: -100,
+          top: -120.h,
+          right: -80.w,
           child: Container(
-            width: 300.w,
-            height: 300.w,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.primary.withValues(alpha: 0.03),
-            ),
+            width: 320.w,
+            height: 320.w,
+            decoration: BoxDecoration(shape: BoxShape.circle, color: color),
           ),
         ),
         Positioned(
-          bottom: -50,
-          left: -50,
+          bottom: -60.h,
+          left: -40.w,
           child: Container(
-            width: 200.w,
-            height: 200.w,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.primary.withValues(alpha: 0.03),
-            ),
+            width: 240.w,
+            height: 240.w,
+            decoration: BoxDecoration(shape: BoxShape.circle, color: color),
           ),
         ),
       ],

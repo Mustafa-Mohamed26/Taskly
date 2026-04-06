@@ -29,11 +29,11 @@ class TaskRepositoryImpl implements TaskRepository {
   Future<void> addTask(TaskEntity task) async {
     final TaskModel taskModel = TaskModel.fromEntity(task);
     
-    await _localDataSource.addTask(taskModel.copyWith(isSynced: false) as TaskModel);
+    await _localDataSource.addTask(taskModel.copyWith(isSynced: false));
     
     try {
       await _remoteDataSource.addTask(taskModel);
-      await _localDataSource.updateTask(taskModel.copyWith(isSynced: true) as TaskModel);
+      await _localDataSource.updateTask(taskModel.copyWith(isSynced: true));
     } catch (e) {
       // Stay unsynced
     }
@@ -43,11 +43,11 @@ class TaskRepositoryImpl implements TaskRepository {
   Future<void> updateTask(TaskEntity task) async {
     final TaskModel taskModel = TaskModel.fromEntity(task);
     
-    await _localDataSource.updateTask(taskModel.copyWith(isSynced: false) as TaskModel);
+    await _localDataSource.updateTask(taskModel.copyWith(isSynced: false));
     
     try {
       await _remoteDataSource.updateTask(taskModel);
-      await _localDataSource.updateTask(taskModel.copyWith(isSynced: true) as TaskModel);
+      await _localDataSource.updateTask(taskModel.copyWith(isSynced: true));
     } catch (e) {
       // Stay unsynced
     }
@@ -78,7 +78,7 @@ class TaskRepositoryImpl implements TaskRepository {
     for (var taskModel in unsyncedTasks) {
       try {
         await _remoteDataSource.addTask(taskModel);
-        await _localDataSource.updateTask(taskModel.copyWith(isSynced: true) as TaskModel);
+        await _localDataSource.updateTask(taskModel.copyWith(isSynced: true));
       } catch (e) {
         // Skip
       }

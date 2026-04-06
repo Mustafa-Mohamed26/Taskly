@@ -56,6 +56,8 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             title: 'Taskly',
             theme: AppTheme.light,
+            darkTheme: AppTheme.dark,
+            themeMode: ThemeMode.system,
             initialRoute: AppRoutes.splash,
             onGenerateRoute: AppRoutesGenerator.onGenerateRoute,
           );

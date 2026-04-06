@@ -1,34 +1,36 @@
 # Taskly Implementation Plan (Feature-Based)
 
 ## Feature 1: Splash Screen
-- [ ] *Design Reference**: `assets/ai/Splash Screen light mode.png`, `assets/ai/Splash Screen dark mode.png`
-- [ ] Initialize Firebase & Dependencies.
-- [ ] **Auto-Authentication**: Implement Auth-state listener in `AuthCubit` to check if user is already logged in.
-- [ ] **Routing**: Implement conditional navigation based on Auth status and Onboarding completion.
+- [x] *Design Reference**: `assets/ai/Splash Screen light mode.png`, `assets/ai/Splash Screen dark mode.png`
+- [x] Initialize Firebase & Dependencies.
+- [x] **Auto-Authentication**: Implement Auth-state listener in `AuthCubit` to check if user is already logged in.
+- [x] **Routing**: Implement conditional navigation based on Auth status and Onboarding completion.
 
 ## Feature 2: Onboarding
--  [ ] *Design Reference**: `assets/ai/Onboarding screens light mode.png`, `assets/ai/Onboarding screens dark mode.png`
-- [ ] Carousel UI implementation.
-- [ ] **Cache Persistence**: Implement `CacheHelper.setOnboardingCompleted(true)` to skip onboarding on next launch.
+-  [x] *Design Reference**: `assets/ai/Onboarding screens light mode.png`, `assets/ai/Onboarding screens dark mode.png`
+- [x] Carousel UI implementation.
+- [x] **Cache Persistence**: Implement `CacheHelper.setOnboardingCompleted(true)` to skip onboarding on next launch.
 
 ## Feature 3: Authentication System
-- [ ] *Design Reference**: `assets/ai/sign in & register & forget password screens light mode.png`, `assets/ai/sign in & register & forget password screens dark mode.png`
-- [ ] Implement Firebase Auth (Sign In, Sign Up, Forgot Password).
-- [ ] Implement Firestore User profile synchronization (Data Sync).
-- [ ] Add form validation and loading state overlays.
+- [x] *Design Reference**: `assets/ai/sign in & register & forget password screens light mode.png`, `assets/ai/sign in & register & forget password screens dark mode.png`
+- [x] Implement Firebase Auth (Sign In, Sign Up, Forgot Password).
+- [x] Implement Firestore User profile synchronization (Data Sync).
+- [x] Add form validation and loading state overlays.
 
 ## Feature 4: Task Dashboard & CRUD System
-- [ ] *Design Reference**: `assets/ai/dashboard and add and view the tasks light mode.png`, `assets/ai/dashboard and add and view the tasks dark mode.png`
-- [ ] **Summary Cards**: Display total task counts for 'Today' and 'This Week' on the dashboard.
-- [ ] **Dynamic Progress Bar**: Calculate and visualize daily progress based on (completed tasks / total tasks).
-- [ ] **Today's Tasks List**: Filtered list view of tasks scheduled for the current day.
-- [ ] **CRUD System**:
-    - [ ] Add Task via floating action button (Navigate to Add Task page).
-    - [ ] Edit/Remove via task item options (three-dot menu).
-    - [ ] Edit Task: Reuse Add Task page as 'Edit Task' mode with pre-filled data.
-- [ ] **Navigation**: 'View All' navigates to the detailed weekly task list.
-- [ ] **UI Feedback**: `AwesomeDialog` overlays for all successful/failed CRUD operations.
-- [ ] **Future Note**: Potential for future expansion (e.g., drag-and-drop reordering, voice-to-text task creation).
+- [x] *Design Reference**: `assets/ai/dashboard and add and view the tasks light mode.png`, `assets/ai/dashboard and add and view the tasks dark mode.png`
+- [x] **Summary Cards**: Display total task counts for 'Today' and 'This Week' on the dashboard.
+- [x] **Dynamic Progress Bar**: Calculate and visualize daily progress based on (completed tasks / total tasks).
+- [x] **Today's Tasks List**: Filtered list view of tasks scheduled for the current day.
+- [x] **CRUD System**:
+    - [x] Add Task via floating action button (Navigate to Add Task page).
+    - [x] Edit/Remove via task item options (three-dot menu).
+    - [x] Edit Task: Reuse Add Task page as 'Edit Task' mode with pre-filled data.
+- [x] **Navigation**: 'View All' navigates to the detailed weekly task list.
+- [x] **UI Feedback**: `AwesomeDialog` overlays for all successful/failed CRUD operations.
+- [x] **Future Note**: Potential for future expansion (e.g., drag-and-drop reordering, voice-to-text task creation).
+
+## Feature 9: Notification System
 - [ ] **Notification System**: Integrate `flutter_local_notifications` for scheduled task reminders.
 
 ## Feature 5: Calendar

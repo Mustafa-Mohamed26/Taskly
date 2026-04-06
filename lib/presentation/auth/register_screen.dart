@@ -41,6 +41,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return BlocListener<AuthCubit, AuthState>(
       listener: (context, state) {
         setState(() {
@@ -72,23 +74,58 @@ class _RegisterScreenState extends State<RegisterScreen> {
       child: Stack(
         children: [
           Scaffold(
-            body: SafeArea(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 40.h),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _buildHeader(),
-                      SizedBox(height: 48.h),
-                      _buildForm(),
-                      SizedBox(height: 40.h),
-                      _buildFooter(),
-                    ],
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            body: Stack(
+              children: [
+                _buildBackgroundDecorations(isDark),
+                SafeArea(
+                  child: Center(
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 24.w,
+                        vertical: 20.h,
+                      ),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const AuthLogo(),
+                            SizedBox(height:20.h),
+                            Text(
+                              'Join Taskly',
+                              style: AppStyles.displayLarge(
+                                isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                              ).copyWith(
+                                fontWeight: FontWeight.w900,
+                                fontSize: 32.sp,
+                                letterSpacing: -1,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(height: 12.h),
+                            Text(
+                              'Start managing your tasks efficiently today.',
+                              style: AppStyles.bodyLarge(
+                                isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                              ).copyWith(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(height: 20.h),
+                            _buildForm(isDark),
+                            SizedBox(height: 20.h),
+                            _buildFooter(isDark),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
           ),
           if (_isLoading) const AuthLoadingWidget(),
@@ -97,27 +134,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Widget _buildHeader() {
-    return Column(
-      children: [
-        const AuthLogo(),
-        SizedBox(height: 40.h),
-        Text(
-          AppStrings.joinTaskly,
-          style: AppStyles.displayLarge(),
-          textAlign: TextAlign.center,
-        ),
-        SizedBox(height: 8.h),
-        Text(
-          AppStrings.joinTasklySubtitle,
-          style: AppStyles.bodyLarge(),
-          textAlign: TextAlign.center,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildForm() {
+  Widget _buildForm(bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -128,15 +145,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
           prefixIcon: Icons.person_outline,
           validator: (val) => Validators.validateFullName(val),
         ),
-        SizedBox(height: 24.h),
+        SizedBox(height: 20.h),
         AuthTextField(
           label: AppStrings.email,
           hint: 'name@company.com',
           controller: _emailController,
           prefixIcon: Icons.email_outlined,
+          keyboardType: TextInputType.emailAddress,
           validator: (val) => Validators.validateEmail(val),
         ),
-        SizedBox(height: 24.h),
+        SizedBox(height: 20.h),
         AuthTextField(
           label: AppStrings.password,
           hint: '••••••••',
@@ -147,8 +165,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
           suffixIcon: IconButton(
             icon: Icon(
               _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-              color: AppColors.fieldHint,
-              size: 20.sp,
+              color: isDark ? AppColors.textSecondaryDark : AppColors.fieldHint,
+              size: 22.sp,
             ),
             onPressed: () {
               setState(() {
@@ -157,7 +175,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             },
           ),
         ),
-        SizedBox(height: 24.h),
+        SizedBox(height: 20.h),
         AuthTextField(
           label: AppStrings.confirmPassword,
           hint: '••••••••',
@@ -168,8 +186,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
           suffixIcon: IconButton(
             icon: Icon(
               _obscureConfirmPassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-              color: AppColors.fieldHint,
-              size: 20.sp,
+              color: isDark ? AppColors.textSecondaryDark : AppColors.fieldHint,
+              size: 22.sp,
             ),
             onPressed: () {
               setState(() {
@@ -195,16 +213,53 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Widget _buildFooter() {
+  Widget _buildFooter(bool isDark) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(AppStrings.alreadyHaveAccount, style: AppStyles.bodyMedium()),
+        Text(
+          'Already have an account? ',
+          style: AppStyles.bodyMedium(
+            isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+          ).copyWith(fontWeight: FontWeight.w500),
+        ),
         GestureDetector(
           onTap: () {
             Navigator.pop(context);
           },
-          child: Text(AppStrings.signIn, style: AppStyles.labelMedium()),
+          child: Text(
+            'Sign In',
+            style: AppStyles.labelSmall(AppColors.primary).copyWith(
+              fontWeight: FontWeight.w800,
+              fontSize: 14.sp,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBackgroundDecorations(bool isDark) {
+    final color = AppColors.primary.withValues(alpha: isDark ? 0.04 : 0.02);
+    return Stack(
+      children: [
+        Positioned(
+          top: -80.h,
+          left: -60.w,
+          child: Container(
+            width: 250.w,
+            height: 250.w,
+            decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+          ),
+        ),
+        Positioned(
+          bottom: -100.h,
+          right: -80.w,
+          child: Container(
+            width: 300.w,
+            height: 300.w,
+            decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+          ),
         ),
       ],
     );

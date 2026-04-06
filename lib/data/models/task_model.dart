@@ -89,4 +89,31 @@ class TaskModel extends TaskEntity {
       'updated_at': updatedAt,
     };
   }
+
+  @override
+  TaskModel copyWith({
+    String? id,
+    String? userId,
+    String? title,
+    String? description,
+    DateTime? dateTime,
+    String? category,
+    String? priority,
+    bool? isCompleted,
+    bool? isSynced,
+    int? updatedAt,
+  }) {
+    return TaskModel(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      dateTime: dateTime ?? this.dateTime,
+      category: category ?? this.category,
+      priority: priority ?? this.priority,
+      isCompleted: isCompleted ?? this.isCompleted,
+      isSynced: isSynced ?? this.isSynced,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
 }

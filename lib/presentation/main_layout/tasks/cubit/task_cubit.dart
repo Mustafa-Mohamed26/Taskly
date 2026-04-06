@@ -38,8 +38,6 @@ class TaskCubit extends Cubit<TaskState> {
     emit(TaskLoading());
     try {
       await AddTaskUseCase.execute(task);
-      // We don't need to emit success here if we are watching the stream,
-      // but we emit a generic success for the UI to handle navigation.
       emit(TaskSuccess<void>(null));
     } catch (e) {
       emit(TaskError(e.toString()));
@@ -54,9 +52,9 @@ class TaskCubit extends Cubit<TaskState> {
     }
   }
 
-  Future<void> deleteTask(String taskId) async {
+  Future<void> deleteTask(TaskEntity task) async {
     try {
-      await DeleteTaskUseCase.execute(taskId);
+      await DeleteTaskUseCase.execute(task.id);
     } catch (e) {
       emit(TaskError(e.toString()));
     }

@@ -21,16 +21,20 @@ class SocialButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: OutlinedButton(
-        onPressed: onPressed,
-        style: OutlinedButton.styleFrom(
-          padding: EdgeInsets.symmetric(vertical: 16.h),
-          side: const BorderSide(color: AppColors.fieldBorder),
-          backgroundColor: AppColors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.r),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return InkWell(
+      onTap: onPressed,
+      borderRadius: BorderRadius.circular(16.r),
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 14.h),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: isDark ? AppColors.fieldBorderDark : AppColors.fieldBorder,
+            width: 1.5,
           ),
+          borderRadius: BorderRadius.circular(16.r),
+          color: isDark ? AppColors.fieldFillDark : AppColors.white,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -38,14 +42,21 @@ class SocialButton extends StatelessWidget {
             if (isIconWidget && iconWidget != null)
               iconWidget!
             else if (iconPath != null)
-              Image.asset(iconPath!, height: 24.h, width: 24.h),
-            SizedBox(width: 12.w),
+              Image.asset(iconPath!, height: 20.h, width: 20.h)
+            else
+              Icon(
+                label.toLowerCase().contains('google')
+                    ? Icons.g_mobiledata_rounded
+                    : Icons.apple_rounded,
+                size: 24.sp,
+                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              ),
+            SizedBox(width: 8.w),
             Text(
               label,
-              style: AppStyles.bodyMedium().copyWith(
-                color: AppColors.textPrimary,
-                fontWeight: FontWeight.w600,
-              ),
+              style: AppStyles.bodyMedium(
+                isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+              ).copyWith(fontWeight: FontWeight.w700, fontSize: 14.sp),
             ),
           ],
         ),

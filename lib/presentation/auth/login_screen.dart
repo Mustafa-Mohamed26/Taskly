@@ -37,6 +37,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return BlocListener<AuthCubit, AuthState>(
       listener: (context, state) {
         setState(() {
@@ -68,25 +70,60 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Stack(
         children: [
           Scaffold(
-            body: SafeArea(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 40.h),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _buildHeader(),
-                      SizedBox(height: 48.h),
-                      _buildForm(),
-                      SizedBox(height: 32.h),
-                      _buildSocialLogin(),
-                      SizedBox(height: 40.h),
-                      _buildFooter(),
-                    ],
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            body: Stack(
+              children: [
+                _buildBackgroundDecorations(isDark),
+                SafeArea(
+                  child: Center(
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 24.w,
+                        vertical: 20.h,
+                      ),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const AuthLogo(),
+                            SizedBox(height: 48.h),
+                            Text(
+                              AppStrings.welcomeBack,
+                              style: AppStyles.displayLarge(
+                                isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+                              ).copyWith(
+                                fontWeight: FontWeight.w900,
+                                fontSize: 32.sp,
+                                letterSpacing: -1,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(height: 12.h),
+                            Text(
+                              AppStrings.welcomeBackSubtitle,
+                              style: AppStyles.bodyLarge(
+                                isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                              ).copyWith(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(height: 48.h),
+                            _buildForm(isDark),
+                            SizedBox(height: 40.h),
+                            _buildSocialLogin(isDark),
+                            SizedBox(height: 48.h),
+                            _buildFooter(isDark),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
           ),
           if (_isLoading) const AuthLoadingWidget(),
@@ -95,50 +132,31 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // --- Sections ---
-
-  Widget _buildHeader() {
-    return Column(
-      children: [
-        const AuthLogo(),
-        SizedBox(height: 40.h),
-        Text(
-          AppStrings.welcomeBack,
-          style: AppStyles.displayLarge(),
-          textAlign: TextAlign.center,
-        ),
-        SizedBox(height: 8.h),
-        Text(
-          AppStrings.welcomeBackSubtitle,
-          style: AppStyles.bodyLarge(),
-          textAlign: TextAlign.center,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildForm() {
+  Widget _buildForm(bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         AuthTextField(
           label: AppStrings.email,
-          hint: 'Enter your email',
+          hint: 'name@company.com',
           controller: _emailController,
+          prefixIcon: Icons.email_outlined,
+          keyboardType: TextInputType.emailAddress,
           validator: (val) => Validators.validateEmail(val),
         ),
         SizedBox(height: 24.h),
         AuthTextField(
           label: AppStrings.password,
-          hint: 'Enter your password',
+          hint: '••••••••',
           controller: _passwordController,
           obscureText: _obscurePassword,
+          prefixIcon: Icons.lock_outline,
           validator: (val) => Validators.validatePassword(val),
           suffixIcon: IconButton(
             icon: Icon(
               _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-              color: AppColors.fieldHint,
-              size: 20.sp,
+              color: isDark ? AppColors.textSecondaryDark : AppColors.fieldHint,
+              size: 22.sp,
             ),
             onPressed: () {
               setState(() {
@@ -147,7 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
             },
           ),
         ),
-        SizedBox(height: 12.h),
+        SizedBox(height: 16.h),
         Align(
           alignment: Alignment.centerRight,
           child: GestureDetector(
@@ -156,11 +174,14 @@ class _LoginScreenState extends State<LoginScreen> {
             },
             child: Text(
               AppStrings.forgotPassword,
-              style: AppStyles.labelMedium(),
+              style: AppStyles.labelSmall(AppColors.primary).copyWith(
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.5,
+              ),
             ),
           ),
         ),
-        SizedBox(height: 24.h),
+        SizedBox(height: 32.h),
         AuthButton(
           text: AppStrings.signIn,
           onPressed: () {
@@ -176,46 +197,69 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildSocialLogin() {
+  Widget _buildSocialLogin(bool isDark) {
     return Column(
       children: [
         Row(
           children: [
-            const Expanded(child: Divider()),
+            Expanded(
+              child: Divider(
+                color: isDark ? AppColors.dividerDark : AppColors.divider,
+                thickness: 1,
+              ),
+            ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.w),
               child: Text(
                 AppStrings.orContinueWith,
-                style: AppStyles.bodySmall(),
+                style: AppStyles.bodySmall(
+                  isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                ).copyWith(fontWeight: FontWeight.w600),
               ),
             ),
-            const Expanded(child: Divider()),
+            Expanded(
+              child: Divider(
+                color: isDark ? AppColors.dividerDark : AppColors.divider,
+                thickness: 1,
+              ),
+            ),
           ],
         ),
         SizedBox(height: 24.h),
         Row(
           children: [
-            SocialButton(
-              label: 'Google',
-              onPressed: () {
-                // Feature removed for now
-                AwesomeDialog(
-                  context: context,
-                  dialogType: DialogType.info,
-                  title: 'Coming Soon',
-                  desc: 'Google Login is currently disabled.',
-                  btnOkOnPress: () {},
-                ).show();
-              },
-              isIconWidget: true,
-              iconWidget: Icon(Icons.g_mobiledata, color: AppColors.priorityHigh, size: 28.sp),
+            Expanded(
+              child: SocialButton(
+                label: 'Google',
+                onPressed: () {
+                  AwesomeDialog(
+                    context: context,
+                    dialogType: DialogType.info,
+                    title: 'Coming Soon',
+                    desc: 'Google Login is currently disabled.',
+                    btnOkOnPress: () {},
+                  ).show();
+                },
+                isIconWidget: true,
+                iconWidget: Icon(
+                  Icons.g_mobiledata,
+                  color: Colors.redAccent,
+                  size: 32.sp,
+                ),
+              ),
             ),
             SizedBox(width: 16.w),
-            SocialButton(
-              label: 'Apple',
-              onPressed: () {},
-              isIconWidget: true,
-              iconWidget: Icon(Icons.apple, color: AppColors.textPrimary, size: 24.sp),
+            Expanded(
+              child: SocialButton(
+                label: 'Apple',
+                onPressed: () {},
+                isIconWidget: true,
+                iconWidget: Icon(
+                  Icons.apple,
+                  color: isDark ? Colors.white : Colors.black,
+                  size: 26.sp,
+                ),
+              ),
             ),
           ],
         ),
@@ -223,21 +267,52 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildFooter() {
+  Widget _buildFooter(bool isDark) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
           AppStrings.dontHaveAccount,
-          style: AppStyles.bodyMedium(),
+          style: AppStyles.bodyMedium(
+            isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+          ).copyWith(fontWeight: FontWeight.w500),
         ),
         GestureDetector(
           onTap: () {
             Navigator.pushNamed(context, AppRoutes.register);
           },
           child: Text(
-            AppStrings.createAccount,
-            style: AppStyles.labelMedium(),
+            ' ${AppStrings.createAccount}',
+            style: AppStyles.labelSmall(AppColors.primary).copyWith(
+              fontWeight: FontWeight.w800,
+              fontSize: 14.sp,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBackgroundDecorations(bool isDark) {
+    final color = AppColors.primary.withValues(alpha: isDark ? 0.04 : 0.02);
+    return Stack(
+      children: [
+        Positioned(
+          top: -100.h,
+          right: -80.w,
+          child: Container(
+            width: 300.w,
+            height: 300.w,
+            decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+          ),
+        ),
+        Positioned(
+          bottom: -50.h,
+          left: -40.w,
+          child: Container(
+            width: 200.w,
+            height: 200.w,
+            decoration: BoxDecoration(shape: BoxShape.circle, color: color),
           ),
         ),
       ],

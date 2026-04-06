@@ -8,21 +8,40 @@ class AuthLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
-          width: 64.w,
-          height: 64.w,
+          padding: EdgeInsets.all(8.w),
           decoration: BoxDecoration(
             color: AppColors.primary,
-            borderRadius: BorderRadius.circular(16.r),
+            borderRadius: BorderRadius.circular(12.r),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primary.withValues(alpha: 0.3),
+                blurRadius: 15,
+                offset: const Offset(0, 5),
+              ),
+            ],
           ),
-          child: Icon(Icons.check_rounded, color: AppColors.white, size: 40.sp),
+          child: Icon(
+            Icons.check_rounded,
+            color: AppColors.white,
+            size: 24.sp,
+          ),
         ),
-        SizedBox(height: 16.h),
+        SizedBox(width: 12.w),
         Text(
           'Taskly',
-          style: AppStyles.displayMedium().copyWith(fontSize: 22.sp),
+          style: AppStyles.displayMedium(
+            isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+          ).copyWith(
+            fontWeight: FontWeight.w900,
+            fontSize: 28.sp,
+            letterSpacing: -1,
+          ),
         ),
       ],
     );

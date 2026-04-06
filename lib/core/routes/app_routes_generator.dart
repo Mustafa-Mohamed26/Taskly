@@ -14,6 +14,7 @@ import '../../presentation/main_layout/profile/notification_settings_screen.dart
 import '../../presentation/main_layout/profile/theme_preference_screen.dart';
 import '../../presentation/main_layout/profile/security_privacy_screen.dart';
 import 'app_routes.dart';
+import '../../domain/entities/task_entity.dart';
 
 class AppRoutesGenerator {
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
@@ -36,7 +37,8 @@ class AppRoutesGenerator {
       case AppRoutes.mainLayout:
         return MaterialPageRoute(builder: (_) => const MainLayoutScreen());
       case AppRoutes.addTask:
-        return MaterialPageRoute(builder: (_) => const AddTaskScreen());
+        final task = settings.arguments as TaskEntity?;
+        return MaterialPageRoute(builder: (_) => AddTaskScreen(task: task));
       case AppRoutes.allTasks:
         return MaterialPageRoute(builder: (_) => const AllTasksScreen());
       case AppRoutes.personalInfo:
