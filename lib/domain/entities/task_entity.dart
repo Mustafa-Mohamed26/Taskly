@@ -4,7 +4,7 @@ class TaskEntity {
   final String title;
   final String? description;
   final DateTime dateTime;
-  final String category;
+  final List<String> categories;
   final String priority;
   final bool isCompleted;
   final bool isSynced;
@@ -16,7 +16,7 @@ class TaskEntity {
     required this.title,
     this.description,
     required this.dateTime,
-    required this.category,
+    required this.categories,
     required this.priority,
     this.isCompleted = false,
     this.isSynced = true,
@@ -29,7 +29,7 @@ class TaskEntity {
     String? title,
     String? description,
     DateTime? dateTime,
-    String? category,
+    List<String>? categories,
     String? priority,
     bool? isCompleted,
     bool? isSynced,
@@ -41,7 +41,7 @@ class TaskEntity {
       title: title ?? this.title,
       description: description ?? this.description,
       dateTime: dateTime ?? this.dateTime,
-      category: category ?? this.category,
+      categories: categories ?? this.categories,
       priority: priority ?? this.priority,
       isCompleted: isCompleted ?? this.isCompleted,
       isSynced: isSynced ?? this.isSynced,

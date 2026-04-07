@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import '../../../../../domain/entities/task_entity.dart';
@@ -13,18 +14,11 @@ part 'task_state.dart';
 class TaskCubit extends Cubit<TaskState> {
   TaskCubit() : super(TaskInitial());
 
-  void getTasks(String userId) async {
-    emit(TaskLoading());
-    try {
-      final tasks = await GetTasksUseCase.execute(userId);
-      emit(TaskSuccess<List<TaskEntity>>(tasks));
-    } catch (e) {
-      emit(TaskError(e.toString()));
-    }
-  }
+  StreamSubscription? _tasksSubscription;
 
   void watchTasks(String userId) {
-    WatchTasksUseCase.execute(userId).listen(
+    _tasksSubscription?.cancel();
+    _tasksSubscription = WatchTasksUseCase.execute(userId).listen(
       (tasks) {
         emit(TaskSuccess<List<TaskEntity>>(tasks));
       },
@@ -35,10 +29,8 @@ class TaskCubit extends Cubit<TaskState> {
   }
 
   Future<void> addTask(TaskEntity task) async {
-    emit(TaskLoading());
     try {
       await AddTaskUseCase.execute(task);
-      emit(TaskSuccess<void>(null));
     } catch (e) {
       emit(TaskError(e.toString()));
     }
@@ -58,5 +50,11 @@ class TaskCubit extends Cubit<TaskState> {
     } catch (e) {
       emit(TaskError(e.toString()));
     }
+  }
+
+  @override
+  Future<void> close() {
+    _tasksSubscription?.cancel();
+    return super.close();
   }
 }

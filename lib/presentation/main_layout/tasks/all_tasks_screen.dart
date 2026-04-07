@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:intl/intl.dart';
 import 'package:taskly/domain/entities/task_entity.dart';
-import 'package:taskly/presentation/auth/cubit/auth_cubit.dart';
 import 'package:taskly/presentation/main_layout/tasks/cubit/task_cubit.dart';
-import '../../../core/constants/app_strings.dart';
+import 'package:taskly/presentation/widgets/task_item_card.dart';
+import 'package:taskly/presentation/widgets/task_detail_dialog.dart';
 import '../../../core/routes/app_routes.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_styles.dart';
+import 'widgets/all_tasks_header.dart';
+import 'widgets/all_tasks_date_card.dart';
+import 'widgets/all_tasks_schedule_header.dart';
+import 'widgets/all_tasks_empty_state.dart';
 
 class AllTasksScreen extends StatefulWidget {
   const AllTasksScreen({super.key});
@@ -20,25 +22,33 @@ class AllTasksScreen extends StatefulWidget {
 class _AllTasksScreenState extends State<AllTasksScreen> {
   DateTime _currentMonth = DateTime(DateTime.now().year, DateTime.now().month);
   DateTime _selectedDate = DateTime.now();
+  late ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
     _currentMonth = DateTime(DateTime.now().year, DateTime.now().month);
     _selectedDate = DateTime.now();
-    _loadTasks();
+    _scrollController = ScrollController();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final now = DateTime.now();
+      final days = _getDaysInMonth(_currentMonth);
+      final todayIndex = days.indexWhere((day) => isSameDay(day, now));
+
+      if (todayIndex != -1 && _scrollController.hasClients) {
+        final double itemWidth = 75.w;
+        final double itemMargin = 12.w;
+        final double offset = todayIndex * (itemWidth + itemMargin);
+        _scrollController.jumpTo(offset);
+      }
+    });
   }
 
-  void _loadTasks() {
-    final authState = context.read<AuthCubit>().state;
-    String userId = '';
-    if (authState is Authenticated) {
-      userId = authState.user.id;
-    }
-
-    if (userId.isNotEmpty) {
-      context.read<TaskCubit>().watchTasks(userId);
-    }
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   List<DateTime> _getDaysInMonth(DateTime month) {
@@ -51,65 +61,25 @@ class _AllTasksScreenState extends State<AllTasksScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final days = _getDaysInMonth(_currentMonth);
+    final sortedDays = _getDaysInMonth(_currentMonth);
 
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(context),
+            AllTasksHeader(currentMonth: _currentMonth),
             SizedBox(height: 16.h),
-            SizedBox(
-              height: 90.h,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: EdgeInsets.symmetric(horizontal: 24.w),
-                itemCount: days.length,
-                itemBuilder: (context, index) {
-                  final date = days[index];
-                  final isSelected = isSameDay(date, _selectedDate);
-                  return _buildDateCard(date, isSelected);
-                },
-              ),
-            ),
+            _buildDatePicker(sortedDays),
             SizedBox(height: 24.h),
             Expanded(
-              child: Container(
+              child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 24.w),
                 child: Column(
                   children: [
-                    _buildScheduleHeader(),
+                    AllTasksScheduleHeader(selectedDate: _selectedDate),
                     SizedBox(height: 16.h),
-                    Expanded(
-                      child: BlocBuilder<TaskCubit, TaskState>(
-                        builder: (context, state) {
-                          if (state is TaskLoading) {
-                            return const Center(child: CircularProgressIndicator());
-                          } else if (state is TaskSuccess<List<TaskEntity>>) {
-                            final tasks = state.data
-                                .where((t) => isSameDay(t.dateTime, _selectedDate))
-                                .toList();
-                            if (tasks.isEmpty) {
-                              return Center(
-                                child: Text(
-                                  'No tasks for this day',
-                                  style: AppStyles.bodyLarge(),
-                                ),
-                              );
-                            }
-                            return ListView.builder(
-                              itemCount: tasks.length,
-                              itemBuilder: (context, index) =>
-                                  _buildTaskItemCard(tasks[index]),
-                            );
-                          } else if (state is TaskError) {
-                            return Center(child: Text(state.message));
-                          }
-                          return const SizedBox.shrink();
-                        },
-                      ),
-                    ),
+                    Expanded(child: _buildTaskList()),
                   ],
                 ),
               ),
@@ -117,174 +87,101 @@ class _AllTasksScreenState extends State<AllTasksScreen> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: null,
-        onPressed: () => Navigator.pushNamed(context, AppRoutes.addTask),
-        backgroundColor: AppColors.primary,
-        shape: const CircleBorder(),
-        child: const Icon(Icons.add, color: AppColors.white),
+      floatingActionButton: _buildFAB(),
+    );
+  }
+
+  Widget _buildDatePicker(List<DateTime> days) {
+    return SizedBox(
+      height: 90.h,
+      child: ListView.builder(
+        controller: _scrollController,
+        scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.symmetric(horizontal: 24.w),
+        itemCount: days.length,
+        itemBuilder: (context, index) {
+          final date = days[index];
+          final isSelected = isSameDay(date, _selectedDate);
+          return AllTasksDateCard(
+            date: date,
+            isSelected: isSelected,
+            onTap: () => _onDateSelected(date, index, days),
+          );
+        },
       ),
     );
+  }
+
+  Widget _buildTaskList() {
+    return BlocBuilder<TaskCubit, TaskState>(
+      builder: (context, state) {
+        if (state is TaskLoading) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is TaskSuccess<List<TaskEntity>>) {
+          final tasks = state.data
+              .where((t) => isSameDay(t.dateTime, _selectedDate))
+              .toList();
+          if (tasks.isEmpty) return const AllTasksEmptyState();
+
+          return ListView.builder(
+            padding: EdgeInsets.only(bottom: 24.h),
+            physics: const BouncingScrollPhysics(),
+            itemCount: tasks.length,
+            itemBuilder: (context, index) {
+              final task = tasks[index];
+              return TaskItemCard(
+                task: task,
+                onToggle: () => context
+                    .read<TaskCubit>()
+                    .updateTask(task.copyWith(isCompleted: !task.isCompleted)),
+                onDelete: () => context.read<TaskCubit>().deleteTask(task),
+                onMenuSelected: (value) {
+                  if (value == 'edit') {
+                    Navigator.pushNamed(context, AppRoutes.addTask,
+                        arguments: task);
+                  } else if (value == 'delete') {
+                    context.read<TaskCubit>().deleteTask(task);
+                  }
+                },
+                onTap: () => showDialog(
+                  context: context,
+                  builder: (context) => TaskDetailDialog(task: task),
+                ),
+              );
+            },
+          );
+        } else if (state is TaskError) {
+          return Center(child: Text(state.message));
+        }
+        return const SizedBox.shrink();
+      },
+    );
+  }
+
+  Widget _buildFAB() {
+    return FloatingActionButton(
+      heroTag: null,
+      onPressed: () => Navigator.pushNamed(context, AppRoutes.addTask),
+      backgroundColor: AppColors.primary,
+      shape: const CircleBorder(),
+      child: const Icon(Icons.add, color: AppColors.white),
+    );
+  }
+
+  void _onDateSelected(DateTime date, int index, List<DateTime> days) {
+    setState(() {
+      _selectedDate = date;
+      if (_scrollController.hasClients) {
+        final double itemWidth = 75.w;
+        final double itemMargin = 12.w;
+        final double offset = index * (itemWidth + itemMargin);
+        _scrollController.animateTo(offset,
+            duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
+      }
+    });
   }
 
   bool isSameDay(DateTime a, DateTime b) {
     return a.year == b.year && a.month == b.month && a.day == b.day;
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              IconButton(
-                icon: const Icon(
-                  Icons.calendar_month_outlined,
-                  color: AppColors.primary,
-                ),
-                onPressed: () {},
-              ),
-              Text(
-                DateFormat('MMMM yyyy').format(_currentMonth),
-                style: AppStyles.titleLarge().copyWith(fontSize: 20.sp),
-              ),
-            ],
-          ),
-          IconButton(
-            icon: const Icon(Icons.search, color: AppColors.textPrimary),
-            onPressed: () {},
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDateCard(DateTime date, bool isSelected) {
-    return GestureDetector(
-      onTap: () => setState(() => _selectedDate = date),
-      child: Container(
-        width: 70.w,
-        margin: EdgeInsets.only(right: 12.w),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : AppColors.white.withValues(alpha: 0.5),
-          borderRadius: BorderRadius.circular(16.r),
-          border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.fieldBorder.withValues(alpha: 0.5),
-          ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              date.day.toString(),
-              style: AppStyles.bodySmallMedium(isSelected ? AppColors.white : AppColors.textSecondary),
-            ),
-            SizedBox(height: 4.h),
-            Text(
-              DateFormat('E').format(date),
-              style: AppStyles.bodyLargeMedium(isSelected ? AppColors.white : AppColors.textPrimary).copyWith(
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildScheduleHeader() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(DateFormat('MMM d, yyyy').format(_selectedDate), style: AppStyles.titleLarge()),
-        BlocBuilder<TaskCubit, TaskState>(
-          builder: (context, state) {
-            if (state is TaskSuccess<List<TaskEntity>>) {
-              final count = state.data
-                  .where((t) => isSameDay(t.dateTime, _selectedDate) && !t.isCompleted)
-                  .length;
-              return Text(
-                '$count tasks left',
-                style: AppStyles.bodyMediumMedium(AppColors.primary),
-              );
-            }
-            return const SizedBox.shrink();
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTaskItemCard(TaskEntity task) {
-    return Dismissible(
-      key: Key(task.id),
-      direction: DismissDirection.endToStart,
-      onDismissed: (_) => context.read<TaskCubit>().deleteTask(task),
-      background: Container(
-        alignment: Alignment.centerRight,
-        padding: EdgeInsets.only(right: 20.w),
-        decoration: BoxDecoration(
-          color: Colors.red,
-          borderRadius: BorderRadius.circular(16.r),
-        ),
-        child: const Icon(Icons.delete, color: Colors.white),
-      ),
-      child: Container(
-        margin: EdgeInsets.only(bottom: 16.h),
-        padding: EdgeInsets.all(16.w),
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(16.r),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.02),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                GestureDetector(
-                  onTap: () => context.read<TaskCubit>().updateTask(
-                        task.copyWith(isCompleted: !task.isCompleted),
-                      ),
-                  child: Container(
-                    width: 24.w,
-                    height: 24.w,
-                    decoration: BoxDecoration(
-                      color: task.isCompleted ? AppColors.primary : Colors.transparent,
-                      borderRadius: BorderRadius.circular(6.r),
-                      border: Border.all(
-                        color: task.isCompleted ? AppColors.primary : AppColors.fieldBorder,
-                        width: 2,
-                      ),
-                    ),
-                    child: task.isCompleted
-                        ? const Icon(Icons.check, size: 16, color: AppColors.white)
-                        : null,
-                  ),
-                ),
-                SizedBox(width: 16.w),
-                Expanded(
-                  child: Text(
-                    task.title,
-                    style: AppStyles.bodyLargeMedium().copyWith(
-                      decoration: task.isCompleted ? TextDecoration.lineThrough : null,
-                      color: task.isCompleted ? AppColors.textSecondary : AppColors.textPrimary,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

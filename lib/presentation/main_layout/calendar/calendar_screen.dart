@@ -69,8 +69,30 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     itemBuilder: (context, index) {
                       final task = tasks[index];
                       return ListTile(
-                        title: Text(task.title),
-                        subtitle: Text(DateFormat('hh:mm a').format(task.dateTime)),
+                        leading: Checkbox(
+                          value: task.isCompleted,
+                          activeColor: AppColors.primary,
+                          onChanged: (value) {
+                            context.read<TaskCubit>().updateTask(
+                                  task.copyWith(isCompleted: value ?? false),
+                                );
+                          },
+                        ),
+                        title: Text(
+                          task.title,
+                          style: AppStyles.bodyLargeMedium().copyWith(
+                            decoration: task.isCompleted
+                                ? TextDecoration.lineThrough
+                                : null,
+                            color: task.isCompleted
+                                ? AppColors.textSecondary
+                                : AppColors.textPrimary,
+                          ),
+                        ),
+                        subtitle: Text(
+                          DateFormat('hh:mm a').format(task.dateTime),
+                          style: AppStyles.bodySmall(),
+                        ),
                       );
                     },
                   );

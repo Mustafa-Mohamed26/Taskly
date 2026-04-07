@@ -37,29 +37,34 @@ class MyApp extends StatelessWidget {
         BlocProvider<AuthCubit>(
           create: (context) => getIt<AuthCubit>()..checkAuth(),
         ),
-        BlocProvider<TaskCubit>(
-          create: (context) => getIt<TaskCubit>(),
-        ),
-        BlocProvider<SyncCubit>(
-          create: (context) => getIt<SyncCubit>(),
-        ),
-        BlocProvider<FocusCubit>(
-          create: (context) => getIt<FocusCubit>(),
-        ),
+        BlocProvider<TaskCubit>(create: (context) => getIt<TaskCubit>()),
+        BlocProvider<SyncCubit>(create: (context) => getIt<SyncCubit>()),
+        BlocProvider<FocusCubit>(create: (context) => getIt<FocusCubit>()),
       ],
-      child: ScreenUtilInit(
-        designSize: const Size(375, 812),
-        minTextAdapt: true,
-        splitScreenMode: true,
-        builder: (context, child) {
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: 'Taskly',
-            theme: AppTheme.light,
-            darkTheme: AppTheme.dark,
-            themeMode: ThemeMode.system,
-            initialRoute: AppRoutes.splash,
-            onGenerateRoute: AppRoutesGenerator.onGenerateRoute,
+      child: Builder(
+        builder: (context) {
+          return BlocListener<AuthCubit, AuthState>(
+            listener: (context, state) {
+              if (state is Authenticated) {
+                context.read<TaskCubit>().watchTasks(state.user.id);
+              }
+            },
+            child: ScreenUtilInit(
+              designSize: const Size(375, 812),
+              minTextAdapt: true,
+              splitScreenMode: true,
+              builder: (context, child) {
+                return MaterialApp(
+                  debugShowCheckedModeBanner: false,
+                  title: 'Taskly',
+                  theme: AppTheme.light,
+                  darkTheme: AppTheme.dark,
+                  themeMode: ThemeMode.system,
+                  onGenerateRoute: AppRoutesGenerator.onGenerateRoute,
+                  initialRoute: AppRoutes.splash,
+                );
+              },
+            ),
           );
         },
       ),
