@@ -12,6 +12,7 @@
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 
+import '../../core/service/audio_service.dart' as _i306;
 import '../../core/service/database_helper.dart' as _i512;
 import '../../data/datasources/auth_data_source.dart' as _i305;
 import '../../data/datasources/local/task_local_data_source_impl.dart' as _i180;
@@ -65,6 +66,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i107.FocusCubit>(() => _i107.FocusCubit());
     gh.factory<_i20.TaskCubit>(() => _i20.TaskCubit());
     gh.singleton<_i512.DatabaseHelper>(() => _i512.DatabaseHelper());
+    gh.lazySingleton<_i306.AudioService>(() => _i306.AudioService());
     gh.factory<_i305.AuthDataSource>(() => _i743.FirebaseAuthDataSourceImpl());
     gh.factory<_i807.TaskRemoteDataSource>(
       () => _i832.FirestoreTaskDataSourceImpl(),

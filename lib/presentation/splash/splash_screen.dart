@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:taskly/core/service/cache_helper.dart';
 import 'package:taskly/presentation/auth/cubit/auth_cubit.dart';
-import 'package:taskly/presentation/auth/widgets/auth_loading_widget.dart';
 import '../../core/constants/app_strings.dart';
 import '../../core/routes/app_routes.dart';
 import '../../core/theme/app_colors.dart';

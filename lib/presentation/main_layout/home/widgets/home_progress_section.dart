@@ -54,7 +54,7 @@ class HomeProgressSection extends StatelessWidget {
                       Text(
                         '${(value * 100).toInt()}%',
                         style: AppStyles.titleMedium(
-                          const Color(0xFF2E2EBA),
+                          AppColors.primary,
                         ).copyWith(fontWeight: FontWeight.w900),
                       ),
                     ],
@@ -65,9 +65,9 @@ class HomeProgressSection extends StatelessWidget {
                     child: LinearProgressIndicator(
                       value: value,
                       minHeight: 12.h,
-                      backgroundColor: const Color(0xFF2E2EBA).withValues(alpha: 0.1),
+                      backgroundColor: AppColors.primary.withValues(alpha: 0.1),
                       valueColor: const AlwaysStoppedAnimation<Color>(
-                        Color(0xFF2E2EBA),
+                        AppColors.primary,
                       ),
                     ),
                   ),

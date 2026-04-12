@@ -4,7 +4,6 @@ import 'package:injectable/injectable.dart';
 import '../../../../../domain/entities/task_entity.dart';
 import '../../../../../domain/usecases/tasks/add_task_usecase.dart';
 import '../../../../../domain/usecases/tasks/delete_task_usecase.dart';
-import '../../../../../domain/usecases/tasks/get_tasks_usecase.dart';
 import '../../../../../domain/usecases/tasks/update_task_usecase.dart';
 import '../../../../../domain/usecases/tasks/watch_tasks_usecase.dart';
 
