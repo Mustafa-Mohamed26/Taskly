@@ -26,6 +26,12 @@ class RegisterSuccess extends AuthState {
   RegisterSuccess(this.user);
 }
 
+// For Profile updates
+class ProfileUpdateSuccess extends AuthState {
+  final UserEntity user;
+  ProfileUpdateSuccess(this.user);
+}
+
 // For manual Forgot Password action
 class ForgotPasswordSuccess extends AuthState {
   final String message;

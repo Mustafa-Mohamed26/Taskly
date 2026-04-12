@@ -65,6 +65,49 @@ class FirebaseAuthDataSourceImpl implements AuthDataSource {
   }
 
   @override
+  Future<UserModel?> getUserProfile(String uid) async {
+    try {
+      final doc = await _firestore.collection('users').doc(uid).get();
+      if (doc.exists && doc.data() != null) {
+        return UserModel.fromJson(doc.data()!);
+      }
+      return null;
+    } catch (e) {
+      throw AuthException('Failed to fetch user profile: ${e.toString()}');
+    }
+  }
+
+  @override
+  Future<void> updateUserProfile({
+    required String uid,
+    String? name,
+    String? phone,
+    String? bio,
+  }) async {
+    try {
+      final user = _firebaseAuth.currentUser;
+      if (user != null && user.uid == uid && name != null) {
+        await user.updateDisplayName(name);
+        await user.reload();
+      }
+
+      final Map<String, dynamic> updates = {};
+      if (name != null) updates['name'] = name;
+      if (phone != null) updates['phone'] = phone;
+      if (bio != null) updates['bio'] = bio;
+
+      if (updates.isNotEmpty) {
+        await _firestore.collection('users').doc(uid).set(
+          updates,
+          SetOptions(merge: true),
+        );
+      }
+    } catch (e) {
+      throw AuthException('Failed to update user profile: ${e.toString()}');
+    }
+  }
+
+  @override
   Future<void> logout() async {
     try {
       await _firebaseAuth.signOut();
@@ -84,8 +127,22 @@ class FirebaseAuthDataSourceImpl implements AuthDataSource {
 
   @override
   Stream<UserModel?> get authStateChanges {
-    return _firebaseAuth.authStateChanges().map((user) {
-      return user != null ? UserModel.fromFirebaseUser(user) : null;
+    return _firebaseAuth.authStateChanges().asyncMap((user) async {
+      if (user != null) {
+        final profile = await getUserProfile(user.uid);
+        if (profile != null) {
+          return UserModel(
+            id: user.uid,
+            email: user.email ?? profile.email,
+            name: user.displayName ?? profile.name,
+            photoUrl: user.photoURL ?? profile.photoUrl,
+            phone: profile.phone,
+            bio: profile.bio,
+          );
+        }
+        return UserModel.fromFirebaseUser(user);
+      }
+      return null;
     });
   }
 

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../auth/cubit/auth_cubit.dart';
+import '../tasks/cubit/task_cubit.dart';
+import '../../../domain/entities/task_entity.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/routes/app_routes.dart';
 import '../../../core/theme/app_colors.dart';
@@ -36,46 +40,95 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Widget _buildUserInfo() {
-    return Column(
-      children: [
-        Container(
-          width: 100.w,
-          height: 100.w,
-          decoration: BoxDecoration(
-            color: AppColors.primary,
-            borderRadius: BorderRadius.circular(24.r),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.3),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
+    return BlocBuilder<AuthCubit, AuthState>(
+      builder: (context, state) {
+        String name = 'Taskly User';
+        String email = '';
+        String? photoUrl;
+
+        if (state is Authenticated) {
+          name = state.user.name ?? 'Taskly User';
+          email = state.user.email;
+          photoUrl = state.user.photoUrl;
+        } else if (state is LoginSuccess) {
+          name = state.user.name ?? 'Taskly User';
+          email = state.user.email;
+          photoUrl = state.user.photoUrl;
+        } else if (state is RegisterSuccess) {
+          name = state.user.name ?? 'Taskly User';
+          email = state.user.email;
+          photoUrl = state.user.photoUrl;
+        }
+
+        return Column(
+          children: [
+            Container(
+              width: 100.w,
+              height: 100.w,
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(24.r),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.3),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+                image: photoUrl != null
+                    ? DecorationImage(
+                        image: NetworkImage(photoUrl),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
+              ),
+              child: photoUrl == null
+                  ? Icon(Icons.person_rounded, color: AppColors.white, size: 60.sp)
+                  : null,
+            ),
+            SizedBox(height: 16.h),
+            Text(
+              name,
+              style: AppStyles.displayMedium().copyWith(fontSize: 24.sp),
+            ),
+            if (email.isNotEmpty) ...[
+              SizedBox(height: 4.h),
+              Text(
+                email,
+                style: AppStyles.bodyMediumMedium(AppColors.textLink),
               ),
             ],
-          ),
-          child: Icon(Icons.check_rounded, color: AppColors.white, size: 60.sp),
-        ),
-        SizedBox(height: 16.h),
-        Text(
-          'Alex Johnson',
-          style: AppStyles.displayMedium().copyWith(fontSize: 24.sp),
-        ),
-        SizedBox(height: 4.h),
-        Text(
-          'alex.johnson@taskly.com',
-          style: AppStyles.bodyMediumMedium(AppColors.textLink),
-        ),
-      ],
+          ],
+        );
+      },
     );
   }
 
   Widget _buildStatsSection() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        _buildStatCard(AppStrings.completed, '124'),
-        _buildStatCard(AppStrings.ongoing, '12'),
-        _buildStatCard(AppStrings.success, '94%'),
-      ],
+    return BlocBuilder<TaskCubit, TaskState>(
+      builder: (context, state) {
+        int completed = 0;
+        int ongoing = 0;
+        int successRate = 0;
+
+        if (state is TaskSuccess<List<TaskEntity>>) {
+          final tasks = state.data;
+          completed = tasks.where((t) => t.isCompleted).length;
+          ongoing = tasks.where((t) => !t.isCompleted).length;
+          if (tasks.isNotEmpty) {
+            successRate = ((completed / tasks.length) * 100).round();
+          }
+        }
+
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildStatCard(AppStrings.completed, '$completed'),
+            _buildStatCard(AppStrings.ongoing, '$ongoing'),
+            _buildStatCard(AppStrings.success, '$successRate%'),
+          ],
+        );
+      },
     );
   }
 
@@ -194,6 +247,7 @@ class ProfileScreen extends StatelessWidget {
   Widget _buildLogoutButton(BuildContext context) {
     return InkWell(
       onTap: () {
+        context.read<AuthCubit>().logout();
         Navigator.pushNamedAndRemoveUntil(
           context,
           AppRoutes.login,

@@ -41,6 +41,21 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<void> updateUserProfile({
+    required String uid,
+    String? name,
+    String? phone,
+    String? bio,
+  }) async {
+    return await _remoteDataSource.updateUserProfile(
+      uid: uid,
+      name: name,
+      phone: phone,
+      bio: bio,
+    );
+  }
+
+  @override
   Stream<UserEntity?> get authStateChanges =>
       _remoteDataSource.authStateChanges;
 

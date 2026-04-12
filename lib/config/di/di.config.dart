@@ -31,6 +31,7 @@ import '../../domain/usecases/auth/get_authenticated_user_usecase.dart' as _i65;
 import '../../domain/usecases/auth/login_usecase.dart' as _i461;
 import '../../domain/usecases/auth/logout_usecase.dart' as _i320;
 import '../../domain/usecases/auth/register_usecase.dart' as _i659;
+import '../../domain/usecases/auth/update_user_profile_usecase.dart' as _i651;
 import '../../domain/usecases/tasks/add_task_usecase.dart' as _i797;
 import '../../domain/usecases/tasks/delete_task_usecase.dart' as _i363;
 import '../../domain/usecases/tasks/get_tasks_usecase.dart' as _i577;
@@ -57,6 +58,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i461.LoginUseCase>(() => _i461.LoginUseCase());
     gh.factory<_i320.LogoutUseCase>(() => _i320.LogoutUseCase());
     gh.factory<_i659.RegisterUseCase>(() => _i659.RegisterUseCase());
+    gh.factory<_i651.UpdateUserProfileUseCase>(
+      () => _i651.UpdateUserProfileUseCase(),
+    );
     gh.factory<_i797.AddTaskUseCase>(() => _i797.AddTaskUseCase());
     gh.factory<_i363.DeleteTaskUseCase>(() => _i363.DeleteTaskUseCase());
     gh.factory<_i577.GetTasksUseCase>(() => _i577.GetTasksUseCase());

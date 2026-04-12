@@ -6,6 +6,8 @@ class UserModel extends UserEntity {
     required super.email,
     super.name,
     super.photoUrl,
+    super.phone,
+    super.bio,
   });
 
   factory UserModel.fromFirebaseUser(dynamic user) {
@@ -17,7 +19,25 @@ class UserModel extends UserEntity {
     );
   }
 
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    return UserModel(
+      id: json['id'] ?? '',
+      email: json['email'] ?? '',
+      name: json['name'],
+      photoUrl: json['photoUrl'],
+      phone: json['phone'],
+      bio: json['bio'],
+    );
+  }
+
   Map<String, dynamic> toJson() {
-    return {'id': id, 'email': email, 'name': name, 'photoUrl': photoUrl};
+    return {
+      'id': id,
+      'email': email,
+      'name': name,
+      'photoUrl': photoUrl,
+      'phone': phone,
+      'bio': bio,
+    };
   }
 }
