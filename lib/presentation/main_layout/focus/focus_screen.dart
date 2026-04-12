@@ -138,15 +138,16 @@ class FocusScreen extends StatelessWidget {
                 children: [
                   Expanded(
                     child: GestureDetector(
-                      onTap: () async {
-                        final selectedTask = await showDialog<TaskEntity>(
-                          context: context,
-                          builder: (context) => const TaskSearchDialog(),
-                        );
-                        if (selectedTask != null) {
-                          context.read<FocusCubit>().selectTask(selectedTask);
-                        }
-                      },
+                        onTap: () async {
+                          final selectedTask = await showDialog<TaskEntity>(
+                            context: context,
+                            builder: (context) => const TaskSearchDialog(),
+                          );
+                          if (!context.mounted) return;
+                          if (selectedTask != null) {
+                            context.read<FocusCubit>().selectTask(selectedTask);
+                          }
+                        },
                       behavior: HitTestBehavior.opaque,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -183,6 +184,7 @@ class FocusScreen extends StatelessWidget {
                           context: context,
                           builder: (context) => const TaskSearchDialog(),
                         );
+                        if (!context.mounted) return;
                         if (selectedTask != null) {
                           context.read<FocusCubit>().selectTask(selectedTask);
                         }

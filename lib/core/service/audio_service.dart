@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:injectable/injectable.dart';
 
@@ -14,7 +15,7 @@ class AudioService {
       // await _player.setLoopMode(LoopMode.one);
       // await _player.play();
     } catch (e) {
-      print('Error playing sound: $e');
+      debugPrint('Error playing sound: $e');
     }
   }
 
