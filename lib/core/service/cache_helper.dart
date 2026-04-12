@@ -81,4 +81,42 @@ class CacheHelper {
   static String getThemeMode() {
     return getData(key: _themeKey) ?? 'system';
   }
+
+  // --- Notification Settings ---
+  static const String _pushNotificationsKey = 'push_notifications_enabled';
+  static const String _remindersKey = 'reminders_enabled';
+  static const String _emailNotificationsKey = 'email_notifications_enabled';
+  static const String _weeklyReportsKey = 'weekly_reports_enabled';
+
+  static Future<bool> setPushNotificationsEnabled(bool value) async {
+    return await saveData(key: _pushNotificationsKey, value: value);
+  }
+
+  static bool getPushNotificationsEnabled() {
+    return getData(key: _pushNotificationsKey) ?? true;
+  }
+
+  static Future<bool> setRemindersEnabled(bool value) async {
+    return await saveData(key: _remindersKey, value: value);
+  }
+
+  static bool getRemindersEnabled() {
+    return getData(key: _remindersKey) ?? true;
+  }
+
+  static Future<bool> setEmailNotificationsEnabled(bool value) async {
+    return await saveData(key: _emailNotificationsKey, value: value);
+  }
+
+  static bool getEmailNotificationsEnabled() {
+    return getData(key: _emailNotificationsKey) ?? false;
+  }
+
+  static Future<bool> setWeeklyReportsEnabled(bool value) async {
+    return await saveData(key: _weeklyReportsKey, value: value);
+  }
+
+  static bool getWeeklyReportsEnabled() {
+    return getData(key: _weeklyReportsKey) ?? true;
+  }
 }

@@ -1,11 +1,58 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_styles.dart';
+import '../../../core/service/cache_helper.dart';
 
-class NotificationSettingsScreen extends StatelessWidget {
+class NotificationSettingsScreen extends StatefulWidget {
   const NotificationSettingsScreen({super.key});
+
+  @override
+  State<NotificationSettingsScreen> createState() =>
+      _NotificationSettingsScreenState();
+}
+
+class _NotificationSettingsScreenState
+    extends State<NotificationSettingsScreen> {
+  bool _pushEnabled = true;
+  bool _remindersEnabled = true;
+  bool _emailEnabled = false;
+  bool _weeklyEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _pushEnabled = CacheHelper.getPushNotificationsEnabled();
+    _remindersEnabled = CacheHelper.getRemindersEnabled();
+    _emailEnabled = CacheHelper.getEmailNotificationsEnabled();
+    _weeklyEnabled = CacheHelper.getWeeklyReportsEnabled();
+  }
+
+  void _toggleSetting(String key, bool value) {
+    HapticFeedback.lightImpact();
+    setState(() {
+      switch (key) {
+        case 'push':
+          _pushEnabled = value;
+          CacheHelper.setPushNotificationsEnabled(value);
+          break;
+        case 'reminders':
+          _remindersEnabled = value;
+          CacheHelper.setRemindersEnabled(value);
+          break;
+        case 'email':
+          _emailEnabled = value;
+          CacheHelper.setEmailNotificationsEnabled(value);
+          break;
+        case 'weekly':
+          _weeklyEnabled = value;
+          CacheHelper.setWeeklyReportsEnabled(value);
+          break;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,13 +80,15 @@ class NotificationSettingsScreen extends StatelessWidget {
             icon: Icons.notifications_active_outlined,
             title: 'Push Notifications',
             subtitle: 'Instant alerts on your device',
-            value: true,
+            value: _pushEnabled,
+            onChanged: (val) => _toggleSetting('push', val),
           ),
           _buildNotificationItem(
             icon: Icons.access_time,
             title: 'Reminders',
             subtitle: 'Don\'t miss upcoming deadlines',
-            value: true,
+            value: _remindersEnabled,
+            onChanged: (val) => _toggleSetting('reminders', val),
           ),
           SizedBox(height: 32.h),
           _buildSectionHeader('ACCOUNT UPDATES'),
@@ -48,13 +97,15 @@ class NotificationSettingsScreen extends StatelessWidget {
             icon: Icons.email_outlined,
             title: 'Email Notifications',
             subtitle: 'Important updates to your inbox',
-            value: false,
+            value: _emailEnabled,
+            onChanged: (val) => _toggleSetting('email', val),
           ),
           _buildNotificationItem(
             icon: Icons.bar_chart_rounded,
             title: 'Weekly Reports',
             subtitle: 'Summary of your task completion',
-            value: true,
+            value: _weeklyEnabled,
+            onChanged: (val) => _toggleSetting('weekly', val),
           ),
           SizedBox(height: 32.h),
           _buildInfoCard(),
@@ -77,6 +128,7 @@ class NotificationSettingsScreen extends StatelessWidget {
     required String title,
     required String subtitle,
     required bool value,
+    required ValueChanged<bool> onChanged,
   }) {
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
@@ -107,7 +159,7 @@ class NotificationSettingsScreen extends StatelessWidget {
           ),
           Switch(
             value: value,
-            onChanged: (val) {},
+            onChanged: onChanged,
             activeThumbColor: AppColors.primary,
           ),
         ],
