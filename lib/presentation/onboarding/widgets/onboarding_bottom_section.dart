@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:taskly/core/theme/app_colors.dart';
 import '../../../../presentation/widgets/app_button.dart';
 
 class OnboardingBottomSection extends StatelessWidget {

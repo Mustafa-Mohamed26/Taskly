@@ -56,6 +56,11 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<UserEntity> loginWithGoogle() async {
+    return await _remoteDataSource.loginWithGoogle();
+  }
+
+  @override
   Stream<UserEntity?> get authStateChanges =>
       _remoteDataSource.authStateChanges;
 

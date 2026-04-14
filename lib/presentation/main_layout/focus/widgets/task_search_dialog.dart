@@ -69,55 +69,69 @@ class _TaskSearchDialogState extends State<TaskSearchDialog> {
             Flexible(
               child: BlocBuilder<TaskCubit, TaskState>(
                 builder: (context, state) {
+                  List<TaskEntity> allTasks = [];
+                  bool isLoading = false;
+
                   if (state is TaskSuccess<List<TaskEntity>>) {
-                    final filteredTasks = state.data
-                        .where((task) =>
-                            task.title
-                                .toLowerCase()
-                                .contains(_searchQuery.toLowerCase()) &&
-                            !task.isCompleted)
-                        .toList();
+                    allTasks = state.data;
+                  } else if (state is TaskActionSuccess) {
+                    allTasks = state.tasks;
+                  } else if (state is TaskLoading) {
+                    allTasks = state.previousData;
+                    isLoading = true;
+                  }
 
-                    if (filteredTasks.isEmpty) {
-                      return Padding(
-                        padding: EdgeInsets.symmetric(vertical: 32.h),
-                        child: Center(
-                          child: Text(
-                            'No tasks found',
-                            style: AppStyles.bodyMedium(
-                              scheme.onSurface.withValues(alpha: 0.5),
-                            ),
-                          ),
-                        ),
-                      );
-                    }
-
-                    return ListView.separated(
-                      shrinkWrap: true,
-                      itemCount: filteredTasks.length,
-                      separatorBuilder: (_, __) => Divider(color: dividerColor),
-                      itemBuilder: (context, index) {
-                        final task = filteredTasks[index];
-                        return ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          title: Text(
-                            task.title,
-                            style: AppStyles.bodyLargeMedium(scheme.onSurface)
-                                .copyWith(fontWeight: FontWeight.w700),
-                          ),
-                          subtitle: Text(
-                            '${task.priority} Priority',
-                            style: AppStyles.bodySmall(
-                              scheme.onSurface.withValues(alpha: 0.5),
-                            ),
-                          ),
-                          onTap: () => Navigator.pop(context, task),
-                        );
-                      },
+                  if (isLoading && allTasks.isEmpty) {
+                    return Center(
+                      child: CircularProgressIndicator(color: scheme.primary),
                     );
                   }
-                  return Center(
-                    child: CircularProgressIndicator(color: scheme.primary),
+
+                  final filteredTasks = allTasks
+                      .where((task) =>
+                          task.title
+                              .toLowerCase()
+                              .contains(_searchQuery.toLowerCase()) &&
+                          !task.isCompleted)
+                      .toList();
+
+                  if (filteredTasks.isEmpty) {
+                    return Padding(
+                      padding: EdgeInsets.symmetric(vertical: 32.h),
+                      child: Center(
+                        child: Text(
+                          isLoading ? 'Loading tasks...' : 'No tasks found',
+                          style: AppStyles.bodyMedium(
+                            scheme.onSurface.withValues(alpha: 0.5),
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+
+                  return ListView.separated(
+                    shrinkWrap: true,
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: filteredTasks.length,
+                    separatorBuilder: (_, __) => Divider(color: dividerColor),
+                    itemBuilder: (context, index) {
+                      final task = filteredTasks[index];
+                      return ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: Text(
+                          task.title,
+                          style: AppStyles.bodyLargeMedium(scheme.onSurface)
+                              .copyWith(fontWeight: FontWeight.w700),
+                        ),
+                        subtitle: Text(
+                          '${task.priority} Priority',
+                          style: AppStyles.bodySmall(
+                            scheme.onSurface.withValues(alpha: 0.5),
+                          ),
+                        ),
+                        onTap: () => Navigator.pop(context, task),
+                      );
+                    },
                   );
                 },
               ),

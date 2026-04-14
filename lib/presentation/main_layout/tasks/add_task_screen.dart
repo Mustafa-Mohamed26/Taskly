@@ -241,6 +241,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   void _handleStateChanges(BuildContext context, TaskState state) {
     setState(() => _isLoading = state is TaskLoading);
     if (state is TaskError) _showErrorDialog(state.message);
+    if (state is TaskActionSuccess) _showSuccessDialog(state.message);
   }
 
   void _showErrorDialog(String message) {
@@ -309,27 +310,20 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
       updatedAt: DateTime.now().millisecondsSinceEpoch,
     );
 
-    try {
-      if (isEditMode) {
-        await context.read<TaskCubit>().updateTask(task);
-      } else {
-        await context.read<TaskCubit>().addTask(task);
-      }
-      if (mounted) _showSuccessDialog();
-    } catch (e) {
-      if (mounted) _showErrorDialog(e.toString());
+    if (isEditMode) {
+      context.read<TaskCubit>().updateTask(task);
+    } else {
+      context.read<TaskCubit>().addTask(task);
     }
   }
 
-  void _showSuccessDialog() {
+  void _showSuccessDialog(String message) {
     AwesomeDialog(
       context: context,
       dialogType: DialogType.success,
       animType: AnimType.bottomSlide,
-      title: isEditMode ? 'Task Updated' : 'Task Added',
-      desc: isEditMode
-          ? 'Your task has been updated successfully.'
-          : 'New task has been added to your list.',
+      title: 'Success',
+      desc: message,
       btnOkOnPress: () => Navigator.pop(context),
     ).show();
   }

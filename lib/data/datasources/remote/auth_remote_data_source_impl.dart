@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:injectable/injectable.dart';
 import '../../models/user_model.dart';
 import '../auth_data_source.dart';
@@ -10,6 +11,7 @@ import '../../../core/utils/auth_exception_handler.dart';
 class FirebaseAuthDataSourceImpl implements AuthDataSource {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   @override
   Future<UserModel> login({
@@ -150,5 +152,49 @@ class FirebaseAuthDataSourceImpl implements AuthDataSource {
   Future<UserModel?> get currentAuthenticatedUser async {
     final user = _firebaseAuth.currentUser;
     return user != null ? UserModel.fromFirebaseUser(user) : null;
+  }
+
+  @override
+  Future<UserModel> loginWithGoogle() async {
+    try {
+      // 1. Trigger the Google Authentication flow
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) {
+        throw AuthException('Google Sign-In was cancelled by the user.');
+      }
+
+      // 2. Obtain the auth details from the request
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      // 3. Create a new credential
+      final OAuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // 4. Sign in to Firebase with the credential
+      final UserCredential userCredential = await _firebaseAuth.signInWithCredential(credential);
+      final User? user = userCredential.user;
+
+      if (user == null) {
+        throw AuthException('Failed to retrieve user information from Google.');
+      }
+
+      // 5. Prepare User Model
+      // Note: We only set createdAt if it's a new user (optional, but good for database hygiene)
+      final userModel = UserModel(
+        id: user.uid,
+        email: user.email ?? '',
+        name: user.displayName ?? 'Google User',
+      );
+
+      // 6. Sync to Firestore (always merge to ensure we have the latest user data)
+      await saveUserProfile(userModel);
+
+      return userModel;
+    } catch (e) {
+      if (e is AuthException) rethrow;
+      throw AuthException(AuthExceptionHandler.handleException(e));
+    }
   }
 }

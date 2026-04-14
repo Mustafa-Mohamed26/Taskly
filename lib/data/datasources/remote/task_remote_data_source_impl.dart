@@ -18,17 +18,29 @@ class FirestoreTaskDataSourceImpl implements TaskRemoteDataSource {
 
   @override
   Future<void> addTask(TaskModel task) async {
-    await _firestore.collection('tasks').doc(task.id).set(task.toJson());
+    await _firestore
+        .collection('tasks')
+        .doc(task.id)
+        .set(task.toJson())
+        .timeout(const Duration(seconds: 15));
   }
 
   @override
   Future<void> updateTask(TaskModel task) async {
-    await _firestore.collection('tasks').doc(task.id).update(task.toJson());
+    await _firestore
+        .collection('tasks')
+        .doc(task.id)
+        .update(task.toJson())
+        .timeout(const Duration(seconds: 15));
   }
 
   @override
   Future<void> deleteTask(String taskId) async {
-    await _firestore.collection('tasks').doc(taskId).delete();
+    await _firestore
+        .collection('tasks')
+        .doc(taskId)
+        .delete()
+        .timeout(const Duration(seconds: 15));
   }
 
   @override

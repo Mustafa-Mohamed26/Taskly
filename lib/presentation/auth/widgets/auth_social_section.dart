@@ -1,9 +1,10 @@
-import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskly/core/constants/app_strings.dart';
 import 'package:taskly/core/theme/app_colors.dart';
 import 'package:taskly/core/theme/app_styles.dart';
+import '../cubit/auth_cubit.dart';
 import 'social_button.dart';
 
 class AuthSocialSection extends StatelessWidget {
@@ -47,13 +48,7 @@ class AuthSocialSection extends StatelessWidget {
               child: SocialButton(
                 label: 'Google',
                 onPressed: () {
-                  AwesomeDialog(
-                    context: context,
-                    dialogType: DialogType.info,
-                    title: 'Coming Soon',
-                    desc: 'Google Login is currently disabled.',
-                    btnOkOnPress: () {},
-                  ).show();
+                  context.read<AuthCubit>().loginWithGoogle();
                 },
                 isIconWidget: true,
                 iconWidget: Icon(

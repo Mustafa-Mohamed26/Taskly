@@ -39,7 +39,14 @@ import '../../domain/usecases/tasks/get_tasks_usecase.dart' as _i577;
 import '../../domain/usecases/tasks/update_task_usecase.dart' as _i715;
 import '../../domain/usecases/tasks/watch_tasks_usecase.dart' as _i938;
 import '../../presentation/auth/cubit/auth_cubit.dart' as _i1063;
+import '../../presentation/main_layout/calendar/cubit/calendar_view_cubit.dart'
+    as _i236;
 import '../../presentation/main_layout/focus/cubit/focus_cubit.dart' as _i107;
+import '../../presentation/main_layout/home/cubit/home_cubit.dart' as _i787;
+import '../../presentation/main_layout/profile/cubit/profile_stats_cubit.dart'
+    as _i385;
+import '../../presentation/main_layout/tasks/cubit/schedule_cubit.dart'
+    as _i625;
 import '../../presentation/main_layout/tasks/cubit/sync_cubit.dart' as _i571;
 import '../../presentation/main_layout/tasks/cubit/task_cubit.dart' as _i20;
 
@@ -68,7 +75,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i715.UpdateTaskUseCase>(() => _i715.UpdateTaskUseCase());
     gh.factory<_i938.WatchTasksUseCase>(() => _i938.WatchTasksUseCase());
     gh.factory<_i1063.AuthCubit>(() => _i1063.AuthCubit());
+    gh.factory<_i236.CalendarViewCubit>(() => _i236.CalendarViewCubit());
     gh.factory<_i107.FocusCubit>(() => _i107.FocusCubit());
+    gh.factory<_i787.HomeCubit>(() => _i787.HomeCubit());
+    gh.factory<_i385.ProfileStatsCubit>(() => _i385.ProfileStatsCubit());
+    gh.factory<_i625.ScheduleCubit>(() => _i625.ScheduleCubit());
     gh.factory<_i20.TaskCubit>(() => _i20.TaskCubit());
     gh.singleton<_i512.DatabaseHelper>(() => _i512.DatabaseHelper());
     gh.singleton<_i11.ThemeCubit>(() => _i11.ThemeCubit());

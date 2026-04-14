@@ -9,6 +9,10 @@ import 'package:taskly/presentation/auth/cubit/auth_cubit.dart';
 import 'package:taskly/presentation/main_layout/focus/cubit/focus_cubit.dart';
 import 'package:taskly/presentation/main_layout/tasks/cubit/sync_cubit.dart';
 import 'package:taskly/presentation/main_layout/tasks/cubit/task_cubit.dart';
+import 'package:taskly/presentation/main_layout/home/cubit/home_cubit.dart';
+import 'package:taskly/presentation/main_layout/tasks/cubit/schedule_cubit.dart';
+import 'package:taskly/presentation/main_layout/calendar/cubit/calendar_view_cubit.dart';
+import 'package:taskly/presentation/main_layout/profile/cubit/profile_stats_cubit.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/cubit/theme_cubit.dart';
 import 'core/routes/app_routes.dart';
@@ -36,13 +40,24 @@ class MyApp extends StatelessWidget {
         BlocProvider<SyncCubit>(create: (_) => getIt<SyncCubit>()),
         BlocProvider<FocusCubit>(create: (_) => getIt<FocusCubit>()),
         BlocProvider<ThemeCubit>(create: (_) => getIt<ThemeCubit>()),
+        BlocProvider<HomeCubit>(create: (_) => getIt<HomeCubit>()),
+        BlocProvider<ScheduleCubit>(create: (_) => getIt<ScheduleCubit>()),
+        BlocProvider<CalendarViewCubit>(create: (_) => getIt<CalendarViewCubit>()),
+        BlocProvider<ProfileStatsCubit>(create: (_) => getIt<ProfileStatsCubit>()),
       ],
       child: Builder(
         builder: (context) {
           return BlocListener<AuthCubit, AuthState>(
             listener: (context, state) {
-              if (state is Authenticated) {
-                context.read<TaskCubit>().watchTasks(state.user.id);
+              if (state is Authenticated ||
+                  state is LoginSuccess ||
+                  state is RegisterSuccess) {
+                final userId = (state as dynamic).user.id;
+                context.read<TaskCubit>().watchTasks(userId);
+                context.read<HomeCubit>().init(userId);
+                context.read<ScheduleCubit>().init(userId);
+                context.read<CalendarViewCubit>().init(userId);
+                context.read<ProfileStatsCubit>().init(userId);
               }
             },
             child: ScreenUtilInit(

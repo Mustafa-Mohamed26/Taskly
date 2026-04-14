@@ -23,6 +23,8 @@ abstract class AuthRepository {
     String? bio,
   });
 
+  Future<UserEntity> loginWithGoogle();
+
   Stream<UserEntity?> get authStateChanges;
 
   Future<UserEntity?> get currentAuthenticatedUser;

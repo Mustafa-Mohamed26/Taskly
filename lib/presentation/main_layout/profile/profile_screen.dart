@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../auth/cubit/auth_cubit.dart';
-import '../tasks/cubit/task_cubit.dart';
-import '../../../domain/entities/task_entity.dart';
 import '../../../core/constants/app_strings.dart';
+import 'cubit/profile_stats_cubit.dart';
 import '../../../core/routes/app_routes.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_styles.dart';
@@ -120,20 +119,11 @@ Widget _buildStatsSection(
   required Color borderColor,
   required ColorScheme scheme,
 }) {
-  return BlocBuilder<TaskCubit, TaskState>(
+  return BlocBuilder<ProfileStatsCubit, ProfileStatsState>(
     builder: (context, state) {
-      int completed = 0;
-      int ongoing = 0;
-      int successRate = 0;
-
-      if (state is TaskSuccess<List<TaskEntity>>) {
-        final tasks = state.data;
-        completed = tasks.where((t) => t.isCompleted).length;
-        ongoing = tasks.where((t) => !t.isCompleted).length;
-        if (tasks.isNotEmpty) {
-          successRate = ((completed / tasks.length) * 100).round();
-        }
-      }
+      final completed = state.completedTasks;
+      final ongoing = state.ongoingTasks;
+      final successRate = state.successRate;
 
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

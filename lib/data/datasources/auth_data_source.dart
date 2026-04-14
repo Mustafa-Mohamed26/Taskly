@@ -25,6 +25,8 @@ abstract class AuthDataSource {
     String? bio,
   });
 
+  Future<UserModel> loginWithGoogle();
+
   Stream<UserModel?> get authStateChanges;
 
   Future<UserModel?> get currentAuthenticatedUser;

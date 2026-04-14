@@ -57,7 +57,7 @@ dependencies:
   freezed: 3.2.5
   json_serializable: ^6.8.0
   go_router: ^17.2.0
-  google_sign_in: ^7.2.0
+  google_sign_in: ^6.2.1
   sign_in_with_apple: ^7.0.1
   image_picker: ^1.2.1
   local_auth: ^3.0.1
@@ -67,6 +67,7 @@ dependencies:
   just_audio: ^0.10.5
   equatable: ^2.0.8
   timezone: ^0.11.0
+  rxdart: ^0.28.0
   
 
 dev_dependencies:

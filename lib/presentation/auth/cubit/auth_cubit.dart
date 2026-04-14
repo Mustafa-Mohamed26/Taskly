@@ -6,6 +6,7 @@ import '../../../domain/usecases/auth/get_authenticated_user_usecase.dart';
 import '../../../domain/usecases/auth/login_usecase.dart';
 import '../../../domain/usecases/auth/logout_usecase.dart';
 import '../../../domain/usecases/auth/register_usecase.dart';
+import '../../../domain/usecases/auth/login_with_google_usecase.dart';
 import '../../../domain/usecases/auth/update_user_profile_usecase.dart';
 
 part 'auth_state.dart';
@@ -47,6 +48,16 @@ class AuthCubit extends Cubit<AuthState> {
         password: password,
       );
       emit(RegisterSuccess(user));
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
+  }
+
+  Future<void> loginWithGoogle() async {
+    emit(AuthLoading());
+    try {
+      final user = await LoginWithGoogleUseCase.execute();
+      emit(LoginSuccess(user));
     } catch (e) {
       emit(AuthError(e.toString()));
     }
