@@ -65,6 +65,8 @@ class CacheHelper {
   static const String _onboardingKey = 'onboarding_completed';
   static const String _themeKey = 'theme_mode';
   static const String _accentColorKey = 'accent_color';
+  static const String _biometricEnabledKey = 'biometric_enabled';
+  static const String _hideNotificationsKey = 'hide_notifications_enabled';
 
   static Future<bool> setOnboardingCompleted(bool value) async =>
       saveData(key: _onboardingKey, value: value);
@@ -116,4 +118,20 @@ class CacheHelper {
 
   static bool getWeeklyReportsEnabled() =>
       getData(key: _weeklyReportsKey) ?? true;
+
+  // ---------------------------------------------------------------------------
+  // Security & Privacy Settings
+  // ---------------------------------------------------------------------------
+
+  static Future<bool> setBiometricEnabled(bool value) async =>
+      saveData(key: _biometricEnabledKey, value: value);
+
+  static bool getBiometricEnabled() =>
+      getData(key: _biometricEnabledKey) ?? false;
+
+  static Future<bool> setHideNotificationsEnabled(bool value) async =>
+      saveData(key: _hideNotificationsKey, value: value);
+
+  static bool getHideNotificationsEnabled() =>
+      getData(key: _hideNotificationsKey) ?? false;
 }

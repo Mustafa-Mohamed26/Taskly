@@ -30,4 +30,6 @@ abstract class AuthDataSource {
   Stream<UserModel?> get authStateChanges;
 
   Future<UserModel?> get currentAuthenticatedUser;
+
+  Future<void> deleteAccount(String uid);
 }

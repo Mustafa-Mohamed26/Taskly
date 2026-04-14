@@ -13,6 +13,7 @@ import 'package:taskly/presentation/main_layout/home/cubit/home_cubit.dart';
 import 'package:taskly/presentation/main_layout/tasks/cubit/schedule_cubit.dart';
 import 'package:taskly/presentation/main_layout/calendar/cubit/calendar_view_cubit.dart';
 import 'package:taskly/presentation/main_layout/profile/cubit/profile_stats_cubit.dart';
+import 'package:taskly/presentation/main_layout/profile/cubit/security_cubit.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/cubit/theme_cubit.dart';
 import 'core/routes/app_routes.dart';
@@ -44,6 +45,7 @@ class MyApp extends StatelessWidget {
         BlocProvider<ScheduleCubit>(create: (_) => getIt<ScheduleCubit>()),
         BlocProvider<CalendarViewCubit>(create: (_) => getIt<CalendarViewCubit>()),
         BlocProvider<ProfileStatsCubit>(create: (_) => getIt<ProfileStatsCubit>()),
+        BlocProvider<SecurityCubit>(create: (_) => getIt<SecurityCubit>()),
       ],
       child: Builder(
         builder: (context) {
@@ -58,6 +60,7 @@ class MyApp extends StatelessWidget {
                 context.read<ScheduleCubit>().init(userId);
                 context.read<CalendarViewCubit>().init(userId);
                 context.read<ProfileStatsCubit>().init(userId);
+                context.read<SecurityCubit>().init();
               }
             },
             child: ScreenUtilInit(

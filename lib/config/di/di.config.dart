@@ -45,6 +45,8 @@ import '../../presentation/main_layout/focus/cubit/focus_cubit.dart' as _i107;
 import '../../presentation/main_layout/home/cubit/home_cubit.dart' as _i787;
 import '../../presentation/main_layout/profile/cubit/profile_stats_cubit.dart'
     as _i385;
+import '../../presentation/main_layout/profile/cubit/security_cubit.dart'
+    as _i858;
 import '../../presentation/main_layout/tasks/cubit/schedule_cubit.dart'
     as _i625;
 import '../../presentation/main_layout/tasks/cubit/sync_cubit.dart' as _i571;
@@ -93,6 +95,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i272.TaskLocalDataSource>(
       () => _i180.SqfliteTaskDataSourceImpl(gh<_i512.DatabaseHelper>()),
+    );
+    gh.factory<_i858.SecurityCubit>(
+      () => _i858.SecurityCubit(gh<_i1073.AuthRepository>()),
     );
     gh.factory<_i250.TaskRepository>(
       () => _i538.TaskRepositoryImpl(

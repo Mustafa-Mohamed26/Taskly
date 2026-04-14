@@ -67,4 +67,9 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<UserEntity?> get currentAuthenticatedUser =>
       _remoteDataSource.currentAuthenticatedUser;
+
+  @override
+  Future<void> deleteAccount(String uid) async {
+    return await _remoteDataSource.deleteAccount(uid);
+  }
 }

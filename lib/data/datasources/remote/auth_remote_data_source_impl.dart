@@ -197,4 +197,28 @@ class FirebaseAuthDataSourceImpl implements AuthDataSource {
       throw AuthException(AuthExceptionHandler.handleException(e));
     }
   }
+
+  @override
+  Future<void> deleteAccount(String uid) async {
+    try {
+      // 1. Delete all tasks belonging to the user
+      final tasksQuery = await _firestore.collection('tasks').where('userId', isEqualTo: uid).get();
+      final batch = _firestore.batch();
+      for (var doc in tasksQuery.docs) {
+        batch.delete(doc.reference);
+      }
+      await batch.commit();
+
+      // 2. Delete the user profile document
+      await _firestore.collection('users').doc(uid).delete();
+
+      // 3. Delete the Firebase Authentication account
+      final user = _firebaseAuth.currentUser;
+      if (user != null && user.uid == uid) {
+        await user.delete();
+      }
+    } catch (e) {
+      throw AuthException(AuthExceptionHandler.handleException(e));
+    }
+  }
 }
