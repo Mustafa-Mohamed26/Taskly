@@ -1,28 +1,27 @@
 import 'dart:async';
+import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
+import 'package:taskly/domain/entities/task_entity.dart';
 
 part 'focus_state.dart';
 
 @injectable
 class FocusCubit extends Cubit<FocusState> {
   Timer? _timer;
-  int _initialDuration = 25 * 60; // Default 25 minutes
-  int _remainingSeconds = 25 * 60;
 
-  FocusCubit() : super(FocusInitial(25 * 60));
+  FocusCubit() : super(FocusState.initial());
 
   void startTimer() {
     if (_timer != null) return;
-    
-    emit(FocusRunning(_remainingSeconds));
+
+    emit(state.copyWith(status: FocusStatus.running));
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_remainingSeconds > 0) {
-        _remainingSeconds--;
-        emit(FocusRunning(_remainingSeconds));
+      if (state.remainingSeconds > 0) {
+        emit(state.copyWith(remainingSeconds: state.remainingSeconds - 1));
       } else {
         stopTimer();
-        emit(FocusCompleted());
+        emit(state.copyWith(status: FocusStatus.completed, remainingSeconds: 0));
       }
     });
   }
@@ -30,20 +29,32 @@ class FocusCubit extends Cubit<FocusState> {
   void pauseTimer() {
     _timer?.cancel();
     _timer = null;
-    emit(FocusPaused(_remainingSeconds));
+    emit(state.copyWith(status: FocusStatus.paused));
   }
 
   void stopTimer() {
     _timer?.cancel();
     _timer = null;
-    _remainingSeconds = _initialDuration;
-    emit(FocusInitial(_initialDuration));
+    emit(state.copyWith(
+      status: FocusStatus.initial,
+      remainingSeconds: state.duration,
+    ));
   }
 
   void setDuration(int minutes) {
-    _initialDuration = minutes * 60;
-    _remainingSeconds = _initialDuration;
-    emit(FocusInitial(_initialDuration));
+    emit(state.copyWith(
+      duration: minutes * 60,
+      remainingSeconds: minutes * 60,
+      status: FocusStatus.initial,
+    ));
+  }
+
+  void selectTask(TaskEntity? task) {
+    emit(state.copyWith(selectedTask: () => task));
+  }
+
+  void selectSound(String? sound) {
+    emit(state.copyWith(selectedSound: () => sound));
   }
 
   @override

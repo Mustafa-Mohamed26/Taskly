@@ -41,10 +41,35 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<void> updateUserProfile({
+    required String uid,
+    String? name,
+    String? phone,
+    String? bio,
+  }) async {
+    return await _remoteDataSource.updateUserProfile(
+      uid: uid,
+      name: name,
+      phone: phone,
+      bio: bio,
+    );
+  }
+
+  @override
+  Future<UserEntity> loginWithGoogle() async {
+    return await _remoteDataSource.loginWithGoogle();
+  }
+
+  @override
   Stream<UserEntity?> get authStateChanges =>
       _remoteDataSource.authStateChanges;
 
   @override
   Future<UserEntity?> get currentAuthenticatedUser =>
       _remoteDataSource.currentAuthenticatedUser;
+
+  @override
+  Future<void> deleteAccount(String uid) async {
+    return await _remoteDataSource.deleteAccount(uid);
+  }
 }

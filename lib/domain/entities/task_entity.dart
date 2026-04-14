@@ -4,10 +4,11 @@ class TaskEntity {
   final String title;
   final String? description;
   final DateTime dateTime;
-  final String category;
+  final List<String> categories;
   final String priority;
   final bool isCompleted;
   final bool isSynced;
+  final bool isDeleted;
   final int updatedAt;
 
   const TaskEntity({
@@ -16,10 +17,11 @@ class TaskEntity {
     required this.title,
     this.description,
     required this.dateTime,
-    required this.category,
+    required this.categories,
     required this.priority,
     this.isCompleted = false,
     this.isSynced = true,
+    this.isDeleted = false,
     required this.updatedAt,
   });
 
@@ -29,10 +31,11 @@ class TaskEntity {
     String? title,
     String? description,
     DateTime? dateTime,
-    String? category,
+    List<String>? categories,
     String? priority,
     bool? isCompleted,
     bool? isSynced,
+    bool? isDeleted,
     int? updatedAt,
   }) {
     return TaskEntity(
@@ -41,10 +44,11 @@ class TaskEntity {
       title: title ?? this.title,
       description: description ?? this.description,
       dateTime: dateTime ?? this.dateTime,
-      category: category ?? this.category,
+      categories: categories ?? this.categories,
       priority: priority ?? this.priority,
       isCompleted: isCompleted ?? this.isCompleted,
       isSynced: isSynced ?? this.isSynced,
+      isDeleted: isDeleted ?? this.isDeleted,
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }

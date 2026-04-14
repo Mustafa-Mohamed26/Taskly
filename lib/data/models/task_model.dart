@@ -7,10 +7,11 @@ class TaskModel extends TaskEntity {
     required super.title,
     super.description,
     required super.dateTime,
-    required super.category,
+    required super.categories,
     required super.priority,
     super.isCompleted,
     super.isSynced,
+    super.isDeleted,
     required super.updatedAt,
   });
 
@@ -21,10 +22,11 @@ class TaskModel extends TaskEntity {
       title: entity.title,
       description: entity.description,
       dateTime: entity.dateTime,
-      category: entity.category,
+      categories: entity.categories,
       priority: entity.priority,
       isCompleted: entity.isCompleted,
       isSynced: entity.isSynced,
+      isDeleted: entity.isDeleted,
       updatedAt: entity.updatedAt,
     );
   }
@@ -36,10 +38,11 @@ class TaskModel extends TaskEntity {
       title: json['title'],
       description: json['description'],
       dateTime: DateTime.parse(json['dateTime'] ?? json['date_time']),
-      category: json['category'],
+      categories: List<String>.from(json['categories'] ?? (json['category'] != null ? [json['category']] : [])),
       priority: json['priority'],
       isCompleted: json['isCompleted'] ?? json['is_completed'] ?? false,
       isSynced: json['isSynced'] ?? json['is_synced'] ?? true,
+      isDeleted: json['isDeleted'] ?? json['is_deleted'] ?? false,
       updatedAt: json['updatedAt'] ?? json['updated_at'],
     );
   }
@@ -51,10 +54,11 @@ class TaskModel extends TaskEntity {
       'title': title,
       'description': description,
       'dateTime': dateTime.toIso8601String(),
-      'category': category,
+      'categories': categories,
       'priority': priority,
       'isCompleted': isCompleted,
       'isSynced': isSynced,
+      'isDeleted': isDeleted,
       'updatedAt': updatedAt,
     };
   }
@@ -67,10 +71,11 @@ class TaskModel extends TaskEntity {
       title: map['title'],
       description: map['description'],
       dateTime: DateTime.parse(map['date_time']),
-      category: map['category'],
+      categories: (map['category'] as String).split(',').where((s) => s.isNotEmpty).toList(),
       priority: map['priority'],
       isCompleted: map['is_completed'] == 1,
       isSynced: map['is_synced'] == 1,
+      isDeleted: map['is_deleted'] == 1,
       updatedAt: map['updated_at'],
     );
   }
@@ -82,11 +87,41 @@ class TaskModel extends TaskEntity {
       'title': title,
       'description': description,
       'date_time': dateTime.toIso8601String(),
-      'category': category,
+      'category': categories.join(','),
       'priority': priority,
       'is_completed': isCompleted ? 1 : 0,
       'is_synced': isSynced ? 1 : 0,
+      'is_deleted': isDeleted ? 1 : 0,
       'updated_at': updatedAt,
     };
+  }
+
+  @override
+  TaskModel copyWith({
+    String? id,
+    String? userId,
+    String? title,
+    String? description,
+    DateTime? dateTime,
+    List<String>? categories,
+    String? priority,
+    bool? isCompleted,
+    bool? isSynced,
+    bool? isDeleted,
+    int? updatedAt,
+  }) {
+    return TaskModel(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      dateTime: dateTime ?? this.dateTime,
+      categories: categories ?? this.categories,
+      priority: priority ?? this.priority,
+      isCompleted: isCompleted ?? this.isCompleted,
+      isSynced: isSynced ?? this.isSynced,
+      isDeleted: isDeleted ?? this.isDeleted,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
   }
 }

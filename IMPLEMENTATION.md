@@ -1,123 +1,85 @@
-# Taskly - Implementation Roadmap
+# Taskly Implementation Plan (Feature-Based)
 
-This document outlines the development phases for Taskly, tracking progress from the initial UI prototype to a fully functional, synchronized task management system using Clean Architecture.
+## Feature 1: Splash Screen
+- [x] *Design Reference**: `assets/ai/Splash Screen light mode.png`, `assets/ai/Splash Screen dark mode.png`
+- [x] Initialize Firebase & Dependencies.
+- [x] **Auto-Authentication**: Implement Auth-state listener in `AuthCubit` to check if user is already logged in.
+- [x] **Routing**: Implement conditional navigation based on Auth status and Onboarding completion.
 
----
+## Feature 2: Onboarding
+-  [x] *Design Reference**: `assets/ai/Onboarding screens light mode.png`, `assets/ai/Onboarding screens dark mode.png`
+- [x] Carousel UI implementation.
+- [x] **Cache Persistence**: Implement `CacheHelper.setOnboardingCompleted(true)` to skip onboarding on next launch.
 
-## Phase 0: UI/UX Prototyping & Foundation (Completed)
-- [x] **Project Scaffolding**: Standard Flutter project structure.
-- [x] **Theme System**: Definition of `AppColors`, `AppStyles`, and `AppTheme`.
-- [x] **Navigation Setup**: Centralized routing in `AppRoutes` and `AppRoutesGenerator`.
-- [x] **Authentication UI**: Splash, Onboarding, Login, Register, Forgot/Change Password.
-- [x] **Task Management UI**: Home, All Tasks, Add Task Form.
-- [x] **User Profile UI**: Profile Overview, Settings.
-- [x] **Utility Screens**: Focus Timer UI, Calendar View.
+## Feature 3: Authentication System
+- [x] *Design Reference**: `assets/ai/sign in & register & forget password screens light mode.png`, `assets/ai/sign in & register & forget password screens dark mode.png`
+- [x] Implement Firebase Auth (Sign In, Sign Up, Forgot Password).
+- [x] Implement Firestore User profile synchronization (Data Sync).
+- [x] Add form validation and loading state overlays.
 
----
+## Feature 4: Task Dashboard & CRUD System
+- [x] *Design Reference**: `assets/ai/dashboard and add and view the tasks light mode.png`, `assets/ai/dashboard and add and view the tasks dark mode.png`
+- [x] **Summary Cards**: Display total task counts for 'Today' and 'This Week' on the dashboard.
+- [x] **Dynamic Progress Bar**: Calculate and visualize daily progress based on (completed tasks / total tasks).
+- [x] **Today's Tasks List**: Filtered list view of tasks scheduled for the current day.
+- [x] **CRUD System**:
+    - [x] Add Task via floating action button (Navigate to Add Task page).
+    - [x] Edit/Remove via task item options (three-dot menu).
+    - [x] Edit Task: Reuse Add Task page as 'Edit Task' mode with pre-filled data.
+- [x] **Navigation**: 'View All' navigates to the detailed weekly task list.
+- [x] **UI Feedback**: `AwesomeDialog` overlays for all successful/failed CRUD operations.
+- [x] **Future Note**: Potential for future expansion (e.g., drag-and-drop reordering, voice-to-text task creation).
 
-## Phase 1: Core Infrastructure & Setup (Completed)
-- [x] **Add Dependencies**: Firebase, `get_it`, `path`, `injectable`, `awesome_dialog`, `build_runner`.
-- [x] **Firebase Integration**: FlutterFire CLI configuration and `main.dart` initialization.
-- [x] **Local Storage Foundation**: `Sqflite` (`DatabaseHelper`) and `Shared Preferences` (`CacheHelper`).
-- [x] **Dependency Injection (DI)**: `GetIt` with `injectable` and `build_runner` code generation.
+## Feature 9: Notification System
+- [ ] **Notification System**: Integrate `flutter_local_notifications` for scheduled task reminders.
 
----
+## Feature 5: Calendar
+- [ ] *Design Reference**: `assets/ai/calander view light mode.png`, `assets/ai/calander view dark mode.png`
+- [ ] **View Modes**: Support Weekly and Monthly toggle views.
+- [ ] **Visualization**:
+    - [ ] **Current Day**: Highlighted with a solid blue circle.
+    - [ ] **Task Indicator**: Low-opacity blue circle for days with scheduled tasks.
+- [ ] **Task Display**: List all tasks (completed/pending) for the selected day.
+- [ ] **Header Info**: Display current date in the AppBar.
+- [ ] **UX Suggestions**:
+    - [ ] **Task Quick-Add**: Long-press on a date to open the 'Add Task' screen pre-filled with that date.
+    - [ ] **Filtering**: Add chips to filter calendar tasks by 'All', 'Completed', and 'Pending'.
+    - [ ] **Transition**: Smooth animation when switching between week/month modes.
 
-## Phase 2: Authentication System (Domain & Data Logic) (Completed - Refactored)
-*Goal: Implement secure user management using Clean Architecture with strict decoupling and improved UX.*
+## Feature 6: Focus Mode
+- [ ] *Design Reference**: `assets/ai/focuse light mode.png`, `assets/ai/focuse dark mode.png`
+- [ ] **Task Selection**: Integration with `TaskCubit` to pick a task for the focus session.
+- [ ] **Timer Core**:
+    - [ ] Implement Pomodoro logic (25 min default) with decreasing circular progress indicator.
+    - [ ] Add soundscape controller (start/stop/switch sounds).
+- [ ] **UX Suggestions**:
+    - [ ] **Auto-Pause**: Lifecycle listener to pause session on background.
+    - [ ] **Stats**: Calculate focus time to update profile stats.
+    - [ ] **Feedback**: Add haptic feedback on completion.
 
-### **1. Domain Layer**
-- [x] Define `UserEntity`.
-- [x] Define `AuthRepository` (Abstract interface in a separated file).
-- [x] Implement **Static Use Cases** (Zero-object instantiation pattern):
-    - [x] `LoginUseCase.execute()`
-    - [x] `RegisterUseCase.execute()`
-    - [x] `LogoutUseCase.execute()`
-    - [x] `ForgotPasswordUseCase.execute()`
-    - [x] `GetAuthenticatedUserUseCase.execute()` (Auth state stream).
+## Feature 7: User Profile & Settings
+- [ ] *Design Reference**: `assets/ai/profile sittings light mode.png`, `assets/ai/profile sittings dark mode.png`, `assets/ai/User profile screen light mode.png`, `assets/ai/User profile screen dark mode.png`
+- [ ] **Profile Display**: 
+    - [ ] Display Name and Email only.
+    - [ ] Task stats calculation (Completed vs Ongoing) + visual percentage progress.
+- [ ] **Account Settings**: 
+    - [ ] Personal info form (Name, Email[Read-only], Phone, Bio).
+    - [ ] 'Save Changes' functionality (Firestore update).
+- [ ] **Notifications**: 
+    - [ ] Implement switch toggle logic for Push Reminders, Email, Weekly Reports.
+    - [ ] Define notification categories (Local for reminders, FCM for email/updates).
+- [ ] **Theme Preferences**: 
+    - [ ] Implement Radio-group for Light/Dark/System Default themes.
+    - [ ] Apply app-wide theme accent colors.
+- [ ] **Security & Privacy**:
+    - [ ] Change Password flow (Email trigger + success dialog).
+    - [ ] Privacy Policy Modal implementation.
+    - [ ] App Permission Linker (System settings).
+    - [ ] Account Deletion (Auth + Firestore data wipe + Confirmation alert).
 
-### **2. Data Layer**
-- [x] Create `UserModel` (Firebase/JSON mapping).
-- [x] **Decoupled DataSources**:
-    - [x] Define abstract `AuthDataSource`.
-    - [x] Implement `FirebaseAuthDataSourceImpl` in `remote/` folder with `@Injectable(as: AuthDataSource)`.
-- [x] **Decoupled Repositories**:
-    - [x] Implement `AuthRepositoryImpl` in `remote/` folder with `@Injectable(as: AuthRepository)`.
-
-### **3. Presentation Layer**
-- [x] Create `AuthCubit` with specific states (`Initial`, `Loading`, `AuthSuccess<T>`, `AuthError`) and `@injectable`.
-- [x] **Enhanced UI Feedback**:
-    - [x] Create `AuthLoadingWidget` (Specialized circular progress container).
-    - [x] Implement `BlocListener` in all Auth screens for `AwesomeDialog` overlays.
-    - [x] Use stack-based `AuthLoadingWidget` overlay triggered by state changes.
-- [x] **Navigation & Persistence**:
-    - [x] Update `SplashScreen` for conditional navigation based on Auth status and Onboarding.
-    - [x] Update `OnboardingScreen` to persist completion status via `CacheHelper`.
-- [x] **User Data Sync**:
-    - [x] Implement Firestore storage for user profiles upon registration/social login.
-
----
-
-## Phase 3: Task Management (Domain & Data Layer) (Completed)
-*Goal: Build the offline-first task engine.*
-
-### **1. Domain Layer**
-- [x] Define `TaskEntity` (id, userId, title, desc, dateTime, category, priority, isCompleted, isSynced, updatedAt).
-- [x] Define `TaskRepository` (interface in separated file).
-- [x] Implement **Static Use Cases**:
-    - [x] `GetTasksUseCase`
-    - [x] `AddTaskUseCase`
-    - [x] `UpdateTaskUseCase`
-    - [x] `DeleteTaskUseCase`
-    - [x] `WatchTasksUseCase`
-
-### **2. Data Layer**
-- [x] Create `TaskModel` (Serialization + SQL mapping).
-- [x] **Remote Data Layer**:
-    - [x] Define abstract `TaskRemoteDataSource`.
-    - [x] Implement `FirestoreTaskDataSourceImpl` in `remote/`.
-- [x] **Local Data Layer**:
-    - [x] Define abstract `TaskLocalDataSource`.
-    - [x] Implement `SqfliteTaskDataSourceImpl` in `local/`.
-- [x] **Repository Implementation**:
-    - [x] Implement `TaskRepositoryImpl` (Logic for local cache first + background remote sync).
-
----
-
-## Phase 4: State Management & UI Wiring (Completed)
-- [x] **Task State Management**: `TaskCubit` with `@injectable` and generic `Success<T>` states.
-- [x] **UI Integration**:
-    - [x] Connect `AddTaskScreen` to Domain logic.
-    - [x] Connect `AllTasksScreen` to live data stream.
-    - [x] Implement real-time updates for completion status.
-
----
-
-## Phase 5: Synchronization & Offline Mode (Completed)
-- [x] **Sync Engine**:
-    - [x] Implement "Pending Sync" flag for local changes.
-    - [x] Set up `Connectivity` listener for auto-syncing when online (`SyncCubit`).
-    - [x] Implement conflict resolution (Last-Write-Wins based on `updatedAt`).
-
----
-
-## Phase 6: Advanced Features & Polishing (Completed)
-- [x] **Focus Timer**: Logic for countdown.
-- [x] **Calendar**: Mapping tasks to the calendar view.
-- [x] **Settings**: Theme toggle and Profile updates logic.
-
----
-
-## Phase 7: QA & Deployment (Completed)
-- [x] **Testing**: Core cubits and use cases validated.
-- [x] **Optimization**: Database queries and performance verified.
-- [x] **Release**: App ready for production build.
-
-## 🚩 Resume Point (Next Session)
-**Next Step**: Start **Phase 3: Task Management (Domain & Data Layer)**.
-1. Create `TaskEntity` in `lib/domain/entities/task_entity.dart`.
-2. Create `TaskRepository` abstract interface in `lib/domain/repositories/task_repository.dart`.
-3. Implement Static UseCases in `lib/domain/usecases/tasks/`.
-4. Create `TaskModel` and DataSources.
-
-*Note: Ensure all new components follow the refactored rules (Injectable, Static UseCases, Decoupled Folders).*
+## Feature 8: Sync & Offline Engine
+- [ ] **Logic**: Local Sqflite (Single Source of Truth) + Background Firestore Sync.
+- [ ] **Connectivity**: Connectivity listener for auto-syncing when online.
+- [ ] **Sync Throttling**: Battery-optimized background sync (Charging + Wi-Fi).
+- [ ] **Debugging**: Dedicated log screen in settings for sync debugging.
+- [ ] **Conflict Resolution**: Timestamp-based resolution.

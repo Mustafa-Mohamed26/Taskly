@@ -17,7 +17,6 @@ class CacheHelper {
     required dynamic value,
   }) async {
     if (_sharedPreferences == null) await init();
-    
     if (_sharedPreferences == null) return false;
 
     try {
@@ -37,9 +36,8 @@ class CacheHelper {
 
   static Future<bool> removeData({required String key}) async {
     if (_sharedPreferences == null) await init();
-    
     if (_sharedPreferences == null) return false;
-    
+
     try {
       return await _sharedPreferences!.remove(key);
     } catch (e) {
@@ -50,9 +48,8 @@ class CacheHelper {
 
   static Future<bool> clearData() async {
     if (_sharedPreferences == null) await init();
-    
     if (_sharedPreferences == null) return false;
-    
+
     try {
       return await _sharedPreferences!.clear();
     } catch (e) {
@@ -61,24 +58,80 @@ class CacheHelper {
     }
   }
 
-  // --- Specific methods for easier access ---
+  // ---------------------------------------------------------------------------
+  // App Settings
+  // ---------------------------------------------------------------------------
 
   static const String _onboardingKey = 'onboarding_completed';
   static const String _themeKey = 'theme_mode';
+  static const String _accentColorKey = 'accent_color';
+  static const String _biometricEnabledKey = 'biometric_enabled';
+  static const String _hideNotificationsKey = 'hide_notifications_enabled';
 
-  static Future<bool> setOnboardingCompleted(bool value) async {
-    return await saveData(key: _onboardingKey, value: value);
-  }
+  static Future<bool> setOnboardingCompleted(bool value) async =>
+      saveData(key: _onboardingKey, value: value);
 
-  static bool getOnboardingCompleted() {
-    return getData(key: _onboardingKey) ?? false;
-  }
+  static bool getOnboardingCompleted() =>
+      getData(key: _onboardingKey) ?? false;
 
-  static Future<bool> setThemeMode(String value) async {
-    return await saveData(key: _themeKey, value: value);
-  }
+  static Future<bool> setThemeMode(String value) async =>
+      saveData(key: _themeKey, value: value);
 
-  static String getThemeMode() {
-    return getData(key: _themeKey) ?? 'system';
-  }
+  static String getThemeMode() => getData(key: _themeKey) ?? 'system';
+
+  /// Stores the accent color as a 32-bit ARGB integer.
+  static Future<bool> setAccentColor(int colorValue) async =>
+      saveData(key: _accentColorKey, value: colorValue);
+
+  /// Returns the stored accent color integer, or null if not yet set.
+  static int? getAccentColor() => getData(key: _accentColorKey);
+
+  // ---------------------------------------------------------------------------
+  // Notification Settings
+  // ---------------------------------------------------------------------------
+
+  static const String _pushNotificationsKey = 'push_notifications_enabled';
+  static const String _remindersKey = 'reminders_enabled';
+  static const String _emailNotificationsKey = 'email_notifications_enabled';
+  static const String _weeklyReportsKey = 'weekly_reports_enabled';
+
+  static Future<bool> setPushNotificationsEnabled(bool value) async =>
+      saveData(key: _pushNotificationsKey, value: value);
+
+  static bool getPushNotificationsEnabled() =>
+      getData(key: _pushNotificationsKey) ?? true;
+
+  static Future<bool> setRemindersEnabled(bool value) async =>
+      saveData(key: _remindersKey, value: value);
+
+  static bool getRemindersEnabled() =>
+      getData(key: _remindersKey) ?? true;
+
+  static Future<bool> setEmailNotificationsEnabled(bool value) async =>
+      saveData(key: _emailNotificationsKey, value: value);
+
+  static bool getEmailNotificationsEnabled() =>
+      getData(key: _emailNotificationsKey) ?? false;
+
+  static Future<bool> setWeeklyReportsEnabled(bool value) async =>
+      saveData(key: _weeklyReportsKey, value: value);
+
+  static bool getWeeklyReportsEnabled() =>
+      getData(key: _weeklyReportsKey) ?? true;
+
+  // ---------------------------------------------------------------------------
+  // Security & Privacy Settings
+  // ---------------------------------------------------------------------------
+
+  static Future<bool> setBiometricEnabled(bool value) async =>
+      saveData(key: _biometricEnabledKey, value: value);
+
+  static bool getBiometricEnabled() =>
+      getData(key: _biometricEnabledKey) ?? false;
+
+  static Future<bool> setHideNotificationsEnabled(bool value) async =>
+      saveData(key: _hideNotificationsKey, value: value);
+
+  static bool getHideNotificationsEnabled() =>
+      getData(key: _hideNotificationsKey) ?? false;
 }

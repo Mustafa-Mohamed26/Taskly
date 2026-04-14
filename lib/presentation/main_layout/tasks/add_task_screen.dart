@@ -7,13 +7,20 @@ import 'package:taskly/domain/entities/task_entity.dart';
 import 'package:taskly/presentation/auth/cubit/auth_cubit.dart';
 import 'package:taskly/presentation/auth/widgets/auth_loading_widget.dart';
 import 'package:taskly/presentation/main_layout/tasks/cubit/task_cubit.dart';
+import 'package:taskly/presentation/widgets/app_button.dart';
+import 'package:taskly/presentation/widgets/app_text_field.dart';
+import 'package:taskly/presentation/widgets/section_title.dart';
 import 'package:uuid/uuid.dart';
-import '../../../core/constants/app_strings.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_styles.dart';
+import 'package:taskly/core/constants/app_strings.dart';
+import 'package:taskly/core/theme/app_styles.dart';
+import 'widgets/add_task_selector_field.dart';
+import 'widgets/add_task_category_chip.dart';
+import 'widgets/add_task_priority_card.dart';
+import 'widgets/add_task_background_decorations.dart';
 
 class AddTaskScreen extends StatefulWidget {
-  const AddTaskScreen({super.key});
+  final TaskEntity? task;
+  const AddTaskScreen({super.key, this.task});
 
   @override
   State<AddTaskScreen> createState() => _AddTaskScreenState();
@@ -24,9 +31,24 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   final _descController = TextEditingController();
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
-  String _selectedCategory = 'Work';
+  List<String> _selectedCategories = ['Work'];
   String _selectedPriority = 'Medium';
   bool _isLoading = false;
+
+  bool get isEditMode => widget.task != null;
+
+  @override
+  void initState() {
+    super.initState();
+    if (isEditMode) {
+      _titleController.text = widget.task!.title;
+      _descController.text = widget.task!.description ?? '';
+      _selectedDate = widget.task!.dateTime;
+      _selectedTime = TimeOfDay.fromDateTime(widget.task!.dateTime);
+      _selectedCategories = List.from(widget.task!.categories);
+      _selectedPriority = widget.task!.priority;
+    }
+  }
 
   @override
   void dispose() {
@@ -35,320 +57,274 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     super.dispose();
   }
 
-  Future<void> _pickDate() async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate,
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2100),
-    );
-    if (picked != null) {
-      setState(() => _selectedDate = picked);
-    }
-  }
-
-  Future<void> _pickTime() async {
-    final picked = await showTimePicker(
-      context: context,
-      initialTime: _selectedTime,
-    );
-    if (picked != null) {
-      setState(() => _selectedTime = picked);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    return BlocListener<TaskCubit, TaskState>(
-      listener: (context, state) {
-        setState(() {
-          _isLoading = state is TaskLoading;
-        });
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final scheme = Theme.of(context).colorScheme;
 
-        if (state is TaskSuccess) {
-          AwesomeDialog(
-            context: context,
-            dialogType: DialogType.success,
-            title: 'Success',
-            desc: 'Task added successfully!',
-            btnOkOnPress: () => Navigator.pop(context),
-          ).show();
-        } else if (state is TaskError) {
-          AwesomeDialog(
-            context: context,
-            dialogType: DialogType.error,
-            title: 'Error',
-            desc: state.message,
-            btnOkOnPress: () {},
-          ).show();
-        }
-      },
+    return BlocListener<TaskCubit, TaskState>(
+      listener: _handleStateChanges,
       child: Stack(
         children: [
           Scaffold(
-            backgroundColor: AppColors.background,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             appBar: AppBar(
-              backgroundColor: AppColors.white,
+              backgroundColor: Colors.transparent,
               elevation: 0,
               leading: IconButton(
-                icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+                icon: Icon(Icons.arrow_back_rounded, color: scheme.onSurface, size: 28.sp),
                 onPressed: () => Navigator.pop(context),
               ),
-              title: Text(AppStrings.newTask, style: AppStyles.titleLarge()),
-              centerTitle: true,
-            ),
-            body: SingleChildScrollView(
-              padding: EdgeInsets.all(24.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildFieldLabel(AppStrings.taskTitle),
-                  _buildTextField('What needs to be done?', controller: _titleController),
-                  SizedBox(height: 24.h),
-                  _buildFieldLabel(AppStrings.description),
-                  _buildTextField('Add more details...', controller: _descController, maxLines: 4),
-                  SizedBox(height: 24.h),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildFieldLabel(AppStrings.date),
-                            GestureDetector(
-                              onTap: _pickDate,
-                              child: _buildSelectorField(
-                                Icons.calendar_today,
-                                DateFormat('MMM dd, yyyy').format(_selectedDate),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(width: 16.w),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildFieldLabel(AppStrings.time),
-                            GestureDetector(
-                              onTap: _pickTime,
-                              child: _buildSelectorField(
-                                Icons.access_time,
-                                _selectedTime.format(context),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 24.h),
-                  _buildFieldLabel(AppStrings.category),
-                  Row(
-                    children: [
-                      _buildCategoryChip('Work', Icons.work),
-                      SizedBox(width: 8.w),
-                      _buildCategoryChip('Personal', Icons.person),
-                      SizedBox(width: 8.w),
-                      _buildCategoryChip('Health', Icons.favorite),
-                    ],
-                  ),
-                  SizedBox(height: 24.h),
-                  _buildFieldLabel(AppStrings.priority),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _buildPriorityButton('Low', AppColors.priorityLow),
-                      _buildPriorityButton('Medium', AppColors.priorityMedium),
-                      _buildPriorityButton('High', AppColors.priorityHigh),
-                    ],
-                  ),
-                  SizedBox(height: 40.h),
-                  ElevatedButton(
-                    onPressed: _createTask,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      minimumSize: Size(double.infinity, 56.h),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.add_task, color: AppColors.white),
-                        SizedBox(width: 8.w),
-                        Text(AppStrings.createTask, style: AppStyles.labelLarge()),
-                      ],
-                    ),
-                  ),
-                ],
+              title: Text(
+                isEditMode ? 'Edit Task' : AppStrings.newTask,
+                style: AppStyles.displayMedium(scheme.onSurface).copyWith(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 22.sp,
+                  letterSpacing: -0.5,
+                ),
               ),
+              centerTitle: false,
+              titleSpacing: 0,
+            ),
+            body: Stack(
+              children: [
+                AddTaskBackgroundDecorations(isDark: isDark),
+                _buildForm(isDark),
+              ],
             ),
           ),
-          if (_isLoading) const AuthLoadingWidget(), // Reusing the same loading overlay
+          if (_isLoading) const AuthLoadingWidget(),
         ],
       ),
     );
   }
 
-  void _createTask() {
-    if (_titleController.text.isEmpty) {
+  Widget _buildForm(bool isDark) {
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AppTextField(
+            label: 'Task Title',
+            hint: 'What needs to be done?',
+            controller: _titleController,
+            isDark: isDark,
+          ),
+          SizedBox(height: 24.h),
+          AppTextField(
+            label: 'Description',
+            hint: 'Add more details about this task...',
+            controller: _descController,
+            maxLines: 4,
+            isDark: isDark,
+          ),
+          SizedBox(height: 24.h),
+          _buildDateTimeSelectors(isDark),
+          SizedBox(height: 24.h),
+          _buildCategorySection(isDark),
+          SizedBox(height: 32.h),
+          _buildPrioritySection(isDark),
+          SizedBox(height: 48.h),
+          AppButton(
+            text: isEditMode ? 'Update Task' : AppStrings.createTask,
+            isLoading: _isLoading,
+            icon: isEditMode ? Icons.check_circle_rounded : Icons.add_task_rounded,
+            onPressed: _handleSubmit,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDateTimeSelectors(bool isDark) {
+    return Row(
+      children: [
+        Expanded(
+          child: AddTaskSelectorField(
+            icon: Icons.calendar_today_rounded,
+            label: 'Date',
+            value: DateFormat('MMM dd, yyyy').format(_selectedDate),
+            isDark: isDark,
+            onTap: _pickDate,
+          ),
+        ),
+        SizedBox(width: 16.w),
+        Expanded(
+          child: AddTaskSelectorField(
+            icon: Icons.access_time_rounded,
+            label: 'Time',
+            value: _selectedTime.format(context),
+            isDark: isDark,
+            onTap: _pickTime,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCategorySection(bool isDark) {
+    final categories = [
+      {'label': 'Work', 'icon': Icons.work_rounded},
+      {'label': 'Personal', 'icon': Icons.person_rounded},
+      {'label': 'Health', 'icon': Icons.favorite_rounded},
+      {'label': 'Shopping', 'icon': Icons.shopping_bag_rounded},
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionTitle(title: 'Category', isDark: isDark),
+        SizedBox(height: 16.h),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
+          child: Row(
+            children: categories.map((cat) {
+              final label = cat['label'] as String;
+              final isSelected = _selectedCategories.contains(label);
+              return Padding(
+                padding: EdgeInsets.only(right: 12.w),
+                child: AddTaskCategoryChip(
+                  label: label,
+                  icon: cat['icon'] as IconData,
+                  isSelected: isSelected,
+                  isDark: isDark,
+                  onTap: () {
+                    setState(() {
+                      if (isSelected) {
+                        if (_selectedCategories.length > 1) {
+                          _selectedCategories.remove(label);
+                        }
+                      } else {
+                        _selectedCategories.add(label);
+                      }
+                    });
+                  },
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPrioritySection(bool isDark) {
+    final priorities = [
+      {'label': 'Low', 'color': Colors.blue},
+      {'label': 'Medium', 'color': Colors.orange},
+      {'label': 'High', 'color': Colors.red},
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionTitle(title: 'Priority', isDark: isDark),
+        SizedBox(height: 16.h),
+        Row(
+          children: priorities.map((prio) {
+            return AddTaskPriorityCard(
+              label: prio['label'] as String,
+              dotColor: prio['color'] as Color,
+              isSelected: _selectedPriority == prio['label'],
+              isDark: isDark,
+              onTap: () => setState(() => _selectedPriority = prio['label'] as String),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  void _handleStateChanges(BuildContext context, TaskState state) {
+    setState(() => _isLoading = state is TaskLoading);
+    if (state is TaskError) _showErrorDialog(state.message);
+    if (state is TaskActionSuccess) _showSuccessDialog(state.message);
+  }
+
+  void _showErrorDialog(String message) {
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.error,
+      animType: AnimType.bottomSlide,
+      title: 'Operation Failed',
+      desc: message,
+    ).show();
+  }
+
+  Future<void> _pickDate() async {
+    final scheme = Theme.of(context).colorScheme;
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime.now().subtract(const Duration(days: 365)),
+      lastDate: DateTime(2100),
+      builder: (context, child) => Theme(
+        data: Theme.of(context).copyWith(
+          colorScheme: Theme.of(context).colorScheme.copyWith(
+                primary: scheme.primary,
+                onPrimary: scheme.onPrimary,
+              ),
+        ),
+        child: child!,
+      ),
+    );
+    if (picked != null) setState(() => _selectedDate = picked);
+  }
+
+  Future<void> _pickTime() async {
+    final picked = await showTimePicker(context: context, initialTime: _selectedTime);
+    if (picked != null) setState(() => _selectedTime = picked);
+  }
+
+  Future<void> _handleSubmit() async {
+    if (_titleController.text.trim().isEmpty) {
       AwesomeDialog(
         context: context,
         dialogType: DialogType.warning,
-        title: 'Validation',
-        desc: 'Title cannot be empty',
+        animType: AnimType.bottomSlide,
+        title: 'Input Required',
+        desc: 'Please enter a title for your task.',
         btnOkOnPress: () {},
       ).show();
       return;
     }
 
     final authState = context.read<AuthCubit>().state;
-    String userId = '';
-    if (authState is Authenticated) {
-      userId = authState.user.id;
-    } else if (authState is LoginSuccess) {
-      userId = authState.user.id;
-    } else if (authState is RegisterSuccess) {
-      userId = authState.user.id;
-    }
-
-    if (userId.isEmpty) return;
-
-    final taskDate = DateTime(
-      _selectedDate.year,
-      _selectedDate.month,
-      _selectedDate.day,
-      _selectedTime.hour,
-      _selectedTime.minute,
-    );
+    if (authState is! Authenticated) return;
 
     final task = TaskEntity(
-      id: const Uuid().v4(),
-      userId: userId,
+      id: isEditMode ? widget.task!.id : const Uuid().v4(),
+      userId: authState.user.id,
       title: _titleController.text.trim(),
       description: _descController.text.trim(),
-      dateTime: taskDate,
-      category: _selectedCategory,
+      dateTime: DateTime(
+        _selectedDate.year, _selectedDate.month, _selectedDate.day,
+        _selectedTime.hour, _selectedTime.minute,
+      ),
+      categories: _selectedCategories,
       priority: _selectedPriority,
+      isCompleted: isEditMode ? widget.task!.isCompleted : false,
       updatedAt: DateTime.now().millisecondsSinceEpoch,
     );
 
-    context.read<TaskCubit>().addTask(task);
+    if (isEditMode) {
+      context.read<TaskCubit>().updateTask(task);
+    } else {
+      context.read<TaskCubit>().addTask(task);
+    }
   }
 
-  Widget _buildFieldLabel(String label) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 8.h),
-      child: Text(
-        label,
-        style: AppStyles.labelSmall().copyWith(letterSpacing: 1.2),
-      ),
-    );
-  }
-
-  Widget _buildTextField(String hint, {TextEditingController? controller, int maxLines = 1}) {
-    return TextField(
-      controller: controller,
-      maxLines: maxLines,
-      decoration: InputDecoration(
-        hintText: hint,
-        hintStyle: AppStyles.bodyMedium(AppColors.fieldHint),
-        filled: true,
-        fillColor: AppColors.white,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: const BorderSide(color: AppColors.fieldBorder),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: const BorderSide(color: AppColors.fieldBorder),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSelectorField(IconData icon, String value) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        border: Border.all(color: AppColors.fieldBorder),
-        borderRadius: BorderRadius.circular(12.r),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, size: 20, color: AppColors.primary),
-          SizedBox(width: 8.w),
-          Text(value, style: AppStyles.bodyMediumMedium(AppColors.textPrimary)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCategoryChip(String label, IconData icon) {
-    final isSelected = _selectedCategory == label;
-    return GestureDetector(
-      onTap: () => setState(() => _selectedCategory = label),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : AppColors.white,
-          border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.fieldBorder,
-          ),
-          borderRadius: BorderRadius.circular(25.r),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              size: 18,
-              color: isSelected ? AppColors.white : AppColors.textSecondary,
-            ),
-            SizedBox(width: 6.w),
-            Text(
-              label,
-              style: AppStyles.bodyMediumMedium(
-                isSelected ? AppColors.white : AppColors.textSecondary,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPriorityButton(String label, Color color) {
-    final isSelected = _selectedPriority == label;
-    return GestureDetector(
-      onTap: () => setState(() => _selectedPriority = label),
-      child: Container(
-        width: 100.w,
-        padding: EdgeInsets.symmetric(vertical: 12.h),
-        decoration: BoxDecoration(
-          color: isSelected ? color.withValues(alpha: 0.1) : AppColors.white,
-          border: Border.all(
-            color: isSelected ? color : AppColors.fieldBorder,
-            width: isSelected ? 2 : 1,
-          ),
-          borderRadius: BorderRadius.circular(12.r),
-        ),
-        child: Column(
-          children: [
-            CircleAvatar(radius: 4, backgroundColor: color),
-            SizedBox(height: 4.h),
-            Text(
-              label,
-              style: AppStyles.bodyMediumMedium(
-                isSelected ? AppColors.textPrimary : AppColors.textSecondary,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+  void _showSuccessDialog(String message) {
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.success,
+      animType: AnimType.bottomSlide,
+      title: 'Success',
+      desc: message,
+      btnOkOnPress: () => Navigator.pop(context),
+    ).show();
   }
 }

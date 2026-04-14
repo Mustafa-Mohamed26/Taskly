@@ -6,6 +6,8 @@ import '../../../domain/usecases/auth/get_authenticated_user_usecase.dart';
 import '../../../domain/usecases/auth/login_usecase.dart';
 import '../../../domain/usecases/auth/logout_usecase.dart';
 import '../../../domain/usecases/auth/register_usecase.dart';
+import '../../../domain/usecases/auth/login_with_google_usecase.dart';
+import '../../../domain/usecases/auth/update_user_profile_usecase.dart';
 
 part 'auth_state.dart';
 
@@ -51,6 +53,16 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
+  Future<void> loginWithGoogle() async {
+    emit(AuthLoading());
+    try {
+      final user = await LoginWithGoogleUseCase.execute();
+      emit(LoginSuccess(user));
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
+  }
+
   Future<void> logout() async {
     emit(AuthLoading());
     try {
@@ -66,6 +78,49 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       await ForgotPasswordUseCase.execute(email);
       emit(ForgotPasswordSuccess('Reset link sent to your email'));
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
+  }
+
+  Future<void> updateProfile({
+    required String uid,
+    String? name,
+    String? phone,
+    String? bio,
+  }) async {
+    UserEntity? currentUser;
+    if (state is Authenticated) {
+      currentUser = (state as Authenticated).user;
+    } else if (state is LoginSuccess) {
+      currentUser = (state as LoginSuccess).user;
+    } else if (state is RegisterSuccess) {
+      currentUser = (state as RegisterSuccess).user;
+    }
+
+    emit(AuthLoading());
+    try {
+      await UpdateUserProfileUseCase.execute(
+        uid: uid,
+        name: name,
+        phone: phone,
+        bio: bio,
+      );
+      
+      if (currentUser != null) {
+        final updatedUser = currentUser.copyWith(
+          name: name ?? currentUser.name,
+          phone: phone ?? currentUser.phone,
+          bio: bio ?? currentUser.bio,
+        );
+        emit(ProfileUpdateSuccess(updatedUser));
+        emit(Authenticated(updatedUser));
+      } else {
+        // Fallback in case state wasn't captured gracefully
+        emit(ProfileUpdateSuccess(
+          UserEntity(id: uid, email: '', name: name, phone: phone, bio: bio)
+        ));
+      }
     } catch (e) {
       emit(AuthError(e.toString()));
     }

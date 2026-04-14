@@ -6,13 +6,15 @@ import 'package:taskly/core/routes/app_routes.dart';
 import 'package:taskly/core/utils/validators.dart';
 import 'package:taskly/presentation/auth/cubit/auth_cubit.dart';
 import 'package:taskly/presentation/auth/widgets/auth_loading_widget.dart';
+import 'package:taskly/presentation/widgets/app_button.dart';
+import 'package:taskly/presentation/widgets/app_text_field.dart';
 import '../../core/constants/app_strings.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_styles.dart';
-import 'widgets/auth_logo.dart';
-import 'widgets/auth_text_field.dart';
-import 'widgets/auth_button.dart';
-import 'widgets/social_button.dart';
+import 'widgets/auth_header.dart';
+import 'widgets/auth_footer.dart';
+import 'widgets/auth_social_section.dart';
+import 'widgets/auth_background_decorations.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -37,56 +39,50 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AuthCubit, AuthState>(
-      listener: (context, state) {
-        setState(() {
-          _isLoading = state is AuthLoading;
-        });
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-        if (state is LoginSuccess) {
-          AwesomeDialog(
-            context: context,
-            dialogType: DialogType.success,
-            animType: AnimType.bottomSlide,
-            title: 'Login Success',
-            desc: 'Welcome back, ${state.user.name ?? 'User'}!',
-            btnOkOnPress: () {
-              Navigator.pushReplacementNamed(context, AppRoutes.mainLayout);
-            },
-          ).show();
-        } else if (state is AuthError) {
-          AwesomeDialog(
-            context: context,
-            dialogType: DialogType.error,
-            animType: AnimType.bottomSlide,
-            title: 'Login Error',
-            desc: state.message,
-            btnOkOnPress: () {},
-          ).show();
-        }
-      },
+    return BlocListener<AuthCubit, AuthState>(
+      listener: _handleAuthState,
       child: Stack(
         children: [
           Scaffold(
-            body: SafeArea(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 40.h),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _buildHeader(),
-                      SizedBox(height: 48.h),
-                      _buildForm(),
-                      SizedBox(height: 32.h),
-                      _buildSocialLogin(),
-                      SizedBox(height: 40.h),
-                      _buildFooter(),
-                    ],
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            body: Stack(
+              children: [
+                AuthBackgroundDecorations(isDark: isDark),
+                SafeArea(
+                  child: Center(
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            AuthHeader(
+                              title: AppStrings.welcomeBack,
+                              subtitle: AppStrings.welcomeBackSubtitle,
+                              isDark: isDark,
+                            ),
+                            SizedBox(height: 48.h),
+                            _buildLoginForm(isDark),
+                            SizedBox(height: 40.h),
+                            AuthSocialSection(isDark: isDark),
+                            SizedBox(height: 48.h),
+                            AuthFooter(
+                              text: AppStrings.dontHaveAccount,
+                              actionText: AppStrings.createAccount,
+                              onActionPressed: () => Navigator.pushNamed(context, AppRoutes.register),
+                              isDark: isDark,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
           ),
           if (_isLoading) const AuthLoadingWidget(),
@@ -95,152 +91,91 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // --- Sections ---
-
-  Widget _buildHeader() {
-    return Column(
-      children: [
-        const AuthLogo(),
-        SizedBox(height: 40.h),
-        Text(
-          AppStrings.welcomeBack,
-          style: AppStyles.displayLarge(),
-          textAlign: TextAlign.center,
-        ),
-        SizedBox(height: 8.h),
-        Text(
-          AppStrings.welcomeBackSubtitle,
-          style: AppStyles.bodyLarge(),
-          textAlign: TextAlign.center,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildForm() {
+  Widget _buildLoginForm(bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        AuthTextField(
+        AppTextField(
           label: AppStrings.email,
-          hint: 'Enter your email',
+          hint: 'name@company.com',
           controller: _emailController,
+          prefixIcon: Icons.email_outlined,
+          keyboardType: TextInputType.emailAddress,
           validator: (val) => Validators.validateEmail(val),
+          isDark: isDark,
         ),
         SizedBox(height: 24.h),
-        AuthTextField(
+        AppTextField(
           label: AppStrings.password,
-          hint: 'Enter your password',
+          hint: '••••••••',
           controller: _passwordController,
           obscureText: _obscurePassword,
+          prefixIcon: Icons.lock_outline,
           validator: (val) => Validators.validatePassword(val),
+          isDark: isDark,
           suffixIcon: IconButton(
             icon: Icon(
               _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-              color: AppColors.fieldHint,
-              size: 20.sp,
+              color: isDark ? AppColors.textSecondaryDark : AppColors.fieldHint,
+              size: 22.sp,
             ),
-            onPressed: () {
-              setState(() {
-                _obscurePassword = !_obscurePassword;
-              });
-            },
+            onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
           ),
         ),
-        SizedBox(height: 12.h),
+        SizedBox(height: 16.h),
         Align(
           alignment: Alignment.centerRight,
           child: GestureDetector(
-            onTap: () {
-              Navigator.pushNamed(context, AppRoutes.forgotPassword);
-            },
+            onTap: () => Navigator.pushNamed(context, AppRoutes.forgotPassword),
             child: Text(
               AppStrings.forgotPassword,
-              style: AppStyles.labelMedium(),
-            ),
-          ),
-        ),
-        SizedBox(height: 24.h),
-        AuthButton(
-          text: AppStrings.signIn,
-          onPressed: () {
-            if (_formKey.currentState!.validate()) {
-              context.read<AuthCubit>().login(
-                    _emailController.text.trim(),
-                    _passwordController.text.trim(),
-                  );
-            }
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSocialLogin() {
-    return Column(
-      children: [
-        Row(
-          children: [
-            const Expanded(child: Divider()),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              child: Text(
-                AppStrings.orContinueWith,
-                style: AppStyles.bodySmall(),
+              style: AppStyles.labelSmall(Theme.of(context).colorScheme.primary).copyWith(
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.5,
               ),
             ),
-            const Expanded(child: Divider()),
-          ],
+          ),
         ),
-        SizedBox(height: 24.h),
-        Row(
-          children: [
-            SocialButton(
-              label: 'Google',
-              onPressed: () {
-                // Feature removed for now
-                AwesomeDialog(
-                  context: context,
-                  dialogType: DialogType.info,
-                  title: 'Coming Soon',
-                  desc: 'Google Login is currently disabled.',
-                  btnOkOnPress: () {},
-                ).show();
-              },
-              isIconWidget: true,
-              iconWidget: Icon(Icons.g_mobiledata, color: AppColors.priorityHigh, size: 28.sp),
-            ),
-            SizedBox(width: 16.w),
-            SocialButton(
-              label: 'Apple',
-              onPressed: () {},
-              isIconWidget: true,
-              iconWidget: Icon(Icons.apple, color: AppColors.textPrimary, size: 24.sp),
-            ),
-          ],
+        SizedBox(height: 32.h),
+        AppButton(
+          text: AppStrings.signIn,
+          onPressed: _onLoginPressed,
+          isLoading: _isLoading,
         ),
       ],
     );
   }
 
-  Widget _buildFooter() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          AppStrings.dontHaveAccount,
-          style: AppStyles.bodyMedium(),
-        ),
-        GestureDetector(
-          onTap: () {
-            Navigator.pushNamed(context, AppRoutes.register);
-          },
-          child: Text(
-            AppStrings.createAccount,
-            style: AppStyles.labelMedium(),
-          ),
-        ),
-      ],
-    );
+  void _onLoginPressed() {
+    if (_formKey.currentState!.validate()) {
+      context.read<AuthCubit>().login(
+            _emailController.text.trim(),
+            _passwordController.text.trim(),
+          );
+    }
+  }
+
+  void _handleAuthState(BuildContext context, AuthState state) {
+    setState(() => _isLoading = state is AuthLoading);
+
+    if (state is LoginSuccess) {
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.success,
+        animType: AnimType.bottomSlide,
+        title: 'Login Success',
+        desc: 'Welcome back, ${state.user.name ?? 'User'}!',
+        btnOkOnPress: () => Navigator.pushReplacementNamed(context, AppRoutes.mainLayout),
+      ).show();
+    } else if (state is AuthError) {
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.error,
+        animType: AnimType.bottomSlide,
+        title: 'Login Error',
+        desc: state.message,
+        btnOkOnPress: () {},
+      ).show();
+    }
   }
 }

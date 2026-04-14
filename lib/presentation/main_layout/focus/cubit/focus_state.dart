@@ -1,22 +1,44 @@
 part of 'focus_cubit.dart';
 
-abstract class FocusState {
+enum FocusStatus { initial, running, paused, completed }
+
+class FocusState extends Equatable {
   final int duration;
-  FocusState(this.duration);
-}
+  final int remainingSeconds;
+  final FocusStatus status;
+  final TaskEntity? selectedTask;
+  final String? selectedSound;
 
-class FocusInitial extends FocusState {
-  FocusInitial(super.duration);
-}
+  const FocusState({
+    required this.duration,
+    required this.remainingSeconds,
+    required this.status,
+    this.selectedTask,
+    this.selectedSound,
+  });
 
-class FocusRunning extends FocusState {
-  FocusRunning(super.duration);
-}
+  factory FocusState.initial() => const FocusState(
+        duration: 25 * 60,
+        remainingSeconds: 25 * 60,
+        status: FocusStatus.initial,
+      );
 
-class FocusPaused extends FocusState {
-  FocusPaused(super.duration);
-}
+  FocusState copyWith({
+    int? duration,
+    int? remainingSeconds,
+    FocusStatus? status,
+    TaskEntity? Function()? selectedTask,
+    String? Function()? selectedSound,
+  }) {
+    return FocusState(
+      duration: duration ?? this.duration,
+      remainingSeconds: remainingSeconds ?? this.remainingSeconds,
+      status: status ?? this.status,
+      selectedTask: selectedTask != null ? selectedTask() : this.selectedTask,
+      selectedSound: selectedSound != null ? selectedSound() : this.selectedSound,
+    );
+  }
 
-class FocusCompleted extends FocusState {
-  FocusCompleted() : super(0);
+  @override
+  List<Object?> get props => [duration, remainingSeconds, status, selectedTask, selectedSound];
 }

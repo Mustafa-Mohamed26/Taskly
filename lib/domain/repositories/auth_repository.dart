@@ -16,7 +16,18 @@ abstract class AuthRepository {
 
   Future<void> forgotPassword(String email);
 
+  Future<void> updateUserProfile({
+    required String uid,
+    String? name,
+    String? phone,
+    String? bio,
+  });
+
+  Future<UserEntity> loginWithGoogle();
+
   Stream<UserEntity?> get authStateChanges;
 
   Future<UserEntity?> get currentAuthenticatedUser;
+
+  Future<void> deleteAccount(String uid);
 }

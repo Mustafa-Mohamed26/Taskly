@@ -15,7 +15,7 @@ class AuthLoadingWidget extends StatelessWidget {
             color: AppColors.white,
             borderRadius: BorderRadius.circular(16),
           ),
-          child: const CircularProgressIndicator(color: AppColors.primary),
+          child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
         ),
       ),
     );

@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import '../../presentation/auth/login_screen.dart';
 import '../../presentation/auth/register_screen.dart';
 import '../../presentation/auth/forgot_password_screen.dart';
-import '../../presentation/auth/change_password_screen.dart';
-import '../../presentation/auth/password_changed_screen.dart';
 import '../../presentation/onboarding/onboarding_screen.dart';
 import '../../presentation/splash/splash_screen.dart';
 import '../../presentation/main_layout/main_layout_screen.dart';
@@ -14,6 +12,7 @@ import '../../presentation/main_layout/profile/notification_settings_screen.dart
 import '../../presentation/main_layout/profile/theme_preference_screen.dart';
 import '../../presentation/main_layout/profile/security_privacy_screen.dart';
 import 'app_routes.dart';
+import '../../domain/entities/task_entity.dart';
 
 class AppRoutesGenerator {
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
@@ -28,15 +27,11 @@ class AppRoutesGenerator {
         return MaterialPageRoute(builder: (_) => const RegisterScreen());
       case AppRoutes.forgotPassword:
         return MaterialPageRoute(builder: (_) => const ForgotPasswordScreen());
-      case AppRoutes.changePassword:
-        final email = settings.arguments as String?;
-        return MaterialPageRoute(builder: (_) => ChangePasswordScreen(email: email));
-      case AppRoutes.passwordChanged:
-        return MaterialPageRoute(builder: (_) => const PasswordChangedScreen());
       case AppRoutes.mainLayout:
         return MaterialPageRoute(builder: (_) => const MainLayoutScreen());
       case AppRoutes.addTask:
-        return MaterialPageRoute(builder: (_) => const AddTaskScreen());
+        final task = settings.arguments as TaskEntity?;
+        return MaterialPageRoute(builder: (_) => AddTaskScreen(task: task));
       case AppRoutes.allTasks:
         return MaterialPageRoute(builder: (_) => const AllTasksScreen());
       case AppRoutes.personalInfo:

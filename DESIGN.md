@@ -1,111 +1,59 @@
-# Taskly - Design Document
+# Taskly Design Document
 
-## 1. Overview
-Taskly is a modern task management application built with Flutter. This document outlines the architectural design and technical specifications for implementing a robust task management system with **Firebase Synchronization** and **Offline-First Local Caching**.
+## 1. Executive Summary
+Taskly is a comprehensive task management application designed for productivity, featuring an offline-first architecture, real-time cloud synchronization, and a focus-driven timer.
 
-## 2. Features
-### **User Authentication**
-- **Email/Password Auth**: Secure registration and login using Firebase Authentication.
-- **Forgot/Change Password**: Password recovery and management.
-- **Onboarding**: Interactive walkthrough for new users.
+## 2. Feature-Specific Design
+### Feature 1: Splash Screen
+- **Reference**: `assets/ai/Splash Screen light mode.png`, `assets/ai/Splash Screen dark mode.png`
+- **Design**: Minimalist logo display.
+- **Functionality**: 
+    - **Auto-Authentication**: Check Firebase `authStateChanges` and `CacheHelper` status to automatically route to `Home` (if logged in) or `Onboarding`/`Login` (if new/logged out).
 
-### **Task Management**
-- **CRUD Operations**: Create, read, update, and delete tasks.
-- **Category Management**: Organize tasks into categories (Work, Personal, Health, etc.).
-- **Priority Levels**: Set task urgency (Low, Medium, High).
-- **Checklist/Status**: Mark tasks as completed or pending.
+### Feature 2: Onboarding
+- **Reference**: `assets/ai/Onboarding screens light mode.png`, `assets/ai/Onboarding screens dark mode.png`
+- **Design**: Three-step carousel.
+- **Functionality**:
+    - **Persistence**: Save completion status to `Shared Preferences` via `CacheHelper` to ensure onboarding only displays once.
 
-### **Calendar & Scheduling**
-- **Weekly/Monthly View**: Visualize tasks on a calendar.
-- **Today's Schedule**: Quick view of immediate tasks.
+### Feature 3: Authentication
+- **Reference**: `assets/ai/sign in & register & forget password screens light mode.png`, `assets/ai/sign in & register & forget password screens dark mode.png`
+- **Design**: Clean form inputs, clear password visibility toggles, and social login buttons.
+- **Backend Requirement**: Automated user profile creation in Firestore upon registration to enable cloud persistence and task assignment.
 
-### **Advanced Functionality**
-- **Offline Mode**: Full app access without internet via Sqflite caching.
-- **Real-time Synchronization**: Background syncing with Firebase Firestore.
-- **Focus Timer**: Dedicated mode for deep work.
-- **Theming**: Support for Light, Dark, and System themes.
+### Feature 4: Task Dashboard & CRUD System
+- **Reference**: `assets/ai/dashboard and add and view the tasks light mode.png`, `assets/ai/dashboard and add and view the tasks dark mode.png`
+- **Design**: Organized task cards with priority tagging and progress visualization.
+- **Features**: 
+    - Full CRUD operations.
+    - **Offline-First**: Local storage via Sqflite for zero-latency UI interactions.
+    - **Local Notifications**: Scheduled alerts for upcoming task deadlines.
+    - **Visual Analytics**: Summary cards and dynamic progress bars.
 
-### **Profile & Settings**
-- **Personal Information**: Edit user profile details.
-- **Notifications**: Manage task reminders and app alerts.
-- **Security & Privacy**: Manage account data and privacy settings.
+### Feature 5: Calendar
+- **Reference**: `assets/ai/calander view light mode.png`, `assets/ai/calander view dark mode.png`
+- **Design**: Intuitive monthly/weekly view, highlighting tasks on selected dates.
+- **Functionality**:
+    - Current day marked with a solid blue circle.
+    - Task indicator (low-opacity blue circle) for scheduled task dates.
 
-## 2. Goals
-- **Real-time Sync**: Synchronize tasks with Firebase Firestore for cross-device access.
-- **Offline-First**: Enable full application functionality without an internet connection using local caching.
-- **Persistence**: Store user preferences and session data locally.
-- **Performance**: Minimize latency by serving data from the local cache while fetching updates in the background.
+### Feature 6: Focus Mode
+- **Reference**: `assets/ai/focuse light mode.png`, `assets/ai/focuse dark mode.png`
+- **Design**: Centered circular timer progress, ambient sound control, and clear task focus area.
+- **Functionality**:
+    - Task-specific focus session selection.
+    - Dynamic circular progress indicator (decreasing blue ring).
+    - Integrated soundscape controller.
 
----
+### Feature 7: Profile & Settings
+- **Reference**: `assets/ai/profile sittings light mode.png`, `assets/ai/profile sittings dark mode.png`, `assets/ai/User profile screen light mode.png`, `assets/ai/User profile screen dark mode.png`
+- **Dashboard**: User Name/Email display and task analytics (Completed vs Ongoing).
+- **Settings**: Account management, Notification toggles, Theme Preferences (Light/Dark/System), and Security/Privacy controls.
 
-## 3. Architecture (Clean Architecture + MVVM)
-The project follows a layered approach to ensure separation of concerns and testability.
-
-### Layers:
-1.  **Presentation (lib/presentation)**:
-    - **UI**: Flutter widgets (Screens, Components).
-    - **Logic**: Bloc/Cubit for state management. Handles UI events and maps them to Domain-level UseCases.
-2.  **Domain (lib/domain)**:
-    - **Entities**: Plain Dart objects representing the core data (e.g., `TaskEntity`).
-    - **Repositories (Abstract)**: Interfaces defining data operations.
-    - **Use Cases**: Specific business rules (e.g., `AddTaskUseCase`, `SyncTasksUseCase`).
-3.  **Data (lib/data)**:
-    - **Models**: Data Transfer Objects (DTOs) with JSON serialization logic (e.g., `TaskModel`).
-    - **Data Sources**:
-        - **Remote**: Firebase Firestore implementation.
-        - **Local**: Sqflite (for tasks) and Shared Preferences (for settings).
-    - **Repositories (Implementation)**: Coordinates between Remote and Local data sources.
-
----
-
-## 4. Data Models
-
-### Task Model
-| Field | Type | Description |
-| :--- | :--- | :--- |
-| `id` | String | Unique identifier (Firebase UID or Local GUID) |
-| `title` | String | Task name |
-| `description`| String | Detailed notes |
-| `dateTime` | DateTime | Scheduled date and time |
-| `category` | String | e.g., Work, Personal, Health |
-| `priority` | String | Low, Medium, High |
-| `isCompleted`| bool | Completion status |
-| `updatedAt` | int | Timestamp for conflict resolution/syncing |
-
----
-
-## 5. Persistence Strategy
-
-### Remote (Firebase)
-- **Firestore**: Used as the primary source of truth for task data.
-- **Authentication**: Firebase Auth for user management (Google, Email/Password).
-
-### Local (Cache)
-- **Sqflite**: Stores tasks locally for offline access.
-- **Shared Preferences**: Stores lightweight data like:
-    - User theme preference (Dark/Light).
-    - Onboarding completion status.
-    - Last sync timestamp.
-
-### Synchronization Logic (Repository Pattern)
-1.  **Read**: Always check the local database first. Fetch from Firestore in the background and update the local DB.
-2.  **Write**: Write to the local DB immediately (UI updates instantly). Attempt to push to Firestore. If offline, mark the record as "needs_sync" for later.
-3.  **Conflict Resolution**: Use `updatedAt` timestamps to determine which version of a task is newer during synchronization.
-
----
-
-## 6. Security & Best Practices
-- **Firestore Security Rules**: Ensure users can only read/write their own data using `request.auth.uid`.
-- **Environment Variables**: Use `.env` or Firebase configuration files to manage sensitive keys.
-- **Null Safety**: Strict adherence to Dart's sound null safety.
-- **Error Handling**: Graceful handling of network timeouts and database failures.
-
----
-
-## 7. Implementation Roadmap
-1.  **Setup**: Configure Firebase (Android/iOS/Web).
-2.  **Data Layer**: Implement Sqflite helper and Firestore data source.
-3.  **Domain Layer**: Define Task entity and Repository interfaces.
-4.  **State Management**: Create `TaskCubit` to handle CRUD operations.
-5.  **Sync Engine**: Implement background sync logic to reconcile local and remote data.
-6.  **UI Integration**: Connect existing screens to the new logic.
+### Feature 8: Sync & Offline Engine
+- **Strategy**: Offline-First Local Cache.
+- **Mechanism**:
+    - **Read**: Local Sqflite cache for fast UI rendering.
+    - **Write**: Local-first write (Optimistic UI) + background Firestore sync.
+    - **Conflict Resolution**: `updatedAt` timestamp and `isSynced` flag to manage state.
+- **Optimization**: Battery-optimized sync (triggered when charging/Wi-Fi connected) and local logging for troubleshooting.
