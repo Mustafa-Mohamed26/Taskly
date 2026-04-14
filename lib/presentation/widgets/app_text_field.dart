@@ -1,9 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:taskly/core/theme/app_colors.dart';
 import 'section_title.dart';
 
+/// A reusable form text field that reads its colors from [Theme.of(context)],
+/// so it naturally adapts to both Light and Dark modes and any accent color.
 class AppTextField extends StatelessWidget {
+  const AppTextField({
+    super.key,
+    required this.label,
+    required this.hint,
+    this.prefixIcon,
+    this.suffixIcon,
+    this.obscureText = false,
+    this.controller,
+    this.validator,
+    this.keyboardType,
+    this.maxLines = 1,
+    this.isDark = false, // kept for API compatibility, no longer used for colors
+    this.onChanged,
+  });
+
   final String label;
   final String hint;
   final IconData? prefixIcon;
@@ -16,23 +32,10 @@ class AppTextField extends StatelessWidget {
   final bool isDark;
   final ValueChanged<String>? onChanged;
 
-  const AppTextField({
-    super.key,
-    required this.label,
-    required this.hint,
-    this.prefixIcon,
-    this.suffixIcon,
-    this.obscureText = false,
-    this.controller,
-    this.validator,
-    this.keyboardType,
-    this.maxLines = 1,
-    required this.isDark,
-    this.onChanged,
-  });
-
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -48,51 +51,19 @@ class AppTextField extends StatelessWidget {
           style: TextStyle(
             fontSize: 16.sp,
             fontWeight: FontWeight.w600,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
+            color: scheme.onSurface,
           ),
+          // InputDecoration is fully driven by the AppTheme inputDecorationTheme,
+          // but we override the focused border colour to always match the accent.
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w500,
-              color: isDark
-                  ? AppColors.textSecondaryDark.withValues(alpha: 0.4)
-                  : AppColors.textSecondary.withValues(alpha: 0.4),
-            ),
-            filled: true,
-            fillColor: isDark ? AppColors.fieldFillDark : AppColors.white,
             prefixIcon: prefixIcon != null
-                ? Icon(
-                    prefixIcon,
-                    color: AppColors.primary,
-                    size: 24.sp,
-                  )
+                ? Icon(prefixIcon, color: scheme.primary, size: 24.sp)
                 : null,
             suffixIcon: suffixIcon,
-            contentPadding: EdgeInsets.all(20.w),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
-              borderSide: BorderSide(
-                color: isDark
-                    ? AppColors.fieldBorderDark
-                    : AppColors.fieldBorder.withValues(alpha: 0.5),
-              ),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
-              borderSide: BorderSide(
-                color: isDark
-                    ? AppColors.fieldBorderDark
-                    : AppColors.fieldBorder.withValues(alpha: 0.5),
-              ),
-            ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12.r),
-              borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.r),
-              borderSide: const BorderSide(color: Colors.redAccent, width: 1.5),
+              borderSide: BorderSide(color: scheme.primary, width: 2),
             ),
           ),
         ),

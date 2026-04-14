@@ -10,18 +10,13 @@ import 'package:taskly/presentation/main_layout/focus/cubit/focus_cubit.dart';
 import 'package:taskly/presentation/main_layout/tasks/cubit/sync_cubit.dart';
 import 'package:taskly/presentation/main_layout/tasks/cubit/task_cubit.dart';
 import 'core/theme/app_theme.dart';
+import 'core/theme/cubit/theme_cubit.dart';
 import 'core/routes/app_routes.dart';
 import 'core/routes/app_routes_generator.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  try {
-    await CacheHelper.init();
-  } catch (e) {
-    debugPrint('CacheHelper initialization failed: $e');
-  }
-
+  await CacheHelper.init();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   configureDependencies();
   runApp(const MyApp());
@@ -35,11 +30,12 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider<AuthCubit>(
-          create: (context) => getIt<AuthCubit>()..checkAuth(),
+          create: (_) => getIt<AuthCubit>()..checkAuth(),
         ),
-        BlocProvider<TaskCubit>(create: (context) => getIt<TaskCubit>()),
-        BlocProvider<SyncCubit>(create: (context) => getIt<SyncCubit>()),
-        BlocProvider<FocusCubit>(create: (context) => getIt<FocusCubit>()),
+        BlocProvider<TaskCubit>(create: (_) => getIt<TaskCubit>()),
+        BlocProvider<SyncCubit>(create: (_) => getIt<SyncCubit>()),
+        BlocProvider<FocusCubit>(create: (_) => getIt<FocusCubit>()),
+        BlocProvider<ThemeCubit>(create: (_) => getIt<ThemeCubit>()),
       ],
       child: Builder(
         builder: (context) {
@@ -53,15 +49,19 @@ class MyApp extends StatelessWidget {
               designSize: const Size(375, 812),
               minTextAdapt: true,
               splitScreenMode: true,
-              builder: (context, child) {
-                return MaterialApp(
-                  debugShowCheckedModeBanner: false,
-                  title: 'Taskly',
-                  theme: AppTheme.light,
-                  darkTheme: AppTheme.dark,
-                  themeMode: ThemeMode.system,
-                  onGenerateRoute: AppRoutesGenerator.onGenerateRoute,
-                  initialRoute: AppRoutes.splash,
+              builder: (context, _) {
+                return BlocBuilder<ThemeCubit, ThemeState>(
+                  builder: (context, themeState) {
+                    return MaterialApp(
+                      debugShowCheckedModeBanner: false,
+                      title: 'Taskly',
+                      theme: AppTheme.light(themeState.accentColor),
+                      darkTheme: AppTheme.dark(themeState.accentColor),
+                      themeMode: themeState.mode,
+                      onGenerateRoute: AppRoutesGenerator.onGenerateRoute,
+                      initialRoute: AppRoutes.splash,
+                    );
+                  },
                 );
               },
             ),

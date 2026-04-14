@@ -32,7 +32,7 @@ class AuthFooter extends StatelessWidget {
           onTap: onActionPressed,
           child: Text(
             ' $actionText',
-            style: AppStyles.labelSmall(AppColors.primary).copyWith(
+            style: AppStyles.labelSmall(Theme.of(context).colorScheme.primary).copyWith(
               fontWeight: FontWeight.w800,
               fontSize: 14.sp,
             ),

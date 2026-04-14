@@ -23,7 +23,7 @@ class OnboardingBottomSection extends StatelessWidget {
       padding: EdgeInsets.fromLTRB(24.w, 0, 24.w, 32.h),
       child: Column(
         children: [
-          _buildDotIndicator(),
+          _buildDotIndicator(context),
           SizedBox(height: 32.h),
           AppButton(
             text: currentIndex == totalItems - 1 ? 'Continue' : 'Next',
@@ -34,7 +34,7 @@ class OnboardingBottomSection extends StatelessWidget {
     );
   }
 
-  Widget _buildDotIndicator() {
+  Widget _buildDotIndicator(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(
@@ -46,8 +46,8 @@ class OnboardingBottomSection extends StatelessWidget {
           height: 10.w,
           decoration: BoxDecoration(
             color: currentIndex == index
-                ? AppColors.primary
-                : AppColors.primary.withValues(alpha: 0.2),
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(5.r),
           ),
         ),

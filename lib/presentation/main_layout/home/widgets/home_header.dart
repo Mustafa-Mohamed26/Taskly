@@ -2,26 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_styles.dart';
 import '../../../auth/cubit/auth_cubit.dart';
 
 class HomeHeader extends StatelessWidget {
-  final bool isDark;
-
   const HomeHeader({super.key, required this.isDark});
+  final bool isDark;
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
     return BlocBuilder<AuthCubit, AuthState>(
       builder: (context, state) {
         final hour = DateTime.now().hour;
-        String greeting = 'Good Morning';
-        if (hour >= 12 && hour < 17) {
-          greeting = 'Good Afternoon';
-        } else if (hour >= 17) {
-          greeting = 'Good Evening';
-        }
+        final greeting = hour < 12
+            ? 'Good Morning'
+            : hour < 17
+                ? 'Good Afternoon'
+                : 'Good Evening';
 
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -31,9 +30,7 @@ class HomeHeader extends StatelessWidget {
               children: [
                 Text(
                   greeting,
-                  style: AppStyles.displayMedium(
-                    isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
-                  ).copyWith(
+                  style: AppStyles.displayMedium(scheme.onSurface).copyWith(
                     fontSize: 24.sp,
                     fontWeight: FontWeight.w900,
                     letterSpacing: -0.5,
@@ -43,7 +40,7 @@ class HomeHeader extends StatelessWidget {
                 Text(
                   DateFormat('EEEE, MMM d').format(DateTime.now()),
                   style: AppStyles.bodyMedium(
-                    isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                    scheme.onSurface.withValues(alpha: 0.6),
                   ).copyWith(fontWeight: FontWeight.w500),
                 ),
               ],
@@ -51,19 +48,12 @@ class HomeHeader extends StatelessWidget {
             Row(
               children: [
                 IconButton(
-                  icon: Icon(
-                    Icons.search,
-                    color: isDark ? AppColors.white : AppColors.textPrimary,
-                    size: 26.sp,
-                  ),
+                  icon: Icon(Icons.search, color: scheme.onSurface, size: 26.sp),
                   onPressed: () {},
                 ),
                 IconButton(
-                  icon: Icon(
-                    Icons.notifications_none_rounded,
-                    color: isDark ? AppColors.white : AppColors.textPrimary,
-                    size: 26.sp,
-                  ),
+                  icon: Icon(Icons.notifications_none_rounded,
+                      color: scheme.onSurface, size: 26.sp),
                   onPressed: () {},
                 ),
               ],

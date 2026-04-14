@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:taskly/domain/entities/task_entity.dart';
 import 'package:taskly/presentation/main_layout/tasks/cubit/task_cubit.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_styles.dart';
 import '../../../widgets/app_text_field.dart';
 
@@ -26,10 +25,13 @@ class _TaskSearchDialogState extends State<TaskSearchDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final dialogBg = isDark ? const Color(0xFF0E1120) : Colors.white;
+    final dividerColor = scheme.onSurface.withValues(alpha: 0.1);
 
     return Dialog(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.white,
+      backgroundColor: dialogBg,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.r)),
       insetPadding: EdgeInsets.all(24.w),
       child: Container(
@@ -39,19 +41,19 @@ class _TaskSearchDialogState extends State<TaskSearchDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Header
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   'Select Task',
-                  style: AppStyles.titleLarge(
-                    isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
-                  ).copyWith(fontWeight: FontWeight.w900),
+                  style: AppStyles.titleLarge(scheme.onSurface)
+                      .copyWith(fontWeight: FontWeight.w900),
                 ),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
                   icon: const Icon(Icons.close),
-                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+                  color: scheme.onSurface.withValues(alpha: 0.5),
                 ),
               ],
             ),
@@ -70,7 +72,9 @@ class _TaskSearchDialogState extends State<TaskSearchDialog> {
                   if (state is TaskSuccess<List<TaskEntity>>) {
                     final filteredTasks = state.data
                         .where((task) =>
-                            task.title.toLowerCase().contains(_searchQuery.toLowerCase()) &&
+                            task.title
+                                .toLowerCase()
+                                .contains(_searchQuery.toLowerCase()) &&
                             !task.isCompleted)
                         .toList();
 
@@ -80,7 +84,9 @@ class _TaskSearchDialogState extends State<TaskSearchDialog> {
                         child: Center(
                           child: Text(
                             'No tasks found',
-                            style: AppStyles.bodyMedium(AppColors.textSecondary),
+                            style: AppStyles.bodyMedium(
+                              scheme.onSurface.withValues(alpha: 0.5),
+                            ),
                           ),
                         ),
                       );
@@ -89,29 +95,30 @@ class _TaskSearchDialogState extends State<TaskSearchDialog> {
                     return ListView.separated(
                       shrinkWrap: true,
                       itemCount: filteredTasks.length,
-                      separatorBuilder: (context, index) => Divider(
-                        color: isDark ? AppColors.dividerDark : AppColors.divider,
-                      ),
+                      separatorBuilder: (_, __) => Divider(color: dividerColor),
                       itemBuilder: (context, index) {
                         final task = filteredTasks[index];
                         return ListTile(
                           contentPadding: EdgeInsets.zero,
                           title: Text(
                             task.title,
-                            style: AppStyles.bodyLargeMedium(
-                              isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
-                            ).copyWith(fontWeight: FontWeight.w700),
+                            style: AppStyles.bodyLargeMedium(scheme.onSurface)
+                                .copyWith(fontWeight: FontWeight.w700),
                           ),
                           subtitle: Text(
                             '${task.priority} Priority',
-                            style: AppStyles.bodySmall(AppColors.textSecondary),
+                            style: AppStyles.bodySmall(
+                              scheme.onSurface.withValues(alpha: 0.5),
+                            ),
                           ),
                           onTap: () => Navigator.pop(context, task),
                         );
                       },
                     );
                   }
-                  return const Center(child: CircularProgressIndicator());
+                  return Center(
+                    child: CircularProgressIndicator(color: scheme.primary),
+                  );
                 },
               ),
             ),

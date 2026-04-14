@@ -155,7 +155,7 @@ class _SplashScreenState extends State<SplashScreen>
                             isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
                           ).copyWith(
                             fontWeight: FontWeight.w900,
-                            color: AppColors.primary,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
                         ),
                       ],
@@ -165,8 +165,8 @@ class _SplashScreenState extends State<SplashScreen>
                       borderRadius: BorderRadius.circular(10.r),
                       child: LinearProgressIndicator(
                         value: _progressAnimation.value,
-                        backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                        valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
+                        backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                        valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
                         minHeight: 6.h,
                       ),
                     ),
@@ -185,11 +185,11 @@ class _SplashScreenState extends State<SplashScreen>
       width: 100.w,
       height: 100.w,
       decoration: BoxDecoration(
-        color: AppColors.primary,
+        color: Theme.of(context).colorScheme.primary,
         borderRadius: BorderRadius.circular(28.r),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.4),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
             blurRadius: 30,
             offset: const Offset(0, 15),
             spreadRadius: 2,
@@ -201,7 +201,7 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Widget _buildBackgroundDecorations(bool isDark) {
-    final color = AppColors.primary.withValues(alpha: isDark ? 0.05 : 0.03);
+    final color = Theme.of(context).colorScheme.primary.withValues(alpha: isDark ? 0.05 : 0.03);
     return Stack(
       children: [
         Positioned(

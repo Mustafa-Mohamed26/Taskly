@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../core/routes/app_routes.dart';
-import '../../core/theme/app_colors.dart';
 import 'calendar/calendar_screen.dart';
 import 'focus/focus_screen.dart';
 import 'home/home_screen.dart';
@@ -28,7 +27,9 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final navBg = Theme.of(context).inputDecorationTheme.fillColor ?? scheme.surface;
 
     return Scaffold(
       body: IndexedStack(index: _currentIndex, children: _screens),
@@ -44,26 +45,15 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
         ),
         child: BottomNavigationBar(
           currentIndex: _currentIndex,
-          onTap: (index) {
-            setState(() {
-              _currentIndex = index;
-            });
-          },
+          onTap: (index) => setState(() => _currentIndex = index),
           type: BottomNavigationBarType.fixed,
-          backgroundColor: isDark ? AppColors.fieldFillDark : AppColors.white,
-          selectedItemColor: AppColors.primary,
-          unselectedItemColor:
-              isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+          backgroundColor: navBg,
+          selectedItemColor: scheme.primary,
+          unselectedItemColor: scheme.onSurface.withValues(alpha: 0.5),
           showSelectedLabels: true,
           showUnselectedLabels: true,
-          selectedLabelStyle: TextStyle(
-            fontSize: 12.sp,
-            fontWeight: FontWeight.w700,
-          ),
-          unselectedLabelStyle: TextStyle(
-            fontSize: 12.sp,
-            fontWeight: FontWeight.w500,
-          ),
+          selectedLabelStyle: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w700),
+          unselectedLabelStyle: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w500),
           items: const [
             BottomNavigationBarItem(
               icon: Padding(
@@ -124,15 +114,11 @@ class _MainLayoutScreenState extends State<MainLayoutScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pushNamed(context, AppRoutes.addTask);
-        },
-        backgroundColor: AppColors.primary,
+        onPressed: () => Navigator.pushNamed(context, AppRoutes.addTask),
+        backgroundColor: scheme.primary,
         elevation: 10,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18.r),
-        ),
-        child: Icon(Icons.add_rounded, color: AppColors.white, size: 32.sp),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.r)),
+        child: Icon(Icons.add_rounded, color: scheme.onPrimary, size: 32.sp),
       ),
     );
   }

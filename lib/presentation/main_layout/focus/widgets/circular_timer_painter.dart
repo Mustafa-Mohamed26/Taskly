@@ -1,49 +1,51 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
 
 class CircularTimerPainter extends CustomPainter {
-  final double progress;
-  final bool isDark;
+  const CircularTimerPainter({
+    required this.progress,
+    required this.color,
+    required this.isDark,
+  });
 
-  CircularTimerPainter({required this.progress, required this.isDark});
+  final double progress;
+  final Color color;
+  final bool isDark;
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = min(size.width / 2, size.height / 2);
-    final strokeWidth = 14.0;
+    const strokeWidth = 14.0;
 
-    // Background circle
-    final bgPaint = Paint()
-      ..color = AppColors.primary.withValues(alpha: 0.1)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth
-      ..strokeCap = StrokeCap.round;
-
-    canvas.drawCircle(center, radius - strokeWidth / 2, bgPaint);
+    // Background track
+    canvas.drawCircle(
+      center,
+      radius - strokeWidth / 2,
+      Paint()
+        ..color = color.withValues(alpha: 0.1)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = strokeWidth
+        ..strokeCap = StrokeCap.round,
+    );
 
     // Progress arc
-    final progressPaint = Paint()
-      ..color = AppColors.primary
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth
-      ..strokeCap = StrokeCap.round;
-
-    final double startAngle = -pi / 2;
-    final double sweepAngle = 2 * pi * progress;
-
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius - strokeWidth / 2),
-      startAngle,
-      sweepAngle,
-      false,
-      progressPaint,
-    );
+    if (progress > 0) {
+      canvas.drawArc(
+        Rect.fromCircle(center: center, radius: radius - strokeWidth / 2),
+        -pi / 2,
+        2 * pi * progress,
+        false,
+        Paint()
+          ..color = color
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = strokeWidth
+          ..strokeCap = StrokeCap.round,
+      );
+    }
   }
 
   @override
-  bool shouldRepaint(covariant CircularTimerPainter oldDelegate) {
-    return oldDelegate.progress != progress || oldDelegate.isDark != isDark;
-  }
+  bool shouldRepaint(covariant CircularTimerPainter old) =>
+      old.progress != progress || old.color != color || old.isDark != isDark;
 }

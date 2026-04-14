@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_styles.dart';
 
 class AllTasksDateCard extends StatelessWidget {
-  final DateTime date;
-  final bool isSelected;
-  final VoidCallback onTap;
-
   const AllTasksDateCard({
     super.key,
     required this.date,
@@ -16,8 +11,16 @@ class AllTasksDateCard extends StatelessWidget {
     required this.onTap,
   });
 
+  final DateTime date;
+  final bool isSelected;
+  final VoidCallback onTap;
+
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final unselectedBg = isDark ? const Color(0xFF1C1F37) : const Color(0xFFF0F4F8);
+
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -25,12 +28,12 @@ class AllTasksDateCard extends StatelessWidget {
         width: 75.w,
         margin: EdgeInsets.only(right: 12.w),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : const Color(0xFFF0F4F8).withValues(alpha: 0.8),
+          color: isSelected ? scheme.primary : unselectedBg,
           borderRadius: BorderRadius.circular(16.r),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.3),
+                    color: scheme.primary.withValues(alpha: 0.3),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -43,14 +46,14 @@ class AllTasksDateCard extends StatelessWidget {
             Text(
               date.day.toString(),
               style: AppStyles.bodyMedium(
-                isSelected ? AppColors.white : AppColors.textSecondary,
+                isSelected ? scheme.onPrimary : scheme.onSurface.withValues(alpha: 0.6),
               ).copyWith(fontWeight: FontWeight.w600, fontSize: 16.sp),
             ),
             SizedBox(height: 4.h),
             Text(
               DateFormat('E').format(date),
               style: AppStyles.bodyMedium(
-                isSelected ? AppColors.white : AppColors.textPrimary,
+                isSelected ? scheme.onPrimary : scheme.onSurface,
               ).copyWith(fontWeight: FontWeight.w900, fontSize: 16.sp),
             ),
             if (isSelected) ...[
@@ -58,8 +61,8 @@ class AllTasksDateCard extends StatelessWidget {
               Container(
                 width: 5.w,
                 height: 5.w,
-                decoration: const BoxDecoration(
-                  color: AppColors.white,
+                decoration: BoxDecoration(
+                  color: scheme.onPrimary,
                   shape: BoxShape.circle,
                 ),
               ),

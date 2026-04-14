@@ -29,7 +29,7 @@ class OnboardingPageContent extends StatelessWidget {
                 child: Column(
                   children: [
                     SizedBox(height: 20.h),
-                    _buildImageSection(),
+                    _buildImageSection(context),
                     const Spacer(),
                     _buildContentSection(),
                     SizedBox(height: 40.h),
@@ -43,7 +43,7 @@ class OnboardingPageContent extends StatelessWidget {
     );
   }
 
-  Widget _buildImageSection() {
+  Widget _buildImageSection(BuildContext context) {
     return Container(
       constraints: BoxConstraints(
         maxHeight: 380.h,
@@ -51,7 +51,7 @@ class OnboardingPageContent extends StatelessWidget {
       ),
       width: double.infinity,
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.05),
+        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(24.r),
         boxShadow: [
           BoxShadow(

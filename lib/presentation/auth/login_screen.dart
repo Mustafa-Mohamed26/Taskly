@@ -129,7 +129,7 @@ class _LoginScreenState extends State<LoginScreen> {
             onTap: () => Navigator.pushNamed(context, AppRoutes.forgotPassword),
             child: Text(
               AppStrings.forgotPassword,
-              style: AppStyles.labelSmall(AppColors.primary).copyWith(
+              style: AppStyles.labelSmall(Theme.of(context).colorScheme.primary).copyWith(
                 fontWeight: FontWeight.w700,
                 letterSpacing: 0.5,
               ),

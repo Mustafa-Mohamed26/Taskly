@@ -1,15 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_styles.dart';
 
 class AddTaskPriorityCard extends StatelessWidget {
-  final String label;
-  final Color dotColor;
-  final bool isSelected;
-  final bool isDark;
-  final VoidCallback onTap;
-
   const AddTaskPriorityCard({
     super.key,
     required this.label,
@@ -19,8 +12,17 @@ class AddTaskPriorityCard extends StatelessWidget {
     required this.onTap,
   });
 
+  final String label;
+  final Color dotColor;
+  final bool isSelected;
+  final bool isDark;
+  final VoidCallback onTap;
+
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final cardBg = Theme.of(context).inputDecorationTheme.fillColor ?? scheme.surface;
+
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
@@ -29,14 +31,12 @@ class AddTaskPriorityCard extends StatelessWidget {
           padding: EdgeInsets.symmetric(vertical: 20.h),
           decoration: BoxDecoration(
             color: isSelected
-                ? const Color(0xFFF1F5F9).withValues(alpha: 0.5)
-                : (isDark ? AppColors.fieldFillDark : const Color(0xFFF8FAFC)),
+                ? scheme.primary.withValues(alpha: 0.1)
+                : cardBg,
             border: Border.all(
               color: isSelected
-                  ? AppColors.primary
-                  : (isDark
-                      ? AppColors.fieldBorderDark
-                      : AppColors.fieldBorder.withValues(alpha: 0.3)),
+                  ? scheme.primary
+                  : scheme.onSurface.withValues(alpha: 0.12),
               width: isSelected ? 2 : 1,
             ),
             borderRadius: BorderRadius.circular(12.r),
@@ -46,14 +46,13 @@ class AddTaskPriorityCard extends StatelessWidget {
               Container(
                 width: 10.w,
                 height: 10.w,
-                decoration:
-                    BoxDecoration(color: dotColor, shape: BoxShape.circle),
+                decoration: BoxDecoration(color: dotColor, shape: BoxShape.circle),
               ),
               SizedBox(height: 12.h),
               Text(
                 label,
                 style: AppStyles.bodyMedium(
-                  isSelected ? AppColors.primary : AppColors.textPrimary,
+                  isSelected ? scheme.primary : scheme.onSurface,
                 ).copyWith(
                   fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
                   fontSize: 14.sp,

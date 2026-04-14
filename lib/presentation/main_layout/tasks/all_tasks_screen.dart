@@ -6,7 +6,6 @@ import 'package:taskly/presentation/main_layout/tasks/cubit/task_cubit.dart';
 import 'package:taskly/presentation/widgets/task_item_card.dart';
 import 'package:taskly/presentation/widgets/task_detail_dialog.dart';
 import '../../../core/routes/app_routes.dart';
-import '../../../core/theme/app_colors.dart';
 import 'widgets/all_tasks_header.dart';
 import 'widgets/all_tasks_date_card.dart';
 import 'widgets/all_tasks_schedule_header.dart';
@@ -32,15 +31,10 @@ class _AllTasksScreenState extends State<AllTasksScreen> {
     _scrollController = ScrollController();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final now = DateTime.now();
       final days = _getDaysInMonth(_currentMonth);
-      final todayIndex = days.indexWhere((day) => isSameDay(day, now));
-
+      final todayIndex = days.indexWhere((day) => isSameDay(day, DateTime.now()));
       if (todayIndex != -1 && _scrollController.hasClients) {
-        final double itemWidth = 75.w;
-        final double itemMargin = 12.w;
-        final double offset = todayIndex * (itemWidth + itemMargin);
-        _scrollController.jumpTo(offset);
+        _scrollController.jumpTo(todayIndex * (75.w + 12.w));
       }
     });
   }
@@ -53,10 +47,12 @@ class _AllTasksScreenState extends State<AllTasksScreen> {
 
   List<DateTime> _getDaysInMonth(DateTime month) {
     final daysInMonth = DateTime(month.year, month.month + 1, 0).day;
-    return List.generate(
-      daysInMonth,
-      (index) => DateTime(month.year, month.month, index + 1),
-    );
+    return List.generate(daysInMonth, (i) => DateTime(month.year, month.month, i + 1));
+  }
+
+  bool isSameDay(DateTime a, DateTime? b) {
+    if (b == null) return false;
+    return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 
   @override
@@ -64,7 +60,7 @@ class _AllTasksScreenState extends State<AllTasksScreen> {
     final sortedDays = _getDaysInMonth(_currentMonth);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -87,7 +83,13 @@ class _AllTasksScreenState extends State<AllTasksScreen> {
           ],
         ),
       ),
-      floatingActionButton: _buildFAB(),
+      floatingActionButton: FloatingActionButton(
+        heroTag: null,
+        onPressed: () => Navigator.pushNamed(context, AppRoutes.addTask),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        shape: const CircleBorder(),
+        child: Icon(Icons.add, color: Theme.of(context).colorScheme.onPrimary),
+      ),
     );
   }
 
@@ -101,11 +103,21 @@ class _AllTasksScreenState extends State<AllTasksScreen> {
         itemCount: days.length,
         itemBuilder: (context, index) {
           final date = days[index];
-          final isSelected = isSameDay(date, _selectedDate);
           return AllTasksDateCard(
             date: date,
-            isSelected: isSelected,
-            onTap: () => _onDateSelected(date, index, days),
+            isSelected: isSameDay(date, _selectedDate),
+            onTap: () {
+              setState(() {
+                _selectedDate = date;
+                if (_scrollController.hasClients) {
+                  _scrollController.animateTo(
+                    index * (75.w + 12.w),
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeOut,
+                  );
+                }
+              });
+            },
           );
         },
       ),
@@ -137,15 +149,14 @@ class _AllTasksScreenState extends State<AllTasksScreen> {
                 onDelete: () => context.read<TaskCubit>().deleteTask(task),
                 onMenuSelected: (value) {
                   if (value == 'edit') {
-                    Navigator.pushNamed(context, AppRoutes.addTask,
-                        arguments: task);
+                    Navigator.pushNamed(context, AppRoutes.addTask, arguments: task);
                   } else if (value == 'delete') {
                     context.read<TaskCubit>().deleteTask(task);
                   }
                 },
                 onTap: () => showDialog(
                   context: context,
-                  builder: (context) => TaskDetailDialog(task: task),
+                  builder: (_) => TaskDetailDialog(task: task),
                 ),
               );
             },
@@ -156,32 +167,5 @@ class _AllTasksScreenState extends State<AllTasksScreen> {
         return const SizedBox.shrink();
       },
     );
-  }
-
-  Widget _buildFAB() {
-    return FloatingActionButton(
-      heroTag: null,
-      onPressed: () => Navigator.pushNamed(context, AppRoutes.addTask),
-      backgroundColor: AppColors.primary,
-      shape: const CircleBorder(),
-      child: const Icon(Icons.add, color: AppColors.white),
-    );
-  }
-
-  void _onDateSelected(DateTime date, int index, List<DateTime> days) {
-    setState(() {
-      _selectedDate = date;
-      if (_scrollController.hasClients) {
-        final double itemWidth = 75.w;
-        final double itemMargin = 12.w;
-        final double offset = index * (itemWidth + itemMargin);
-        _scrollController.animateTo(offset,
-            duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
-      }
-    });
-  }
-
-  bool isSameDay(DateTime a, DateTime b) {
-    return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 }

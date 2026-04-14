@@ -35,7 +35,7 @@ class AppButton extends StatelessWidget {
         boxShadow: showShadow
             ? [
                 BoxShadow(
-                  color: (backgroundColor ?? AppColors.primary).withValues(alpha: 0.3),
+                  color: (backgroundColor ?? Theme.of(context).colorScheme.primary).withValues(alpha: 0.3),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 ),
@@ -45,14 +45,14 @@ class AppButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor ?? AppColors.primary,
+          backgroundColor: backgroundColor ?? Theme.of(context).colorScheme.primary,
           foregroundColor: textColor ?? AppColors.white,
           minimumSize: Size(double.infinity, height ?? 56.h),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(radius ?? 12.r),
           ),
           elevation: 0,
-          disabledBackgroundColor: (backgroundColor ?? AppColors.primary).withValues(alpha: 0.6),
+          disabledBackgroundColor: (backgroundColor ?? Theme.of(context).colorScheme.primary).withValues(alpha: 0.6),
         ),
         child: isLoading
             ? SizedBox(

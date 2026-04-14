@@ -3,15 +3,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_styles.dart';
 
+/// A generic summary card used on the Home screen.
+///
+/// Accept explicit [color] and [textColor] so the caller (HomeSummarySection)
+/// can decide whether to use the accent primary or the surface card colour.
 class HomeSummaryCard extends StatelessWidget {
-  final String title;
-  final String count;
-  final Color color;
-  final Color textColor;
-  final IconData icon;
-  final bool isDark;
-  final bool hasDecoration;
-
   const HomeSummaryCard({
     super.key,
     required this.title,
@@ -22,6 +18,14 @@ class HomeSummaryCard extends StatelessWidget {
     this.isDark = false,
     this.hasDecoration = false,
   });
+
+  final String title;
+  final String count;
+  final Color color;
+  final Color textColor;
+  final IconData icon;
+  final bool isDark;
+  final bool hasDecoration;
 
   @override
   Widget build(BuildContext context) {
@@ -78,9 +82,10 @@ class HomeSummaryCard extends StatelessWidget {
                   SizedBox(height: 4.h),
                   Text(
                     count,
-                    style: AppStyles.titleLarge(
-                      textColor,
-                    ).copyWith(fontWeight: FontWeight.w900, fontSize: 20.sp),
+                    style: AppStyles.titleLarge(textColor).copyWith(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 20.sp,
+                    ),
                   ),
                 ],
               ),

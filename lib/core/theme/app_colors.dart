@@ -4,7 +4,7 @@ class AppColors {
   // Primary colors
   static const Color primary = Color(0xFF2211D1);
   static const Color background = Color(0xFFF8F9FA);
-  static const Color backgroundDark = Color(0xFF0D0D0D);
+  static const Color backgroundDark = Color(0xFF0B0E20); // Deep navy from screenshot
   static const Color white = Color(0xFFFFFFFF);
   static const Color transparent = Colors.transparent;
 
@@ -17,9 +17,9 @@ class AppColors {
 
   // Field colors
   static const Color fieldFill = Color(0xFFFFFFFF);
-  static const Color fieldFillDark = Color(0xFF1A1A1A);
+  static const Color fieldFillDark = Color(0xFF131629); // Matches form fields in the dark UI
   static const Color fieldBorder = Color(0xFFEEEEEE);
-  static const Color fieldBorderDark = Color(0xFF2A2A2A);
+  static const Color fieldBorderDark = Color(0xFF1C1F37);
   static const Color fieldHint = Color(0xFFAAAAAA);
 
   // Social button colors

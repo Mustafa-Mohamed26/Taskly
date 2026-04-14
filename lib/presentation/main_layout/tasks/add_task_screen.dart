@@ -12,7 +12,6 @@ import 'package:taskly/presentation/widgets/app_text_field.dart';
 import 'package:taskly/presentation/widgets/section_title.dart';
 import 'package:uuid/uuid.dart';
 import 'package:taskly/core/constants/app_strings.dart';
-import 'package:taskly/core/theme/app_colors.dart';
 import 'package:taskly/core/theme/app_styles.dart';
 import 'widgets/add_task_selector_field.dart';
 import 'widgets/add_task_category_chip.dart';
@@ -61,6 +60,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final scheme = Theme.of(context).colorScheme;
 
     return BlocListener<TaskCubit, TaskState>(
       listener: _handleStateChanges,
@@ -68,7 +68,24 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         children: [
           Scaffold(
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            appBar: _buildAppBar(isDark),
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back_rounded, color: scheme.onSurface, size: 28.sp),
+                onPressed: () => Navigator.pop(context),
+              ),
+              title: Text(
+                isEditMode ? 'Edit Task' : AppStrings.newTask,
+                style: AppStyles.displayMedium(scheme.onSurface).copyWith(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 22.sp,
+                  letterSpacing: -0.5,
+                ),
+              ),
+              centerTitle: false,
+              titleSpacing: 0,
+            ),
             body: Stack(
               children: [
                 AddTaskBackgroundDecorations(isDark: isDark),
@@ -79,33 +96,6 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
           if (_isLoading) const AuthLoadingWidget(),
         ],
       ),
-    );
-  }
-
-  AppBar _buildAppBar(bool isDark) {
-    return AppBar(
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      leading: IconButton(
-        icon: Icon(
-          Icons.arrow_back_rounded,
-          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
-          size: 28.sp,
-        ),
-        onPressed: () => Navigator.pop(context),
-      ),
-      title: Text(
-        isEditMode ? 'Edit Task' : AppStrings.newTask,
-        style: AppStyles.displayMedium(
-          isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
-        ).copyWith(
-          fontWeight: FontWeight.w900,
-          fontSize: 22.sp,
-          letterSpacing: -0.5,
-        ),
-      ),
-      centerTitle: false,
-      titleSpacing: 0,
     );
   }
 
@@ -250,9 +240,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
 
   void _handleStateChanges(BuildContext context, TaskState state) {
     setState(() => _isLoading = state is TaskLoading);
-    if (state is TaskError) {
-      _showErrorDialog(state.message);
-    }
+    if (state is TaskError) _showErrorDialog(state.message);
   }
 
   void _showErrorDialog(String message) {
@@ -266,6 +254,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   }
 
   Future<void> _pickDate() async {
+    final scheme = Theme.of(context).colorScheme;
     final picked = await showDatePicker(
       context: context,
       initialDate: _selectedDate,
@@ -273,7 +262,10 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
       lastDate: DateTime(2100),
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
-          colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary, primary: AppColors.primary),
+          colorScheme: Theme.of(context).colorScheme.copyWith(
+                primary: scheme.primary,
+                onPrimary: scheme.onPrimary,
+              ),
         ),
         child: child!,
       ),
@@ -307,7 +299,10 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
       userId: authState.user.id,
       title: _titleController.text.trim(),
       description: _descController.text.trim(),
-      dateTime: DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day, _selectedTime.hour, _selectedTime.minute),
+      dateTime: DateTime(
+        _selectedDate.year, _selectedDate.month, _selectedDate.day,
+        _selectedTime.hour, _selectedTime.minute,
+      ),
       categories: _selectedCategories,
       priority: _selectedPriority,
       isCompleted: isEditMode ? widget.task!.isCompleted : false,
@@ -332,7 +327,9 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
       dialogType: DialogType.success,
       animType: AnimType.bottomSlide,
       title: isEditMode ? 'Task Updated' : 'Task Added',
-      desc: isEditMode ? 'Your task has been updated successfully.' : 'New task has been added to your list.',
+      desc: isEditMode
+          ? 'Your task has been updated successfully.'
+          : 'New task has been added to your list.',
       btnOkOnPress: () => Navigator.pop(context),
     ).show();
   }

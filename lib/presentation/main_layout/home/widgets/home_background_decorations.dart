@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../../../core/theme/app_colors.dart';
 
 class HomeBackgroundDecorations extends StatelessWidget {
-  final bool isDark;
-
   const HomeBackgroundDecorations({super.key, required this.isDark});
+  final bool isDark;
 
   @override
   Widget build(BuildContext context) {
-    final color = AppColors.primary.withValues(alpha: isDark ? 0.04 : 0.02);
+    final primary = Theme.of(context).colorScheme.primary;
+    final color = primary.withValues(alpha: isDark ? 0.04 : 0.02);
+
     return Stack(
       children: [
         Positioned(

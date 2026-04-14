@@ -42,7 +42,7 @@ class AddTaskSelectorField extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Icon(icon, size: 24.sp, color: AppColors.primary),
+                Icon(icon, size: 24.sp, color: Theme.of(context).colorScheme.primary),
                 SizedBox(width: 12.w),
                 Expanded(
                   child: Text(

@@ -8,7 +8,6 @@ import 'package:taskly/presentation/main_layout/focus/widgets/task_search_dialog
 import 'package:taskly/core/service/audio_service.dart';
 import 'package:taskly/config/di/di.dart';
 import '../../../core/constants/app_strings.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_styles.dart';
 
 class FocusScreen extends StatelessWidget {
@@ -18,26 +17,24 @@ class FocusScreen extends StatelessWidget {
 
   String _formatDuration(int seconds) {
     final minutes = (seconds / 60).floor();
-    final remainingSeconds = seconds % 60;
-    return '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
+    return '${minutes.toString().padLeft(2, '0')}:${(seconds % 60).toString().padLeft(2, '0')}';
   }
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return BlocBuilder<FocusCubit, FocusState>(
       builder: (context, state) {
         return Scaffold(
-          backgroundColor: isDark ? AppColors.backgroundDark : AppColors.white,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           appBar: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
             title: Text(
               AppStrings.focusMode,
-              style: AppStyles.titleLarge(
-                isDark ? AppColors.white : AppColors.textPrimary,
-              ).copyWith(fontWeight: FontWeight.w900),
+              style: AppStyles.titleLarge(scheme.onSurface).copyWith(fontWeight: FontWeight.w900),
             ),
             centerTitle: true,
           ),
@@ -46,13 +43,13 @@ class FocusScreen extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
             child: Column(
               children: [
-                _buildTimerSection(context, state, isDark),
+                _buildTimerSection(state, scheme, isDark),
                 SizedBox(height: 48.h),
-                _buildCurrentTaskCard(context, state, isDark),
+                _buildCurrentTaskCard(context, state, scheme, isDark),
                 SizedBox(height: 32.h),
-                _buildAmbientSoundsSection(context, state, isDark),
+                _buildAmbientSoundsSection(context, state, scheme, isDark),
                 SizedBox(height: 40.h),
-                _buildActionButtons(context, state, isDark),
+                _buildActionButtons(context, state, scheme, isDark),
               ],
             ),
           ),
@@ -61,12 +58,8 @@ class FocusScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTimerSection(
-    BuildContext context,
-    FocusState state,
-    bool isDark,
-  ) {
-    double progress = state.remainingSeconds / state.duration;
+  Widget _buildTimerSection(FocusState state, ColorScheme scheme, bool isDark) {
+    final progress = state.remainingSeconds / state.duration;
 
     return Center(
       child: Stack(
@@ -74,16 +67,18 @@ class FocusScreen extends StatelessWidget {
         children: [
           CustomPaint(
             size: Size(260.w, 260.w),
-            painter: CircularTimerPainter(progress: progress, isDark: isDark),
+            painter: CircularTimerPainter(
+              progress: progress,
+              color: scheme.primary,
+              isDark: isDark,
+            ),
           ),
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 _formatDuration(state.remainingSeconds),
-                style: AppStyles.displayLarge(
-                  isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
-                ).copyWith(
+                style: AppStyles.displayLarge(scheme.onSurface).copyWith(
                   fontSize: 64.sp,
                   fontWeight: FontWeight.w900,
                   letterSpacing: -2,
@@ -91,9 +86,8 @@ class FocusScreen extends StatelessWidget {
               ),
               Text(
                 AppStrings.pomodoro.toUpperCase(),
-                style: AppStyles.bodySmallMedium(
-                  AppColors.textSecondary,
-                ).copyWith(letterSpacing: 2, fontWeight: FontWeight.w800),
+                style: AppStyles.bodySmallMedium(scheme.onSurface.withValues(alpha: 0.5))
+                    .copyWith(letterSpacing: 2, fontWeight: FontWeight.w800),
               ),
             ],
           ),
@@ -105,22 +99,22 @@ class FocusScreen extends StatelessWidget {
   Widget _buildCurrentTaskCard(
     BuildContext context,
     FocusState state,
+    ColorScheme scheme,
     bool isDark,
   ) {
     final task = state.selectedTask;
+    final cardBg = Theme.of(context).inputDecorationTheme.fillColor ?? scheme.surface;
+    final borderColor = isDark ? const Color(0xFF2A2F4F) : scheme.onSurface.withValues(alpha: 0.1);
 
     return ValueListenableBuilder<bool>(
       valueListenable: _isExpanded,
-      builder: (context, isExpanded, child) {
+      builder: (context, isExpanded, _) {
         return Container(
           padding: EdgeInsets.all(20.w),
           decoration: BoxDecoration(
-            color: isDark ? AppColors.fieldFillDark : AppColors.background,
+            color: cardBg,
             borderRadius: BorderRadius.circular(24.r),
-            border: Border.all(
-              color: isDark ? AppColors.fieldBorderDark : AppColors.fieldBorder,
-              width: 1,
-            ),
+            border: Border.all(color: borderColor),
             boxShadow: [
               if (!isDark)
                 BoxShadow(
@@ -138,39 +132,36 @@ class FocusScreen extends StatelessWidget {
                 children: [
                   Expanded(
                     child: GestureDetector(
-                        onTap: () async {
-                          final selectedTask = await showDialog<TaskEntity>(
-                            context: context,
-                            builder: (context) => const TaskSearchDialog(),
-                          );
-                          if (!context.mounted) return;
-                          if (selectedTask != null) {
-                            context.read<FocusCubit>().selectTask(selectedTask);
-                          }
-                        },
                       behavior: HitTestBehavior.opaque,
+                      onTap: () async {
+                        final selected = await showDialog<TaskEntity>(
+                          context: context,
+                          builder: (_) => const TaskSearchDialog(),
+                        );
+                        if (!context.mounted) return;
+                        if (selected != null) {
+                          context.read<FocusCubit>().selectTask(selected);
+                        }
+                      },
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             AppStrings.currentTask.toUpperCase(),
-                            style: AppStyles.labelSmall(AppColors.primary).copyWith(
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 0.5,
-                            ),
+                            style: AppStyles.labelSmall(scheme.primary)
+                                .copyWith(fontWeight: FontWeight.w900, letterSpacing: 0.5),
                           ),
                           SizedBox(height: 8.h),
                           Text(
                             task?.title ?? 'No task selected',
-                            style: AppStyles.titleLarge(
-                              isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
-                            ).copyWith(fontSize: 18.sp, fontWeight: FontWeight.w900),
+                            style: AppStyles.titleLarge(scheme.onSurface)
+                                .copyWith(fontSize: 18.sp, fontWeight: FontWeight.w900),
                           ),
                           if (task != null) ...[
                             SizedBox(height: 4.h),
                             Text(
                               'Priority: ${task.priority} • Taskly Pro',
-                              style: AppStyles.bodySmall(AppColors.textSecondary),
+                              style: AppStyles.bodySmall(scheme.onSurface.withValues(alpha: 0.5)),
                             ),
                           ],
                         ],
@@ -180,13 +171,13 @@ class FocusScreen extends StatelessWidget {
                   GestureDetector(
                     onTap: () async {
                       if (task == null) {
-                        final selectedTask = await showDialog<TaskEntity>(
+                        final selected = await showDialog<TaskEntity>(
                           context: context,
-                          builder: (context) => const TaskSearchDialog(),
+                          builder: (_) => const TaskSearchDialog(),
                         );
                         if (!context.mounted) return;
-                        if (selectedTask != null) {
-                          context.read<FocusCubit>().selectTask(selectedTask);
+                        if (selected != null) {
+                          context.read<FocusCubit>().selectTask(selected);
                         }
                       } else {
                         _isExpanded.value = !_isExpanded.value;
@@ -195,14 +186,16 @@ class FocusScreen extends StatelessWidget {
                     child: Container(
                       padding: EdgeInsets.all(12.w),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.1),
+                        color: scheme.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(16.r),
                       ),
                       child: Icon(
                         task != null
-                            ? (isExpanded ? Icons.keyboard_arrow_up_rounded : Icons.info_outline_rounded)
+                            ? (isExpanded
+                                ? Icons.keyboard_arrow_up_rounded
+                                : Icons.info_outline_rounded)
                             : Icons.add_rounded,
-                        color: AppColors.primary,
+                        color: scheme.primary,
                         size: 24.sp,
                       ),
                     ),
@@ -217,11 +210,12 @@ class FocusScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Divider(color: isDark ? AppColors.fieldBorderDark : AppColors.fieldBorder),
+                        Divider(color: borderColor),
                         SizedBox(height: 8.h),
                         Text(
-                          task.description ?? "there is no description for this task",
-                          style: AppStyles.bodyMedium(Colors.black).copyWith(fontWeight: FontWeight.w500),
+                          task.description ?? 'No description for this task.',
+                          style: AppStyles.bodyMedium(scheme.onSurface)
+                              .copyWith(fontWeight: FontWeight.w500),
                         ),
                       ],
                     ),
@@ -239,6 +233,7 @@ class FocusScreen extends StatelessWidget {
   Widget _buildAmbientSoundsSection(
     BuildContext context,
     FocusState state,
+    ColorScheme scheme,
     bool isDark,
   ) {
     return Column(
@@ -246,102 +241,31 @@ class FocusScreen extends StatelessWidget {
       children: [
         Text(
           AppStrings.ambientSounds.toUpperCase(),
-          style: AppStyles.labelSmall(
-            AppColors.textSecondary,
-          ).copyWith(letterSpacing: 1.5, fontWeight: FontWeight.w800),
+          style: AppStyles.labelSmall(scheme.onSurface.withValues(alpha: 0.5))
+              .copyWith(letterSpacing: 1.5, fontWeight: FontWeight.w800),
         ),
         SizedBox(height: 16.h),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildAmbientIcon(
-              context,
-              Icons.water_drop_rounded,
-              AppStrings.rain,
-              state.selectedSound == AppStrings.rain,
-            ),
-            _buildAmbientIcon(
-              context,
-              Icons.forest_rounded,
-              AppStrings.forest,
-              state.selectedSound == AppStrings.forest,
-            ),
-            _buildAmbientIcon(
-              context,
-              Icons.waves_rounded,
-              AppStrings.waves,
-              state.selectedSound == AppStrings.waves,
-            ),
-            _buildAmbientIcon(
-              context,
-              Icons.multiline_chart_rounded,
-              AppStrings.white,
-              state.selectedSound == AppStrings.white,
-            ),
+            _buildAmbientIcon(context, icon: Icons.water_drop_rounded, label: AppStrings.rain, isSelected: state.selectedSound == AppStrings.rain),
+            _buildAmbientIcon(context, icon: Icons.forest_rounded, label: AppStrings.forest, isSelected: state.selectedSound == AppStrings.forest),
+            _buildAmbientIcon(context, icon: Icons.waves_rounded, label: AppStrings.waves, isSelected: state.selectedSound == AppStrings.waves),
+            _buildAmbientIcon(context, icon: Icons.multiline_chart_rounded, label: AppStrings.white, isSelected: state.selectedSound == AppStrings.white),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildAmbientIcon(
-    BuildContext context,
-    IconData icon,
-    String label,
-    bool isSelected,
-  ) {
-    return GestureDetector(
-      onTap:
-          () =>
-              context.read<FocusCubit>().selectSound(isSelected ? null : label),
-      child: Column(
-        children: [
-          Container(
-            width: 72.w,
-            height: 72.w,
-            decoration: BoxDecoration(
-              color:
-                  isSelected
-                      ? AppColors.primary
-                      : (Theme.of(context).brightness == Brightness.dark
-                          ? AppColors.fieldFillDark
-                          : AppColors.background),
-              borderRadius: BorderRadius.circular(20.r),
-              boxShadow: [
-                if (isSelected)
-                  BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.3),
-                    blurRadius: 12,
-                    offset: const Offset(0, 6),
-                  ),
-              ],
-            ),
-            child: Icon(
-              icon,
-              color: isSelected ? AppColors.white : AppColors.textSecondary,
-              size: 28.sp,
-            ),
-          ),
-          SizedBox(height: 10.h),
-          Text(
-            label,
-            style: AppStyles.bodySmallMedium(
-              isSelected ? AppColors.primary : AppColors.textSecondary,
-            ).copyWith(
-              fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildActionButtons(
     BuildContext context,
     FocusState state,
+    ColorScheme scheme,
     bool isDark,
   ) {
-    final bool isRunning = state.status == FocusStatus.running;
+    final isRunning = state.status == FocusStatus.running;
+    final cardBg = Theme.of(context).inputDecorationTheme.fillColor ?? scheme.surface;
 
     return Column(
       children: [
@@ -356,29 +280,21 @@ class FocusScreen extends StatelessWidget {
             }
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
-            foregroundColor: AppColors.white,
+            backgroundColor: scheme.primary,
+            foregroundColor: scheme.onPrimary,
             minimumSize: Size(double.infinity, 64.h),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.r),
-            ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
             elevation: 8,
-            shadowColor: AppColors.primary.withValues(alpha: 0.4),
+            shadowColor: scheme.primary.withValues(alpha: 0.4),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                isRunning ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                size: 28.sp,
-              ),
+              Icon(isRunning ? Icons.pause_rounded : Icons.play_arrow_rounded, size: 28.sp),
               SizedBox(width: 12.w),
               Text(
                 isRunning ? AppStrings.pauseSession : 'Start Session',
-                style: AppStyles.labelLarge().copyWith(
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.w900,
-                ),
+                style: AppStyles.labelLarge().copyWith(fontSize: 18.sp, fontWeight: FontWeight.w900),
               ),
             ],
           ),
@@ -390,27 +306,18 @@ class FocusScreen extends StatelessWidget {
             getIt<AudioService>().stopSound();
           },
           style: TextButton.styleFrom(
-            backgroundColor:
-                isDark ? AppColors.fieldFillDark : AppColors.background,
+            backgroundColor: cardBg,
             minimumSize: Size(double.infinity, 64.h),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.r),
-            ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.stop_rounded,
-                color: isDark ? AppColors.white : AppColors.textPrimary,
-                size: 28.sp,
-              ),
+              Icon(Icons.stop_rounded, color: scheme.onSurface, size: 28.sp),
               SizedBox(width: 12.w),
               Text(
                 AppStrings.endSession,
-                style: AppStyles.bodyLargeMedium(
-                  isDark ? AppColors.white : AppColors.textPrimary,
-                ).copyWith(fontWeight: FontWeight.w900),
+                style: AppStyles.bodyLargeMedium(scheme.onSurface).copyWith(fontWeight: FontWeight.w900),
               ),
             ],
           ),
@@ -418,4 +325,56 @@ class FocusScreen extends StatelessWidget {
       ],
     );
   }
+}
+
+// ---------------------------------------------------------------------------
+// Private sub-widget
+// ---------------------------------------------------------------------------
+
+Widget _buildAmbientIcon(
+  BuildContext context, {
+  required IconData icon,
+  required String label,
+  required bool isSelected,
+}) {
+  final scheme = Theme.of(context).colorScheme;
+  final cardBg = Theme.of(context).inputDecorationTheme.fillColor ?? scheme.surface;
+
+  return GestureDetector(
+    onTap: () =>
+        context.read<FocusCubit>().selectSound(isSelected ? null : label),
+    child: Column(
+      children: [
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          width: 72.w,
+          height: 72.w,
+          decoration: BoxDecoration(
+            color: isSelected ? scheme.primary : cardBg,
+            borderRadius: BorderRadius.circular(20.r),
+            boxShadow: [
+              if (isSelected)
+                BoxShadow(
+                  color: scheme.primary.withValues(alpha: 0.3),
+                  blurRadius: 12,
+                  offset: const Offset(0, 6),
+                ),
+            ],
+          ),
+          child: Icon(
+            icon,
+            color: isSelected ? scheme.onPrimary : scheme.onSurface.withValues(alpha: 0.5),
+            size: 28.sp,
+          ),
+        ),
+        SizedBox(height: 10.h),
+        Text(
+          label,
+          style: AppStyles.bodySmallMedium(
+                  isSelected ? scheme.primary : scheme.onSurface.withValues(alpha: 0.5))
+              .copyWith(fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600),
+        ),
+      ],
+    ),
+  );
 }

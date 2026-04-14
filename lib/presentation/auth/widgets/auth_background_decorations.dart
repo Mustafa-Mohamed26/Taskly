@@ -9,7 +9,7 @@ class AuthBackgroundDecorations extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = AppColors.primary.withValues(alpha: isDark ? 0.04 : 0.02);
+    final color = Theme.of(context).colorScheme.primary.withValues(alpha: isDark ? 0.04 : 0.02);
     return Stack(
       children: [
         Positioned(

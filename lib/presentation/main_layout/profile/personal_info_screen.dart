@@ -84,7 +84,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
         final isLoading = state is AuthLoading;
 
         return Scaffold(
-          backgroundColor: AppColors.background,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           appBar: _buildAppBar(context),
           body: SingleChildScrollView(
             padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
@@ -94,9 +94,9 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                 children: [
                   _buildProfileIcon(),
                   SizedBox(height: 32.h),
-                  _buildForm(),
+                  _buildForm(context),
                   SizedBox(height: 24.h),
-                  _buildVerificationBanner(),
+                  _buildVerificationBanner(context),
                   SizedBox(height: 32.h),
                   _buildActionButtons(context, isLoading),
                 ],
@@ -110,13 +110,13 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
 
   PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
-      backgroundColor: AppColors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       elevation: 0,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+        icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
         onPressed: () => Navigator.pop(context),
       ),
-      title: Text(AppStrings.personalInfo, style: AppStyles.titleLarge()),
+      title: Text(AppStrings.personalInfo, style: AppStyles.titleLarge(Theme.of(context).colorScheme.onSurface)),
       centerTitle: true,
     );
   }
@@ -126,23 +126,25 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
       width: 100.w,
       height: 100.w,
       decoration: BoxDecoration(
-        color: AppColors.primary,
+        color: Theme.of(context).colorScheme.primary,
         borderRadius: BorderRadius.circular(24.r),
       ),
       child: Icon(Icons.person_rounded, color: AppColors.white, size: 60.sp),
     );
   }
 
-  Widget _buildForm() {
+  Widget _buildForm(BuildContext context) {
     return Column(
       children: [
         _buildInfoField(
+          context,
           'Full Name',
           _nameController,
           Icons.person_outline,
         ),
         SizedBox(height: 20.h),
         _buildInfoField(
+          context,
           'Email Address',
           _emailController,
           Icons.email_outlined,
@@ -150,32 +152,37 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
         ),
         SizedBox(height: 20.h),
         _buildInfoField(
+          context,
           'Phone Number',
           _phoneController,
           Icons.phone_outlined,
           keyboardType: TextInputType.phone,
         ),
         SizedBox(height: 20.h),
-        _buildBioField(),
+        _buildBioField(context),
       ],
     );
   }
 
   Widget _buildInfoField(
+    BuildContext context,
     String label,
     TextEditingController controller,
     IconData icon, {
     bool readOnly = false,
     TextInputType? keyboardType,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final fillColor = isDark ? const Color(0xFF131629) : AppColors.white;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Icon(icon, size: 16.sp, color: AppColors.primary),
+            Icon(icon, size: 16.sp, color: Theme.of(context).colorScheme.primary),
             SizedBox(width: 8.w),
-            Text(label, style: AppStyles.labelSmall(AppColors.textPrimary)),
+            Text(label, style: AppStyles.labelSmall(Theme.of(context).colorScheme.onSurface)),
           ],
         ),
         SizedBox(height: 8.h),
@@ -184,11 +191,11 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
           readOnly: readOnly,
           keyboardType: keyboardType,
           style: AppStyles.bodyMedium(
-            readOnly ? AppColors.textSecondary : AppColors.textPrimary,
+            readOnly ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5) : Theme.of(context).colorScheme.onSurface,
           ),
           decoration: InputDecoration(
             filled: true,
-            fillColor: AppColors.white,
+            fillColor: fillColor,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12.r),
               borderSide: BorderSide.none,
@@ -203,25 +210,28 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     );
   }
 
-  Widget _buildBioField() {
+  Widget _buildBioField(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final fillColor = isDark ? const Color(0xFF131629) : AppColors.white;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Icon(Icons.notes_rounded, size: 16.sp, color: AppColors.primary),
+            Icon(Icons.notes_rounded, size: 16.sp, color: Theme.of(context).colorScheme.primary),
             SizedBox(width: 8.w),
-            Text('Bio', style: AppStyles.labelSmall(AppColors.textPrimary)),
+            Text('Bio', style: AppStyles.labelSmall(Theme.of(context).colorScheme.onSurface)),
           ],
         ),
         SizedBox(height: 8.h),
         TextFormField(
           controller: _bioController,
           maxLines: 4,
-          style: AppStyles.bodyMedium(AppColors.textPrimary),
+          style: AppStyles.bodyMedium(Theme.of(context).colorScheme.onSurface),
           decoration: InputDecoration(
             filled: true,
-            fillColor: AppColors.white,
+            fillColor: fillColor,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12.r),
               borderSide: BorderSide.none,
@@ -233,19 +243,29 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     );
   }
 
-  Widget _buildVerificationBanner() {
+  Widget _buildVerificationBanner(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bannerBg = isDark ? const Color(0xFF131629) : Theme.of(context).colorScheme.primary.withValues(alpha: 0.05);
+
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.05),
+        color: bannerBg,
         borderRadius: BorderRadius.circular(12.r),
       ),
       child: Row(
         children: [
-          Icon(
-            Icons.verified_user_outlined,
-            color: AppColors.primary,
-            size: 24.sp,
+          Container(
+            padding: EdgeInsets.all(8.w),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.verified_user_outlined,
+              color: Theme.of(context).colorScheme.primary,
+              size: 20.sp,
+            ),
           ),
           SizedBox(width: 12.w),
           Expanded(
@@ -254,11 +274,11 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
               children: [
                 Text(
                   'Account Verification',
-                  style: AppStyles.bodyLargeMedium(),
+                  style: AppStyles.bodyLargeMedium(Theme.of(context).colorScheme.onSurface),
                 ),
                 Text(
                   'Your account is fully verified',
-                  style: AppStyles.bodySmall(),
+                  style: AppStyles.bodySmall(Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
                 ),
               ],
             ),
@@ -270,12 +290,15 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
   }
 
   Widget _buildActionButtons(BuildContext context, bool isLoading) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cancelBg = isDark ? const Color(0xFFFFFFFF) : AppColors.white;
+
     return Column(
       children: [
         ElevatedButton(
           onPressed: isLoading ? null : _saveChanges,
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
+            backgroundColor: Theme.of(context).colorScheme.primary,
             minimumSize: Size(double.infinity, 56.h),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12.r),
@@ -294,7 +317,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
           onPressed: isLoading ? null : () => Navigator.pop(context),
           style: TextButton.styleFrom(
             minimumSize: Size(double.infinity, 56.h),
-            backgroundColor: AppColors.white,
+            backgroundColor: cancelBg,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12.r),
             ),
@@ -308,3 +331,4 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     );
   }
 }
+

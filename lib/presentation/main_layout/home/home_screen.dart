@@ -5,7 +5,6 @@ import 'package:taskly/core/routes/app_routes.dart';
 import 'package:taskly/presentation/main_layout/tasks/cubit/task_cubit.dart';
 import 'package:taskly/presentation/widgets/task_item_card.dart';
 import '../../../core/constants/app_strings.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_styles.dart';
 import '../../../../domain/entities/task_entity.dart';
 import 'widgets/home_header.dart';
@@ -20,6 +19,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
@@ -35,18 +35,15 @@ class HomeScreen extends StatelessWidget {
                   allTasks = state.data;
                 }
 
-                final todayTasks = allTasks.where((task) {
-                  final now = DateTime.now();
-                  return task.dateTime.year == now.year &&
-                      task.dateTime.month == now.month &&
-                      task.dateTime.day == now.day;
-                }).toList();
+                final now = DateTime.now();
+                final todayTasks = allTasks.where((task) =>
+                    task.dateTime.year == now.year &&
+                    task.dateTime.month == now.month &&
+                    task.dateTime.day == now.day).toList();
 
-                final completedToday =
-                    todayTasks.where((t) => t.isCompleted).length;
+                final completedToday = todayTasks.where((t) => t.isCompleted).length;
                 final totalToday = todayTasks.length;
-                final progress =
-                    totalToday > 0 ? completedToday / totalToday : 0.0;
+                final progress = totalToday > 0 ? completedToday / totalToday : 0.0;
 
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,7 +55,11 @@ class HomeScreen extends StatelessWidget {
                         children: [
                           HomeHeader(isDark: isDark),
                           SizedBox(height: 32.h),
-                          _buildSummaryTitle(isDark),
+                          Text(
+                            'Summary',
+                            style: AppStyles.titleLarge(scheme.onSurface)
+                                .copyWith(fontWeight: FontWeight.w900, fontSize: 18.sp),
+                          ),
                           SizedBox(height: 16.h),
                           HomeSummarySection(
                             allTasks: allTasks,
@@ -66,12 +67,27 @@ class HomeScreen extends StatelessWidget {
                             isDark: isDark,
                           ),
                           SizedBox(height: 32.h),
-                          HomeProgressSection(
-                            progress: progress,
-                            isDark: isDark,
-                          ),
+                          HomeProgressSection(progress: progress, isDark: isDark),
                           SizedBox(height: 32.h),
-                          _buildTasksHeader(context, isDark),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                AppStrings.todaysTasks,
+                                style: AppStyles.titleLarge(scheme.onSurface)
+                                    .copyWith(fontWeight: FontWeight.w900),
+                              ),
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.pushNamed(context, AppRoutes.allTasks),
+                                child: Text(
+                                  AppStrings.viewAll,
+                                  style: AppStyles.bodyMediumMedium(scheme.primary)
+                                      .copyWith(fontWeight: FontWeight.w800),
+                                ),
+                              ),
+                            ],
+                          ),
                           SizedBox(height: 16.h),
                         ],
                       ),
@@ -101,18 +117,15 @@ class HomeScreen extends StatelessWidget {
                                       context.read<TaskCubit>().deleteTask(task),
                                   onMenuSelected: (value) {
                                     if (value == 'edit') {
-                                      Navigator.pushNamed(
-                                        context,
-                                        AppRoutes.addTask,
-                                        arguments: task,
-                                      );
+                                      Navigator.pushNamed(context, AppRoutes.addTask,
+                                          arguments: task);
                                     } else if (value == 'delete') {
                                       context.read<TaskCubit>().deleteTask(task);
                                     }
                                   },
                                   onTap: () => showDialog(
                                     context: context,
-                                    builder: (context) => TaskDetailDialog(task: task),
+                                    builder: (_) => TaskDetailDialog(task: task),
                                   ),
                                 );
                               },
@@ -125,38 +138,6 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildSummaryTitle(bool isDark) {
-    return Text(
-      'Summary',
-      style: AppStyles.titleLarge(
-        isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
-      ).copyWith(fontWeight: FontWeight.w900, fontSize: 18.sp),
-    );
-  }
-
-  Widget _buildTasksHeader(BuildContext context, bool isDark) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          AppStrings.todaysTasks,
-          style: AppStyles.titleLarge(
-            isDark ? AppColors.textPrimaryDark : AppColors.textPrimary,
-          ).copyWith(fontWeight: FontWeight.w900),
-        ),
-        TextButton(
-          onPressed: () => Navigator.pushNamed(context, AppRoutes.allTasks),
-          child: Text(
-            AppStrings.viewAll,
-            style: AppStyles.bodyMediumMedium(
-              AppColors.primary,
-            ).copyWith(fontWeight: FontWeight.w800),
-          ),
-        ),
-      ],
     );
   }
 }

@@ -9,7 +9,6 @@ import 'package:taskly/presentation/widgets/task_item_card.dart';
 import 'package:taskly/presentation/widgets/task_detail_dialog.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/routes/app_routes.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_styles.dart';
 
 class CalendarScreen extends StatefulWidget {
@@ -31,7 +30,8 @@ class _CalendarScreenState extends State<CalendarScreen>
     super.initState();
     _tabController = TabController(length: 3, vsync: this, initialIndex: 2);
     _tabController.addListener(() {
-      if (_tabController.indexIsChanging || _tabController.animation?.value == _tabController.index) {
+      if (_tabController.indexIsChanging ||
+          _tabController.animation?.value == _tabController.index) {
         setState(() {
           if (_tabController.index == 0) {
             _focusedDay = DateTime.now();
@@ -53,9 +53,17 @@ class _CalendarScreenState extends State<CalendarScreen>
     super.dispose();
   }
 
+  bool isSameDay(DateTime? a, DateTime? b) {
+    if (a == null || b == null) return false;
+    return a.year == b.year && a.month == b.month && a.day == b.day;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final scheme = Theme.of(context).colorScheme;
+    final scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
+    final cardBg =
+        Theme.of(context).inputDecorationTheme.fillColor ?? scheme.surface;
 
     return BlocBuilder<TaskCubit, TaskState>(
       builder: (context, state) {
@@ -64,24 +72,64 @@ class _CalendarScreenState extends State<CalendarScreen>
           allTasks = state.data;
         }
 
-        final selectedTasks = allTasks
-            .where((task) => isSameDay(task.dateTime, _selectedDay))
-            .toList();
+        final selectedTasks =
+            allTasks
+                .where((task) => isSameDay(task.dateTime, _selectedDay))
+                .toList();
 
         return Scaffold(
-          backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
-          appBar: _buildAppBar(context, isDark),
+          backgroundColor: scaffoldBg,
+          appBar: AppBar(
+            backgroundColor: scaffoldBg,
+            elevation: 0,
+            title: Text(
+              AppStrings.calendar,
+              style: AppStyles.titleLarge(
+                scheme.onSurface,
+              ).copyWith(fontWeight: FontWeight.w800),
+            ),
+            centerTitle: true,
+            actions: [
+              IconButton(
+                icon: Icon(Icons.search, color: scheme.onSurface),
+                onPressed: () {},
+              ),
+              IconButton(
+                icon: Icon(Icons.more_vert, color: scheme.onSurface),
+                onPressed: () {},
+              ),
+            ],
+          ),
           body: Column(
             children: [
-              _buildTabRow(isDark),
+              // Tab bar
+              Container(
+                color: cardBg,
+                child: TabBar(
+                  controller: _tabController,
+                  indicatorColor: scheme.primary,
+                  indicatorWeight: 3,
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  labelColor: scheme.primary,
+                  unselectedLabelColor: scheme.onSurface.withValues(alpha: 0.5),
+                  labelStyle: AppStyles.bodyLargeMedium().copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                  tabs: const [
+                    Tab(text: AppStrings.day),
+                    Tab(text: AppStrings.week),
+                    Tab(text: AppStrings.month),
+                  ],
+                ),
+              ),
               Expanded(
                 child: SingleChildScrollView(
                   physics: const BouncingScrollPhysics(),
                   child: Column(
                     children: [
                       if (_tabController.index != 0)
-                        _buildCalendarSection(allTasks, isDark),
-                      _buildTasksSection(selectedTasks, isDark),
+                        _buildCalendarSection(allTasks, cardBg, scheme),
+                      _buildTasksSection(selectedTasks, scheme),
                     ],
                   ),
                 ),
@@ -93,55 +141,13 @@ class _CalendarScreenState extends State<CalendarScreen>
     );
   }
 
-  PreferredSizeWidget _buildAppBar(BuildContext context, bool isDark) {
-    return AppBar(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.white,
-      elevation: 0,
-      title: Text(
-        AppStrings.calendar,
-        style: AppStyles.titleLarge(
-                isDark ? AppColors.white : AppColors.textPrimary)
-            .copyWith(fontWeight: FontWeight.w800),
-      ),
-      centerTitle: true,
-      actions: [
-        IconButton(
-          icon: Icon(Icons.search,
-              color: isDark ? AppColors.white : AppColors.textPrimary),
-          onPressed: () {},
-        ),
-        IconButton(
-          icon: Icon(Icons.more_vert,
-              color: isDark ? AppColors.white : AppColors.textPrimary),
-          onPressed: () {},
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTabRow(bool isDark) {
+  Widget _buildCalendarSection(
+    List<TaskEntity> allTasks,
+    Color cardBg,
+    ColorScheme scheme,
+  ) {
     return Container(
-      color: isDark ? AppColors.backgroundDark : AppColors.white,
-      child: TabBar(
-        controller: _tabController,
-        indicatorColor: AppColors.primary,
-        indicatorWeight: 3,
-        indicatorSize: TabBarIndicatorSize.tab,
-        labelColor: AppColors.primary,
-        unselectedLabelColor: AppColors.textSecondary,
-        labelStyle: AppStyles.bodyLargeMedium().copyWith(fontWeight: FontWeight.w800),
-        tabs: const [
-          Tab(text: AppStrings.day),
-          Tab(text: AppStrings.week),
-          Tab(text: AppStrings.month),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCalendarSection(List<TaskEntity> allTasks, bool isDark) {
-    return Container(
-      color: isDark ? AppColors.backgroundDark : AppColors.white,
+      color: cardBg,
       padding: EdgeInsets.only(bottom: 20.h),
       child: Column(
         children: [
@@ -152,25 +158,29 @@ class _CalendarScreenState extends State<CalendarScreen>
               children: [
                 IconButton(
                   icon: const Icon(Icons.chevron_left),
-                  onPressed: () {
-                    setState(() {
-                      _focusedDay = DateTime(_focusedDay.year, _focusedDay.month - 1);
-                    });
-                  },
+                  onPressed:
+                      () => setState(() {
+                        _focusedDay = DateTime(
+                          _focusedDay.year,
+                          _focusedDay.month - 1,
+                        );
+                      }),
                 ),
                 Text(
                   DateFormat('MMMM yyyy').format(_focusedDay),
                   style: AppStyles.titleMedium(
-                          isDark ? AppColors.white : AppColors.textPrimary)
-                      .copyWith(fontWeight: FontWeight.w900, fontSize: 18.sp),
+                    scheme.onSurface,
+                  ).copyWith(fontWeight: FontWeight.w900, fontSize: 18.sp),
                 ),
                 IconButton(
                   icon: const Icon(Icons.chevron_right),
-                  onPressed: () {
-                    setState(() {
-                      _focusedDay = DateTime(_focusedDay.year, _focusedDay.month + 1);
-                    });
-                  },
+                  onPressed:
+                      () => setState(() {
+                        _focusedDay = DateTime(
+                          _focusedDay.year,
+                          _focusedDay.month + 1,
+                        );
+                      }),
                 ),
               ],
             ),
@@ -190,42 +200,42 @@ class _CalendarScreenState extends State<CalendarScreen>
             },
             calendarStyle: CalendarStyle(
               outsideDaysVisible: false,
-              defaultTextStyle: AppStyles.bodyMedium(
-                  isDark ? AppColors.white : AppColors.textPrimary),
-              weekendTextStyle: AppStyles.bodyMedium(
-                  isDark ? AppColors.white : AppColors.textPrimary),
+              defaultTextStyle: AppStyles.bodyMedium(scheme.onSurface),
+              weekendTextStyle: AppStyles.bodyMedium(scheme.onSurface),
               selectedDecoration: BoxDecoration(
-                color: AppColors.primary,
+                color: scheme.primary,
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.4),
+                    color: scheme.primary.withValues(alpha: 0.4),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
                 ],
               ),
               todayDecoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.4),
+                color: scheme.primary.withValues(alpha: 0.4),
                 shape: BoxShape.circle,
               ),
-              markerDecoration: const BoxDecoration(
-                color: AppColors.primary,
+              markerDecoration: BoxDecoration(
+                color: scheme.primary,
                 shape: BoxShape.circle,
               ),
               markersMaxCount: 1,
             ),
             daysOfWeekStyle: DaysOfWeekStyle(
-              weekdayStyle: AppStyles.bodySmallMedium(AppColors.primary)
-                  .copyWith(fontWeight: FontWeight.w800),
-              weekendStyle: AppStyles.bodySmallMedium(AppColors.primary)
-                  .copyWith(fontWeight: FontWeight.w800),
+              weekdayStyle: AppStyles.bodySmallMedium(
+                scheme.primary,
+              ).copyWith(fontWeight: FontWeight.w800),
+              weekendStyle: AppStyles.bodySmallMedium(
+                scheme.primary,
+              ).copyWith(fontWeight: FontWeight.w800),
             ),
-            eventLoader: (day) {
-              return allTasks
-                  .where((task) => isSameDay(task.dateTime, day))
-                  .toList();
-            },
+            eventLoader:
+                (day) =>
+                    allTasks
+                        .where((task) => isSameDay(task.dateTime, day))
+                        .toList(),
             calendarBuilders: CalendarBuilders(
               markerBuilder: (context, date, events) {
                 if (events.isNotEmpty) {
@@ -234,8 +244,8 @@ class _CalendarScreenState extends State<CalendarScreen>
                     child: Container(
                       width: 5,
                       height: 5,
-                      decoration: const BoxDecoration(
-                        color: AppColors.primary,
+                      decoration: BoxDecoration(
+                        color: scheme.primary,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -250,7 +260,10 @@ class _CalendarScreenState extends State<CalendarScreen>
     );
   }
 
-  Widget _buildTasksSection(List<TaskEntity> selectedTasks, bool isDark) {
+  Widget _buildTasksSection(
+    List<TaskEntity> selectedTasks,
+    ColorScheme scheme,
+  ) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
       child: Column(
@@ -264,20 +277,24 @@ class _CalendarScreenState extends State<CalendarScreen>
                     ? AppStrings.todaysTasks
                     : "Day's Tasks",
                 style: AppStyles.titleMedium(
-                        isDark ? AppColors.white : AppColors.textPrimary)
-                    .copyWith(fontWeight: FontWeight.w900),
+                  scheme.onSurface,
+                ).copyWith(fontWeight: FontWeight.w900),
               ),
               if (selectedTasks.isNotEmpty)
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.w,
+                    vertical: 6.h,
+                  ),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
+                    color: scheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20.r),
                   ),
                   child: Text(
                     '${selectedTasks.length} Tasks',
-                    style: AppStyles.bodySmallMedium(AppColors.primary)
-                        .copyWith(fontWeight: FontWeight.w800),
+                    style: AppStyles.bodySmallMedium(
+                      scheme.primary,
+                    ).copyWith(fontWeight: FontWeight.w800),
                   ),
                 ),
             ],
@@ -289,7 +306,9 @@ class _CalendarScreenState extends State<CalendarScreen>
                 padding: EdgeInsets.only(top: 40.h),
                 child: Text(
                   'No tasks for this day',
-                  style: AppStyles.bodyLarge(AppColors.textSecondary),
+                  style: AppStyles.bodyLarge(
+                    scheme.onSurface.withValues(alpha: 0.5),
+                  ),
                 ),
               ),
             )
@@ -302,21 +321,27 @@ class _CalendarScreenState extends State<CalendarScreen>
                 final task = selectedTasks[index];
                 return TaskItemCard(
                   task: task,
-                  onToggle: () => context.read<TaskCubit>().updateTask(
-                      task.copyWith(isCompleted: !task.isCompleted)),
+                  onToggle:
+                      () => context.read<TaskCubit>().updateTask(
+                        task.copyWith(isCompleted: !task.isCompleted),
+                      ),
                   onDelete: () => context.read<TaskCubit>().deleteTask(task),
                   onMenuSelected: (value) {
                     if (value == 'edit') {
-                      Navigator.pushNamed(context, AppRoutes.addTask,
-                          arguments: task);
+                      Navigator.pushNamed(
+                        context,
+                        AppRoutes.addTask,
+                        arguments: task,
+                      );
                     } else if (value == 'delete') {
                       context.read<TaskCubit>().deleteTask(task);
                     }
                   },
-                  onTap: () => showDialog(
-                    context: context,
-                    builder: (context) => TaskDetailDialog(task: task),
-                  ),
+                  onTap:
+                      () => showDialog(
+                        context: context,
+                        builder: (_) => TaskDetailDialog(task: task),
+                      ),
                 );
               },
             ),
@@ -325,4 +350,3 @@ class _CalendarScreenState extends State<CalendarScreen>
     );
   }
 }
-
