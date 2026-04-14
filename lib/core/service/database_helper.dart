@@ -17,7 +17,7 @@ class DatabaseHelper {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
 
-    return await openDatabase(path, version: 2, onCreate: _createDB, onUpgrade: _onUpgrade);
+    return await openDatabase(path, version: 3, onCreate: _createDB, onUpgrade: _onUpgrade);
   }
 
   Future _createDB(Database db, int version) async {
@@ -37,6 +37,7 @@ CREATE TABLE tasks (
   priority $textType,
   is_completed $boolType,
   is_synced $boolType,
+  is_deleted $boolType,
   updated_at $intType
 )
 ''');
@@ -46,6 +47,11 @@ CREATE TABLE tasks (
     if (oldVersion < 2) {
       await db.execute(
         'ALTER TABLE tasks ADD COLUMN user_id TEXT NOT NULL DEFAULT ""',
+      );
+    }
+    if (oldVersion < 3) {
+      await db.execute(
+        'ALTER TABLE tasks ADD COLUMN is_deleted INTEGER NOT NULL DEFAULT 0',
       );
     }
   }

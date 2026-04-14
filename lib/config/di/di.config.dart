@@ -21,8 +21,7 @@ import '../../data/datasources/remote/auth_remote_data_source_impl.dart'
     as _i743;
 import '../../data/datasources/remote/task_remote_data_source_impl.dart'
     as _i832;
-import '../../data/datasources/task_local_data_source.dart' as _i272;
-import '../../data/datasources/task_remote_data_source.dart' as _i807;
+import '../../data/datasources/task_data_source.dart' as _i926;
 import '../../data/repositories/remote/auth_repository_impl.dart' as _i381;
 import '../../data/repositories/remote/task_repository_impl.dart' as _i538;
 import '../../domain/repositories/auth_repository.dart' as _i1073;
@@ -86,14 +85,14 @@ extension GetItInjectableX on _i174.GetIt {
     gh.singleton<_i512.DatabaseHelper>(() => _i512.DatabaseHelper());
     gh.singleton<_i11.ThemeCubit>(() => _i11.ThemeCubit());
     gh.lazySingleton<_i306.AudioService>(() => _i306.AudioService());
-    gh.factory<_i305.AuthDataSource>(() => _i743.FirebaseAuthDataSourceImpl());
-    gh.factory<_i807.TaskRemoteDataSource>(
+    gh.factory<_i926.TaskRemoteDataSource>(
       () => _i832.FirestoreTaskDataSourceImpl(),
     );
+    gh.factory<_i305.AuthDataSource>(() => _i743.FirebaseAuthDataSourceImpl());
     gh.factory<_i1073.AuthRepository>(
       () => _i381.AuthRepositoryImpl(gh<_i305.AuthDataSource>()),
     );
-    gh.factory<_i272.TaskLocalDataSource>(
+    gh.factory<_i926.TaskLocalDataSource>(
       () => _i180.SqfliteTaskDataSourceImpl(gh<_i512.DatabaseHelper>()),
     );
     gh.factory<_i858.SecurityCubit>(
@@ -101,8 +100,8 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i250.TaskRepository>(
       () => _i538.TaskRepositoryImpl(
-        gh<_i807.TaskRemoteDataSource>(),
-        gh<_i272.TaskLocalDataSource>(),
+        gh<_i926.TaskRemoteDataSource>(),
+        gh<_i926.TaskLocalDataSource>(),
       ),
     );
     gh.factory<_i571.SyncCubit>(

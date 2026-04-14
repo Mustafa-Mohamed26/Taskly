@@ -8,6 +8,7 @@ class TaskEntity {
   final String priority;
   final bool isCompleted;
   final bool isSynced;
+  final bool isDeleted;
   final int updatedAt;
 
   const TaskEntity({
@@ -20,6 +21,7 @@ class TaskEntity {
     required this.priority,
     this.isCompleted = false,
     this.isSynced = true,
+    this.isDeleted = false,
     required this.updatedAt,
   });
 
@@ -33,6 +35,7 @@ class TaskEntity {
     String? priority,
     bool? isCompleted,
     bool? isSynced,
+    bool? isDeleted,
     int? updatedAt,
   }) {
     return TaskEntity(
@@ -45,6 +48,7 @@ class TaskEntity {
       priority: priority ?? this.priority,
       isCompleted: isCompleted ?? this.isCompleted,
       isSynced: isSynced ?? this.isSynced,
+      isDeleted: isDeleted ?? this.isDeleted,
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }

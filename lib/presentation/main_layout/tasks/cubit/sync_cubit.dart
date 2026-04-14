@@ -4,32 +4,47 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:taskly/presentation/auth/cubit/auth_cubit.dart';
 import '../../../../../domain/repositories/task_repository.dart';
+import 'sync_state.dart';
 
 @injectable
-class SyncCubit extends Cubit<void> {
+class SyncCubit extends Cubit<SyncState> {
   final TaskRepository _repository;
   final AuthCubit _authCubit;
   late StreamSubscription<List<ConnectivityResult>> _subscription;
 
-  SyncCubit(this._repository, this._authCubit) : super(null) {
+  SyncCubit(this._repository, this._authCubit) : super(const SyncState()) {
     _subscription = Connectivity().onConnectivityChanged.listen((results) {
       if (results.any((result) => result != ConnectivityResult.none)) {
         _triggerSync();
       }
     });
+
+    // Also trigger on startup if online
+    _triggerSync();
   }
 
-  void _triggerSync() {
-    final state = _authCubit.state;
+  Future<void> _triggerSync() async {
+    final authState = _authCubit.state;
     String? userId;
-    if (state is Authenticated) userId = state.user.id;
-    if (state is LoginSuccess) userId = state.user.id;
-    if (state is RegisterSuccess) userId = state.user.id;
+    if (authState is Authenticated) userId = authState.user.id;
+    if (authState is LoginSuccess) userId = authState.user.id;
+    if (authState is RegisterSuccess) userId = authState.user.id;
 
-    if (userId != null) {
-      _repository.syncTasks(userId);
+    if (userId != null && state.status != SyncStatus.syncing) {
+      emit(state.copyWith(status: SyncStatus.syncing));
+      try {
+        await _repository.syncTasks(userId);
+        emit(state.copyWith(
+          status: SyncStatus.success,
+          lastSyncedAt: DateTime.now().toIso8601String(),
+        ));
+      } catch (e) {
+        emit(state.copyWith(status: SyncStatus.error, errorMessage: e.toString()));
+      }
     }
   }
+
+  void forceSync() => _triggerSync();
 
   @override
   Future<void> close() {

@@ -11,6 +11,7 @@ class TaskModel extends TaskEntity {
     required super.priority,
     super.isCompleted,
     super.isSynced,
+    super.isDeleted,
     required super.updatedAt,
   });
 
@@ -25,6 +26,7 @@ class TaskModel extends TaskEntity {
       priority: entity.priority,
       isCompleted: entity.isCompleted,
       isSynced: entity.isSynced,
+      isDeleted: entity.isDeleted,
       updatedAt: entity.updatedAt,
     );
   }
@@ -40,6 +42,7 @@ class TaskModel extends TaskEntity {
       priority: json['priority'],
       isCompleted: json['isCompleted'] ?? json['is_completed'] ?? false,
       isSynced: json['isSynced'] ?? json['is_synced'] ?? true,
+      isDeleted: json['isDeleted'] ?? json['is_deleted'] ?? false,
       updatedAt: json['updatedAt'] ?? json['updated_at'],
     );
   }
@@ -55,6 +58,7 @@ class TaskModel extends TaskEntity {
       'priority': priority,
       'isCompleted': isCompleted,
       'isSynced': isSynced,
+      'isDeleted': isDeleted,
       'updatedAt': updatedAt,
     };
   }
@@ -71,6 +75,7 @@ class TaskModel extends TaskEntity {
       priority: map['priority'],
       isCompleted: map['is_completed'] == 1,
       isSynced: map['is_synced'] == 1,
+      isDeleted: map['is_deleted'] == 1,
       updatedAt: map['updated_at'],
     );
   }
@@ -86,6 +91,7 @@ class TaskModel extends TaskEntity {
       'priority': priority,
       'is_completed': isCompleted ? 1 : 0,
       'is_synced': isSynced ? 1 : 0,
+      'is_deleted': isDeleted ? 1 : 0,
       'updated_at': updatedAt,
     };
   }
@@ -101,6 +107,7 @@ class TaskModel extends TaskEntity {
     String? priority,
     bool? isCompleted,
     bool? isSynced,
+    bool? isDeleted,
     int? updatedAt,
   }) {
     return TaskModel(
@@ -113,6 +120,7 @@ class TaskModel extends TaskEntity {
       priority: priority ?? this.priority,
       isCompleted: isCompleted ?? this.isCompleted,
       isSynced: isSynced ?? this.isSynced,
+      isDeleted: isDeleted ?? this.isDeleted,
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }

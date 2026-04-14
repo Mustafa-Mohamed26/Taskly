@@ -2,7 +2,7 @@ import 'package:injectable/injectable.dart';
 import 'package:sqflite/sqflite.dart';
 import '../../../core/service/database_helper.dart';
 import '../../models/task_model.dart';
-import '../task_local_data_source.dart';
+import '../task_data_source.dart';
 
 @Injectable(as: TaskLocalDataSource)
 class SqfliteTaskDataSourceImpl implements TaskLocalDataSource {
@@ -15,7 +15,7 @@ class SqfliteTaskDataSourceImpl implements TaskLocalDataSource {
     final db = await _databaseHelper.database;
     final maps = await db.query(
       'tasks',
-      where: 'user_id = ?',
+      where: 'user_id = ? AND is_deleted = 0',
       whereArgs: [userId],
       orderBy: 'updated_at DESC',
     );
@@ -46,8 +46,9 @@ class SqfliteTaskDataSourceImpl implements TaskLocalDataSource {
   @override
   Future<void> deleteTask(String taskId) async {
     final db = await _databaseHelper.database;
-    await db.delete(
+    await db.update(
       'tasks',
+      {'is_deleted': 1, 'is_synced': 0},
       where: 'id = ?',
       whereArgs: [taskId],
     );
@@ -72,9 +73,31 @@ class SqfliteTaskDataSourceImpl implements TaskLocalDataSource {
     final db = await _databaseHelper.database;
     final maps = await db.query(
       'tasks',
-      where: 'is_synced = ?',
+      where: 'is_synced = ? AND is_deleted = 0',
       whereArgs: [0],
     );
     return maps.map((map) => TaskModel.fromSql(map)).toList();
+  }
+
+  @override
+  Future<List<TaskModel>> getDeletedUnsyncedTasks() async {
+    final db = await _databaseHelper.database;
+    // We want tasks that are marked as deleted but NOT synced (meaning the remote doesn't know they are deleted yet)
+    final maps = await db.query(
+      'tasks',
+      where: 'is_synced = ? AND is_deleted = 1',
+      whereArgs: [0],
+    );
+    return maps.map((map) => TaskModel.fromSql(map)).toList();
+  }
+
+  @override
+  Future<void> hardDeleteTask(String taskId) async {
+    final db = await _databaseHelper.database;
+    await db.delete(
+      'tasks',
+      where: 'id = ?',
+      whereArgs: [taskId],
+    );
   }
 }
